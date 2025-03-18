@@ -1,6 +1,6 @@
-import * as THREE from 'three'
 import { Scene } from './scene'
 import './game'
+import './style.css'
 
 // Create the scene
 new Scene()
