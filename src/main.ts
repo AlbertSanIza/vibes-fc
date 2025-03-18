@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import './game'
 
 // Scene setup
 const scene = new THREE.Scene()
@@ -14,6 +15,11 @@ const renderer = new THREE.WebGLRenderer({ antialias: true })
 renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.shadowMap.enabled = true
 document.body.appendChild(renderer.domElement)
+
+// Expose scene, camera, and renderer to window object for game.ts
+;(window as any).scene = scene
+;(window as any).camera = camera
+;(window as any).renderer = renderer
 
 // Lighting
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
@@ -219,8 +225,8 @@ const createGoal = (position: [number, number, number], rotation: [number, numbe
 
 // Create goals
 const goalPositions = [
-    { position: [0, 0, fieldLength / 2 + goalDepth / 2] as [number, number, number], rotation: [0, 0, 0] as [number, number, number] }, // North goal
-    { position: [0, 0, -fieldLength / 2 - goalDepth / 2] as [number, number, number], rotation: [0, Math.PI, 0] as [number, number, number] } // South goal
+    { position: [0, 0, fieldLength / 2 - goalDepth / 2] as [number, number, number], rotation: [0, 0, 0] as [number, number, number] }, // North goal
+    { position: [0, 0, -fieldLength / 2 + goalDepth / 2] as [number, number, number], rotation: [0, Math.PI, 0] as [number, number, number] } // South goal
 ]
 
 goalPositions.forEach(({ position, rotation }) => {
