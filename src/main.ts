@@ -25,27 +25,48 @@ directionalLight.castShadow = true
 scene.add(directionalLight)
 
 // Clouds
-const createCloud = (x: number, y: number, z: number, size: number) => {
-    const cloudGeometry = new THREE.SphereGeometry(size, 8, 8)
+const createCloud = (x: number, y: number, z: number, baseSize: number) => {
+    const cloudGroup = new THREE.Group()
     const cloudMaterial = new THREE.MeshStandardMaterial({
         color: 0xffffff,
         transparent: true,
         opacity: 0.8
     })
 
-    const cloud = new THREE.Mesh(cloudGeometry, cloudMaterial)
-    cloud.position.set(x, y, z)
-    cloud.castShadow = true
-    cloud.receiveShadow = true
-    scene.add(cloud)
+    // Create multiple spheres for each cloud
+    const numSpheres = 5 + Math.floor(Math.random() * 3) // Random number between 5-7 spheres
+    const spheres = []
+
+    for (let i = 0; i < numSpheres; i++) {
+        const size = baseSize * (0.7 + Math.random() * 0.6) // Random size between 70% and 130% of base size
+        const sphereGeometry = new THREE.SphereGeometry(size, 8, 8)
+        const sphere = new THREE.Mesh(sphereGeometry, cloudMaterial)
+
+        // Random offset from center
+        const offsetX = (Math.random() - 0.5) * baseSize * 2
+        const offsetY = (Math.random() - 0.5) * baseSize
+        const offsetZ = (Math.random() - 0.5) * baseSize * 2
+
+        sphere.position.set(offsetX, offsetY, offsetZ)
+        sphere.castShadow = true
+        sphere.receiveShadow = true
+        spheres.push(sphere)
+        cloudGroup.add(sphere)
+    }
+
+    cloudGroup.position.set(x, y, z)
+    scene.add(cloudGroup)
 }
 
-// Add some clouds
+// Add more clouds with varying sizes and positions
 createCloud(-15, 8, -10, 2)
 createCloud(15, 10, 5, 2.5)
 createCloud(0, 12, -15, 3)
 createCloud(-10, 9, 15, 2.2)
 createCloud(10, 11, -20, 2.8)
+createCloud(-20, 13, 0, 2.3)
+createCloud(20, 9, -25, 2.6)
+createCloud(-5, 11, 25, 2.4)
 
 // Soccer field dimensions
 const fieldWidth = 20
@@ -219,18 +240,18 @@ ground.receiveShadow = true
 scene.add(ground)
 
 // Simple trees
-const createTree = (x: number, z: number) => {
-    const trunkGeometry = new THREE.CylinderGeometry(0.2, 0.4, 2, 8)
+const createTree = (x: number, z: number, height: number = 2, crownSize: number = 1) => {
+    const trunkGeometry = new THREE.CylinderGeometry(0.2, 0.4, height, 8)
     const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 })
     const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial)
-    trunk.position.set(x, 1, z)
+    trunk.position.set(x, height / 2, z)
     trunk.castShadow = true
     trunk.receiveShadow = true
 
-    const crownGeometry = new THREE.ConeGeometry(1, 2, 8)
+    const crownGeometry = new THREE.ConeGeometry(crownSize, height, 8)
     const crownMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22 })
     const crown = new THREE.Mesh(crownGeometry, crownMaterial)
-    crown.position.set(x, 2.5, z)
+    crown.position.set(x, height + crownSize / 2, z)
     crown.castShadow = true
     crown.receiveShadow = true
 
@@ -238,11 +259,19 @@ const createTree = (x: number, z: number) => {
     scene.add(crown)
 }
 
-// Add some trees around the field
-createTree(fieldWidth, fieldLength)
-createTree(-fieldWidth, fieldLength)
-createTree(fieldWidth, -fieldLength)
-createTree(-fieldWidth, -fieldLength)
+// Add more trees around the field with varying sizes
+createTree(fieldWidth, fieldLength, 2.5, 1.2)
+createTree(-fieldWidth, fieldLength, 2.2, 1)
+createTree(fieldWidth, -fieldLength, 2.8, 1.3)
+createTree(-fieldWidth, -fieldLength, 2.3, 1.1)
+createTree(fieldWidth * 1.5, fieldLength * 1.5, 2.6, 1.2)
+createTree(-fieldWidth * 1.5, fieldLength * 1.5, 2.4, 1)
+createTree(fieldWidth * 1.5, -fieldLength * 1.5, 2.7, 1.3)
+createTree(-fieldWidth * 1.5, -fieldLength * 1.5, 2.5, 1.1)
+createTree(fieldWidth * 0.5, fieldLength * 0.5, 2.3, 0.9)
+createTree(-fieldWidth * 0.5, fieldLength * 0.5, 2.4, 1)
+createTree(fieldWidth * 0.5, -fieldLength * 0.5, 2.2, 0.9)
+createTree(-fieldWidth * 0.5, -fieldLength * 0.5, 2.5, 1.1)
 
 // Animation loop
 function animate() {
