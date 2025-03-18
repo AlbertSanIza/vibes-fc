@@ -5,11 +5,14 @@ class Game {
     private camera: THREE.PerspectiveCamera
     private renderer: THREE.WebGLRenderer
     private player!: THREE.Mesh
-    private moveSpeed: number = 0.3
+    private moveSpeed: number = 0.5
     private cameraDistance: number = 5
-    private cameraAngle: number = 0
+    private playerRotation: number = 0
+    private rotationSpeed: number = 0.15
     private isDragging: boolean = false
     private previousMousePosition: { x: number; y: number } = { x: 0, y: 0 }
+    private keys: { [key: string]: boolean } = {}
+    private lastTime: number = 0
 
     constructor() {
         // Get existing scene, camera, and renderer from main.ts
@@ -31,6 +34,7 @@ class Game {
 
         // Event listeners
         window.addEventListener('keydown', this.handleKeyDown.bind(this))
+        window.addEventListener('keyup', this.handleKeyUp.bind(this))
         window.addEventListener('wheel', this.handleWheel.bind(this))
         window.addEventListener('mousedown', this.handleMouseDown.bind(this))
         window.addEventListener('mousemove', this.handleMouseMove.bind(this))
@@ -38,29 +42,48 @@ class Game {
         window.addEventListener('resize', this.handleResize.bind(this))
 
         // Start animation loop
+        this.lastTime = performance.now()
         this.animate()
     }
 
     private handleKeyDown(event: KeyboardEvent) {
-        const newPosition = this.player.position.clone()
+        this.keys[event.key] = true
+    }
 
-        switch (event.key) {
-            case 'ArrowUp':
-                newPosition.z -= this.moveSpeed
-                break
-            case 'ArrowDown':
-                newPosition.z += this.moveSpeed
-                break
-            case 'ArrowLeft':
-                newPosition.x -= this.moveSpeed
-                break
-            case 'ArrowRight':
-                newPosition.x += this.moveSpeed
-                break
+    private handleKeyUp(event: KeyboardEvent) {
+        this.keys[event.key] = false
+    }
+
+    private updatePlayer(deltaTime: number) {
+        const newPosition = this.player.position.clone()
+        let moved = false
+
+        // Handle rotation
+        if (this.keys['ArrowLeft']) {
+            this.playerRotation += this.rotationSpeed * deltaTime
+            this.player.rotation.y = this.playerRotation
+            moved = true
+        }
+        if (this.keys['ArrowRight']) {
+            this.playerRotation -= this.rotationSpeed * deltaTime
+            this.player.rotation.y = this.playerRotation
+            moved = true
+        }
+
+        // Handle movement
+        if (this.keys['ArrowUp']) {
+            newPosition.z -= Math.cos(this.playerRotation) * this.moveSpeed * deltaTime
+            newPosition.x -= Math.sin(this.playerRotation) * this.moveSpeed * deltaTime
+            moved = true
+        }
+        if (this.keys['ArrowDown']) {
+            newPosition.z += Math.cos(this.playerRotation) * this.moveSpeed * deltaTime
+            newPosition.x += Math.sin(this.playerRotation) * this.moveSpeed * deltaTime
+            moved = true
         }
 
         // Check if new position is within bounds (inside the field)
-        if (Math.abs(newPosition.x) < 9 && Math.abs(newPosition.z) < 14) {
+        if (moved && Math.abs(newPosition.x) < 9 && Math.abs(newPosition.z) < 14) {
             this.player.position.copy(newPosition)
             this.updateCamera()
         }
@@ -84,7 +107,8 @@ class Game {
             y: event.clientY - this.previousMousePosition.y
         }
 
-        this.cameraAngle += deltaMove.x * 0.01
+        this.playerRotation += deltaMove.x * 0.01
+        this.player.rotation.y = this.playerRotation
         this.updateCamera()
 
         this.previousMousePosition = { x: event.clientX, y: event.clientY }
@@ -101,15 +125,22 @@ class Game {
     }
 
     private updateCamera() {
-        const x = this.player.position.x + Math.sin(this.cameraAngle) * this.cameraDistance
-        const z = this.player.position.z + Math.cos(this.cameraAngle) * this.cameraDistance
+        // Calculate camera position relative to player's rotation
+        const x = this.player.position.x + Math.sin(this.playerRotation) * this.cameraDistance
+        const z = this.player.position.z + Math.cos(this.playerRotation) * this.cameraDistance
         this.camera.position.set(x, 2, z)
         this.camera.lookAt(this.player.position)
     }
 
     private animate() {
-        requestAnimationFrame(this.animate.bind(this))
+        const currentTime = performance.now()
+        const deltaTime = (currentTime - this.lastTime) / 1000 // Convert to seconds
+        this.lastTime = currentTime
+
+        this.updatePlayer(deltaTime)
         this.renderer.render(this.scene, this.camera)
+
+        requestAnimationFrame(this.animate.bind(this))
     }
 }
 
