@@ -8,7 +8,7 @@ class Game {
     private moveSpeed: number = 5.0
     private cameraDistance: number = 5
     private playerRotation: number = 0
-    private rotationSpeed: number = 0.15
+    private rotationSpeed: number = 2
     private isDragging: boolean = false
     private previousMousePosition: { x: number; y: number } = { x: 0, y: 0 }
     private keys: { [key: string]: boolean } = {}
