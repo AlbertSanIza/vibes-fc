@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+        "esbenp.prettier-vscode",
+        "formulahendry.auto-rename-tag",
+        "GitHub.copilot",
+        "PKief.material-icon-theme",
+        "streetsidesoftware.code-spell-checker",
+        "yoavbls.pretty-ts-errors"
+    ]
+}
