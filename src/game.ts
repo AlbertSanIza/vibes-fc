@@ -5,6 +5,7 @@ class Game {
     private camera: THREE.PerspectiveCamera
     private renderer: THREE.WebGLRenderer
     private player!: THREE.Mesh
+    private ball!: THREE.Mesh
     private moveSpeed: number = 5.0
     private cameraDistance: number = 5
     private playerRotation: number = 0
@@ -18,6 +19,10 @@ class Game {
     private jumpForce: number = 8.0
     private gravity: number = 20.0
     private groundLevel: number = 0.5
+    private ballVelocity: THREE.Vector3 = new THREE.Vector3()
+    private ballFriction: number = 0.98
+    private ballBounce: number = 0.7
+    private ballRadius: number = 0.5
 
     constructor() {
         // Get existing scene, camera, and renderer from main.ts
@@ -36,6 +41,16 @@ class Game {
         this.player = new THREE.Mesh(geometry, material)
         this.player.position.set(0, this.groundLevel, 0) // Position at center of field
         this.scene.add(this.player)
+
+        // Create ball
+        const ballGeometry = new THREE.SphereGeometry(this.ballRadius, 32, 32)
+        const ballMaterial = new THREE.MeshPhongMaterial({
+            color: 0xff0000,
+            shininess: 100
+        })
+        this.ball = new THREE.Mesh(ballGeometry, ballMaterial)
+        this.ball.position.set(2, this.ballRadius, 0) // Position ball slightly to the right
+        this.scene.add(this.ball)
 
         // Event listeners
         window.addEventListener('keydown', this.handleKeyDown.bind(this))
@@ -61,6 +76,58 @@ class Game {
 
     private handleKeyUp(event: KeyboardEvent) {
         this.keys[event.key] = false
+    }
+
+    private updateBall(deltaTime: number) {
+        // Apply friction
+        this.ballVelocity.multiplyScalar(this.ballFriction)
+
+        // Apply gravity
+        this.ballVelocity.y -= this.gravity * deltaTime
+
+        // Update ball position
+        this.ball.position.add(this.ballVelocity.clone().multiplyScalar(deltaTime))
+
+        // Check for collision with ground
+        if (this.ball.position.y <= this.ballRadius) {
+            this.ball.position.y = this.ballRadius
+            this.ballVelocity.y = -this.ballVelocity.y * this.ballBounce
+        }
+
+        // Check for collision with walls
+        if (Math.abs(this.ball.position.x) > 9 - this.ballRadius) {
+            this.ball.position.x = Math.sign(this.ball.position.x) * (9 - this.ballRadius)
+            this.ballVelocity.x *= -this.ballBounce
+        }
+        if (Math.abs(this.ball.position.z) > 14 - this.ballRadius) {
+            this.ball.position.z = Math.sign(this.ball.position.z) * (14 - this.ballRadius)
+            this.ballVelocity.z *= -this.ballBounce
+        }
+
+        // Check for collision with player
+        const playerToBall = this.ball.position.clone().sub(this.player.position)
+        const distance = playerToBall.length()
+
+        if (distance < 1 + this.ballRadius) {
+            // Collision response
+            playerToBall.normalize()
+            const overlap = (1 + this.ballRadius - distance) * 0.5
+            this.ball.position.add(playerToBall.clone().multiplyScalar(overlap))
+            this.player.position.sub(playerToBall.clone().multiplyScalar(overlap))
+
+            // Transfer momentum from player to ball
+            const playerVelocity = new THREE.Vector3()
+            if (this.keys['ArrowUp']) {
+                playerVelocity.z -= Math.cos(this.playerRotation) * this.moveSpeed
+                playerVelocity.x -= Math.sin(this.playerRotation) * this.moveSpeed
+            }
+            if (this.keys['ArrowDown']) {
+                playerVelocity.z += Math.cos(this.playerRotation) * this.moveSpeed
+                playerVelocity.x += Math.sin(this.playerRotation) * this.moveSpeed
+            }
+
+            this.ballVelocity.add(playerVelocity.multiplyScalar(0.5))
+        }
     }
 
     private updatePlayer(deltaTime: number) {
@@ -160,6 +227,7 @@ class Game {
         this.lastTime = currentTime
 
         this.updatePlayer(deltaTime)
+        this.updateBall(deltaTime)
         this.renderer.render(this.scene, this.camera)
 
         requestAnimationFrame(this.animate.bind(this))
