@@ -24,10 +24,35 @@ directionalLight.position.set(5, 5, 5)
 directionalLight.castShadow = true
 scene.add(directionalLight)
 
+// Clouds
+const createCloud = (x: number, y: number, z: number, size: number) => {
+    const cloudGeometry = new THREE.SphereGeometry(size, 8, 8)
+    const cloudMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.8
+    })
+
+    const cloud = new THREE.Mesh(cloudGeometry, cloudMaterial)
+    cloud.position.set(x, y, z)
+    cloud.castShadow = true
+    cloud.receiveShadow = true
+    scene.add(cloud)
+}
+
+// Add some clouds
+createCloud(-15, 8, -10, 2)
+createCloud(15, 10, 5, 2.5)
+createCloud(0, 12, -15, 3)
+createCloud(-10, 9, 15, 2.2)
+createCloud(10, 11, -20, 2.8)
+
 // Soccer field dimensions
 const fieldWidth = 20
 const fieldLength = 30
 const wallHeight = 2
+const lineWidth = 0.2
+const lineColor = 0xffffff
 
 // Field (green plane)
 const fieldGeometry = new THREE.PlaneGeometry(fieldWidth, fieldLength)
@@ -39,6 +64,43 @@ const field = new THREE.Mesh(fieldGeometry, fieldMaterial)
 field.rotation.x = -Math.PI / 2
 field.receiveShadow = true
 scene.add(field)
+
+// Field lines
+const createFieldLine = (width: number, length: number, position: [number, number, number], rotation: [number, number, number]) => {
+    const lineGeometry = new THREE.PlaneGeometry(width, length)
+    const lineMaterial = new THREE.MeshStandardMaterial({ color: lineColor })
+    const line = new THREE.Mesh(lineGeometry, lineMaterial)
+    line.position.set(...position)
+    line.rotation.set(...rotation)
+    line.receiveShadow = true
+    scene.add(line)
+}
+
+// Center line
+createFieldLine(fieldWidth, lineWidth, [0, 0.01, 0], [-Math.PI / 2, 0, 0])
+
+// Center circle
+const centerCircleRadius = 3
+const centerCircleGeometry = new THREE.RingGeometry(centerCircleRadius - lineWidth / 2, centerCircleRadius + lineWidth / 2, 32)
+const centerCircleMaterial = new THREE.MeshStandardMaterial({ color: lineColor })
+const centerCircle = new THREE.Mesh(centerCircleGeometry, centerCircleMaterial)
+centerCircle.rotation.x = -Math.PI / 2
+centerCircle.position.y = 0.01
+centerCircle.receiveShadow = true
+scene.add(centerCircle)
+
+// Penalty areas
+const penaltyAreaWidth = 8
+const penaltyAreaLength = 4
+const penaltyAreaPositions = [
+    { position: [0, 0.01, fieldLength / 2 - penaltyAreaLength / 2] as [number, number, number], rotation: [-Math.PI / 2, 0, 0] as [number, number, number] },
+    { position: [0, 0.01, -fieldLength / 2 + penaltyAreaLength / 2] as [number, number, number], rotation: [-Math.PI / 2, 0, 0] as [number, number, number] }
+]
+
+penaltyAreaPositions.forEach(({ position, rotation }) => {
+    createFieldLine(penaltyAreaWidth, lineWidth, position, rotation)
+    createFieldLine(lineWidth, penaltyAreaLength, position, rotation)
+})
 
 // Walls
 const wallMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff })
@@ -82,23 +144,66 @@ wallPositions.forEach(({ position, rotation, size }) => {
 // Goals
 const goalWidth = 4
 const goalHeight = 2
-const goalDepth = 1
-const goalMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff })
+const goalDepth = 2
+const goalPostRadius = 0.1
+const goalNetColor = 0xffffff
+
+const createGoal = (position: [number, number, number], rotation: [number, number, number]) => {
+    // Goal posts
+    const postGeometry = new THREE.CylinderGeometry(goalPostRadius, goalPostRadius, goalHeight, 8)
+    const postMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        metalness: 0.5,
+        roughness: 0.2
+    })
+
+    // Left post
+    const leftPost = new THREE.Mesh(postGeometry, postMaterial)
+    leftPost.position.set(position[0] - goalWidth / 2, position[1] + goalHeight / 2, position[2])
+    leftPost.castShadow = true
+    leftPost.receiveShadow = true
+
+    // Right post
+    const rightPost = new THREE.Mesh(postGeometry, postMaterial)
+    rightPost.position.set(position[0] + goalWidth / 2, position[1] + goalHeight / 2, position[2])
+    rightPost.castShadow = true
+    rightPost.receiveShadow = true
+
+    // Crossbar
+    const crossbarGeometry = new THREE.CylinderGeometry(goalPostRadius, goalPostRadius, goalWidth, 8)
+    const crossbar = new THREE.Mesh(crossbarGeometry, postMaterial)
+    crossbar.position.set(position[0], position[1] + goalHeight, position[2])
+    crossbar.rotation.z = Math.PI / 2
+    crossbar.castShadow = true
+    crossbar.receiveShadow = true
+
+    // Goal net (simplified)
+    const netGeometry = new THREE.BoxGeometry(goalWidth, goalHeight, goalDepth)
+    const netMaterial = new THREE.MeshStandardMaterial({
+        color: goalNetColor,
+        transparent: true,
+        opacity: 0.5,
+        side: THREE.DoubleSide
+    })
+    const net = new THREE.Mesh(netGeometry, netMaterial)
+    net.position.set(position[0], position[1] + goalHeight / 2, position[2] + goalDepth / 2)
+    net.castShadow = true
+    net.receiveShadow = true
+
+    scene.add(leftPost)
+    scene.add(rightPost)
+    scene.add(crossbar)
+    scene.add(net)
+}
 
 // Create goals
 const goalPositions = [
-    { position: [0, goalHeight / 2, fieldLength / 2 + goalDepth / 2] as [number, number, number], rotation: [0, 0, 0] as [number, number, number] }, // North goal
-    { position: [0, goalHeight / 2, -fieldLength / 2 - goalDepth / 2] as [number, number, number], rotation: [0, Math.PI, 0] as [number, number, number] } // South goal
+    { position: [0, 0, fieldLength / 2 + goalDepth / 2] as [number, number, number], rotation: [0, 0, 0] as [number, number, number] }, // North goal
+    { position: [0, 0, -fieldLength / 2 - goalDepth / 2] as [number, number, number], rotation: [0, Math.PI, 0] as [number, number, number] } // South goal
 ]
 
 goalPositions.forEach(({ position, rotation }) => {
-    const goalGeometry = new THREE.BoxGeometry(goalWidth, goalHeight, goalDepth)
-    const goal = new THREE.Mesh(goalGeometry, goalMaterial)
-    goal.position.set(...position)
-    goal.rotation.set(...rotation)
-    goal.castShadow = true
-    goal.receiveShadow = true
-    scene.add(goal)
+    createGoal(position, rotation)
 })
 
 // Ground plane (extends beyond field)
