@@ -5,7 +5,7 @@ class Game {
     private camera: THREE.PerspectiveCamera
     private renderer: THREE.WebGLRenderer
     private player!: THREE.Mesh
-    private moveSpeed: number = 0.5
+    private moveSpeed: number = 5.0
     private cameraDistance: number = 5
     private playerRotation: number = 0
     private rotationSpeed: number = 0.15
@@ -13,6 +13,11 @@ class Game {
     private previousMousePosition: { x: number; y: number } = { x: 0, y: 0 }
     private keys: { [key: string]: boolean } = {}
     private lastTime: number = 0
+    private isJumping: boolean = false
+    private jumpVelocity: number = 0
+    private jumpForce: number = 8.0
+    private gravity: number = 20.0
+    private groundLevel: number = 0.5
 
     constructor() {
         // Get existing scene, camera, and renderer from main.ts
@@ -29,7 +34,7 @@ class Game {
         const geometry = new THREE.BoxGeometry(1, 1, 1)
         const material = new THREE.MeshPhongMaterial({ color: 0x0000ff })
         this.player = new THREE.Mesh(geometry, material)
-        this.player.position.set(0, 0.5, 0) // Position at center of field
+        this.player.position.set(0, this.groundLevel, 0) // Position at center of field
         this.scene.add(this.player)
 
         // Event listeners
@@ -48,6 +53,10 @@ class Game {
 
     private handleKeyDown(event: KeyboardEvent) {
         this.keys[event.key] = true
+        if (event.key === ' ' && !this.isJumping) {
+            this.jumpVelocity = this.jumpForce
+            this.isJumping = true
+        }
     }
 
     private handleKeyUp(event: KeyboardEvent) {
@@ -80,6 +89,19 @@ class Game {
             newPosition.z += Math.cos(this.playerRotation) * this.moveSpeed * deltaTime
             newPosition.x += Math.sin(this.playerRotation) * this.moveSpeed * deltaTime
             moved = true
+        }
+
+        // Handle jumping
+        if (this.isJumping) {
+            this.jumpVelocity -= this.gravity * deltaTime
+            newPosition.y += this.jumpVelocity * deltaTime
+
+            // Check if landed
+            if (newPosition.y <= this.groundLevel) {
+                newPosition.y = this.groundLevel
+                this.isJumping = false
+                this.jumpVelocity = 0
+            }
         }
 
         // Check if new position is within bounds (inside the field)
