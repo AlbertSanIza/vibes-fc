@@ -20,9 +20,10 @@ class Game {
     private gravity: number = 20.0
     private groundLevel: number = 0.5
     private ballVelocity: THREE.Vector3 = new THREE.Vector3()
-    private ballFriction: number = 0.98
-    private ballBounce: number = 0.7
+    private ballFriction: number = 0.99
+    private ballBounce: number = 0.8
     private ballRadius: number = 0.5
+    private pushStrength: number = 2.0
 
     constructor() {
         // Get existing scene, camera, and renderer from main.ts
@@ -115,7 +116,7 @@ class Game {
             this.ball.position.add(playerToBall.clone().multiplyScalar(overlap))
             this.player.position.sub(playerToBall.clone().multiplyScalar(overlap))
 
-            // Transfer momentum from player to ball
+            // Transfer momentum from player to ball with increased strength
             const playerVelocity = new THREE.Vector3()
             if (this.keys['ArrowUp']) {
                 playerVelocity.z -= Math.cos(this.playerRotation) * this.moveSpeed
@@ -126,7 +127,8 @@ class Game {
                 playerVelocity.x += Math.sin(this.playerRotation) * this.moveSpeed
             }
 
-            this.ballVelocity.add(playerVelocity.multiplyScalar(0.5))
+            // Apply stronger push force
+            this.ballVelocity.add(playerVelocity.multiplyScalar(this.pushStrength))
         }
     }
 
