@@ -1,9 +1,25 @@
 import * as THREE from 'three'
 import Stats from 'three/examples/jsm/libs/stats.module.js'
-
-const FIELD_WIDTH = 75
-const FIELD_LENGTH = 110
-const WALL_HEIGHT = 3
+import {
+    BALL_BOUNCE,
+    BALL_COLOR,
+    BALL_FRICTION,
+    BALL_PUSH_STRENGTH,
+    BALL_RADIUS,
+    BALL_SHININESS,
+    CAMERA_DISTANCE,
+    FIELD_LENGTH,
+    FIELD_WIDTH,
+    PLAYER_BODY_HEIGHT,
+    PLAYER_BODY_RADIUS,
+    PLAYER_COLOR,
+    PLAYER_GRAVITY,
+    PLAYER_GROUND_LEVEL,
+    PLAYER_JUMP_FORCE,
+    PLAYER_MOVE_SPEED,
+    PLAYER_ROTATION_SPEED,
+    PLAYER_SHININESS
+} from './constants'
 
 class Game {
     private scene: THREE.Scene
@@ -12,24 +28,24 @@ class Game {
     private player!: THREE.Group
     private ball!: THREE.Mesh
     private stats: Stats = new Stats()
-    private moveSpeed: number = 5.0
-    private cameraDistance: number = 5
+    private moveSpeed: number = PLAYER_MOVE_SPEED
+    private cameraDistance: number = CAMERA_DISTANCE
     private playerRotation: number = 0
-    private rotationSpeed: number = 2
+    private rotationSpeed: number = PLAYER_ROTATION_SPEED
     private isDragging: boolean = false
     private previousMousePosition: { x: number; y: number } = { x: 0, y: 0 }
     private keys: { [key: string]: boolean } = {}
     private lastTime: number = 0
     private isJumping: boolean = false
     private jumpVelocity: number = 0
-    private jumpForce: number = 8.0
-    private gravity: number = 20.0
-    private groundLevel: number = 0.5
+    private jumpForce: number = PLAYER_JUMP_FORCE
+    private gravity: number = PLAYER_GRAVITY
+    private groundLevel: number = PLAYER_GROUND_LEVEL
     private ballVelocity: THREE.Vector3 = new THREE.Vector3()
-    private ballFriction: number = 0.99
-    private ballBounce: number = 0.8
-    private ballRadius: number = 0.5
-    private pushStrength: number = 2.0
+    private ballFriction: number = BALL_FRICTION
+    private ballBounce: number = BALL_BOUNCE
+    private ballRadius: number = BALL_RADIUS
+    private pushStrength: number = BALL_PUSH_STRENGTH
 
     constructor() {
         // Get existing scene, camera, and renderer from main.ts
@@ -49,33 +65,22 @@ class Game {
         const playerGroup = new THREE.Group()
 
         // Main body (cylinder)
-        const bodyHeight = 1.2
-        const bodyRadius = 0.4
-        const bodyGeometry = new THREE.CylinderGeometry(bodyRadius, bodyRadius, bodyHeight, 16)
-        const bodyMaterial = new THREE.MeshPhongMaterial({
-            color: 0x0000ff,
-            shininess: 30
-        })
+        const bodyGeometry = new THREE.CylinderGeometry(PLAYER_BODY_RADIUS, PLAYER_BODY_RADIUS, PLAYER_BODY_HEIGHT - PLAYER_BODY_RADIUS * 2, 16)
+        const bodyMaterial = new THREE.MeshPhongMaterial({ color: PLAYER_COLOR, shininess: PLAYER_SHININESS })
         const body = new THREE.Mesh(bodyGeometry, bodyMaterial)
-        body.position.y = bodyHeight / 2
+        body.position.y = PLAYER_BODY_RADIUS
         playerGroup.add(body)
 
         // Top hemisphere
-        const topGeometry = new THREE.SphereGeometry(bodyRadius, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2)
-        const topMaterial = new THREE.MeshPhongMaterial({
-            color: 0x0000ff,
-            shininess: 30
-        })
+        const topGeometry = new THREE.SphereGeometry(PLAYER_BODY_RADIUS, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2)
+        const topMaterial = new THREE.MeshPhongMaterial({ color: PLAYER_COLOR, shininess: PLAYER_SHININESS })
         const top = new THREE.Mesh(topGeometry, topMaterial)
-        top.position.y = bodyHeight
+        top.position.y = PLAYER_BODY_HEIGHT - PLAYER_BODY_RADIUS
         playerGroup.add(top)
 
         // Bottom hemisphere
-        const bottomGeometry = new THREE.SphereGeometry(bodyRadius, 16, 16, 0, Math.PI * 2, Math.PI / 2, Math.PI)
-        const bottomMaterial = new THREE.MeshPhongMaterial({
-            color: 0x0000ff,
-            shininess: 30
-        })
+        const bottomGeometry = new THREE.SphereGeometry(PLAYER_BODY_RADIUS, 16, 16, 0, Math.PI * 2, Math.PI / 2, Math.PI)
+        const bottomMaterial = new THREE.MeshPhongMaterial({ color: PLAYER_COLOR, shininess: PLAYER_SHININESS })
         const bottom = new THREE.Mesh(bottomGeometry, bottomMaterial)
         bottom.position.y = 0
         playerGroup.add(bottom)
@@ -87,10 +92,7 @@ class Game {
 
         // Create ball
         const ballGeometry = new THREE.SphereGeometry(this.ballRadius, 32, 32)
-        const ballMaterial = new THREE.MeshPhongMaterial({
-            color: 0xff0000,
-            shininess: 100
-        })
+        const ballMaterial = new THREE.MeshPhongMaterial({ color: BALL_COLOR, shininess: BALL_SHININESS })
         this.ball = new THREE.Mesh(ballGeometry, ballMaterial)
         this.ball.position.set(2, this.ballRadius, 0) // Position ball slightly to the right
         this.scene.add(this.ball)

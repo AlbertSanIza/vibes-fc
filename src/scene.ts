@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 
-import { FIELD_WIDTH, FIELD_LENGTH, FIELD_LINE_WIDTH, FIELD_LINE_COLOR, WALL_HEIGHT } from './constants'
+import { FIELD_LENGTH, FIELD_LINE_COLOR, FIELD_LINE_THICKNESS, FIELD_WIDTH, WALL_HEIGHT, WALL_THICKNESS } from './constants'
 
 export class Scene {
     public scene: THREE.Scene
@@ -8,17 +8,17 @@ export class Scene {
     public renderer: THREE.WebGLRenderer
 
     constructor() {
-        // Scene setup
+        // Scene
         this.scene = new THREE.Scene()
         this.scene.background = new THREE.Color(0x87ceeb) // Sky blue background
 
-        // Camera setup
+        // Camera
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight)
 
-        // Renderer setup
+        // Renderer
         this.renderer = new THREE.WebGLRenderer({ antialias: true })
         this.renderer.setSize(window.innerWidth, window.innerHeight)
-        // this.renderer.shadowMap.enabled = true
+        this.renderer.shadowMap.enabled = true
         document.body.appendChild(this.renderer.domElement)
 
         // Lighting
@@ -34,13 +34,13 @@ export class Scene {
         this.createSoccerField()
 
         // Clouds
-        this.createClouds()
+        // this.createClouds()
 
         // Goals
-        this.createGoals()
+        // this.createGoals()
 
         // Trees
-        this.createTrees()
+        // this.createTrees()
 
         // Expose scene, camera, and renderer to window object for game.ts
         ;(window as any).scene = this.scene
@@ -66,7 +66,7 @@ export class Scene {
         field.receiveShadow = true
         this.scene.add(field)
 
-        // Field lines
+        // Field Lines
         const createFieldLine = (width: number, length: number, position: [number, number, number], rotation: [number, number, number]) => {
             const lineGeometry = new THREE.PlaneGeometry(width, length)
             const lineMaterial = new THREE.MeshStandardMaterial({ color: FIELD_LINE_COLOR })
@@ -76,94 +76,88 @@ export class Scene {
             this.scene.add(line)
         }
 
-        // Center line
-        createFieldLine(FIELD_WIDTH, FIELD_LINE_WIDTH, [0, 0.01, 0], [-Math.PI / 2, 0, 0])
+        // Center Line
+        createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, [0, 0.01, 0], [-Math.PI / 2, 0, 0])
 
-        // Center circle
+        // Center Circle
         const centerCircleRadius = 9.15 / 2
-        const centerCircleGeometry = new THREE.RingGeometry(centerCircleRadius - FIELD_LINE_WIDTH / 2, centerCircleRadius + FIELD_LINE_WIDTH / 2, 32)
+        const centerCircleGeometry = new THREE.RingGeometry(centerCircleRadius - FIELD_LINE_THICKNESS / 2, centerCircleRadius + FIELD_LINE_THICKNESS / 2, 32)
         const centerCircleMaterial = new THREE.MeshStandardMaterial({ color: FIELD_LINE_COLOR })
         const centerCircle = new THREE.Mesh(centerCircleGeometry, centerCircleMaterial)
         centerCircle.rotation.x = -Math.PI / 2
         centerCircle.position.y = 0.01
         this.scene.add(centerCircle)
 
-        // Center spot
-        const centerSpotGeometry = new THREE.CircleGeometry(FIELD_LINE_WIDTH, 32)
-        const centerSpotMaterial = new THREE.MeshStandardMaterial({ color: FIELD_LINE_COLOR })
-        const centerSpot = new THREE.Mesh(centerSpotGeometry, centerSpotMaterial)
-        centerSpot.rotation.x = -Math.PI / 2
-        centerSpot.position.y = 0.01
-        this.scene.add(centerSpot)
+        // Spots
+        const createSpot = (x: number, z: number) => {
+            const centerSpotGeometry = new THREE.CircleGeometry(FIELD_LINE_THICKNESS, 32)
+            const centerSpotMaterial = new THREE.MeshStandardMaterial({ color: FIELD_LINE_COLOR })
+            const centerSpot = new THREE.Mesh(centerSpotGeometry, centerSpotMaterial)
+            centerSpot.rotation.x = -Math.PI / 2
+            centerSpot.position.set(x, 0.01, z)
+            this.scene.add(centerSpot)
+        }
+        // Center Spot
+        createSpot(0, 0)
+        // Penalty Spot North
+        createSpot(0, FIELD_LENGTH / 2 - 11)
+        // Penalty Spot South
+        createSpot(0, -FIELD_LENGTH / 2 + 11)
 
-        // Penalty areas
-        const penaltyAreaWidth = 8
-        const penaltyAreaLength = 4
-        const penaltyAreaPositions = [
-            {
-                position: [0, 0.01, FIELD_LENGTH / 2 - penaltyAreaLength / 2] as [number, number, number],
-                rotation: [-Math.PI / 2, 0, 0] as [number, number, number]
-            },
-            {
-                position: [0, 0.01, -FIELD_LENGTH / 2 + penaltyAreaLength / 2] as [number, number, number],
-                rotation: [-Math.PI / 2, 0, 0] as [number, number, number]
-            }
-        ]
-
-        penaltyAreaPositions.forEach(({ position, rotation }) => {
-            createFieldLine(penaltyAreaWidth, FIELD_LINE_WIDTH, position, rotation)
-            createFieldLine(FIELD_LINE_WIDTH, penaltyAreaLength, position, rotation)
-        })
+        // Penalty Area North
+        createFieldLine(40.3, FIELD_LINE_THICKNESS, [0, 0.01, FIELD_LENGTH / 2 - 16.5], [-Math.PI / 2, 0, 0])
+        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, [20.15, 0.01, FIELD_LENGTH / 2 - 8.25], [-Math.PI / 2, 0, 0])
+        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, [-20.15, 0.01, FIELD_LENGTH / 2 - 8.25], [-Math.PI / 2, 0, 0])
+        // Goal Area North
+        createFieldLine(18.32, FIELD_LINE_THICKNESS, [0, 0.01, FIELD_LENGTH / 2 - 5.5], [-Math.PI / 2, 0, 0])
+        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, [9.16, 0.01, FIELD_LENGTH / 2 - 2.75], [-Math.PI / 2, 0, 0])
+        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, [-9.16, 0.01, FIELD_LENGTH / 2 - 2.75], [-Math.PI / 2, 0, 0])
+        // Penalty South
+        createFieldLine(40.3, FIELD_LINE_THICKNESS, [0, 0.01, -FIELD_LENGTH / 2 + 16.5], [-Math.PI / 2, 0, 0])
+        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, [20.15, 0.01, -FIELD_LENGTH / 2 + 8.25], [-Math.PI / 2, 0, 0])
+        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, [-20.15, 0.01, -FIELD_LENGTH / 2 + 8.25], [-Math.PI / 2, 0, 0])
+        // Penalty Box South
+        createFieldLine(18.32, FIELD_LINE_THICKNESS, [0, 0.01, -FIELD_LENGTH / 2 + 5.5], [-Math.PI / 2, 0, 0])
+        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, [9.16, 0.01, -FIELD_LENGTH / 2 + 2.75], [-Math.PI / 2, 0, 0])
+        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, [-9.16, 0.01, -FIELD_LENGTH / 2 + 2.75], [-Math.PI / 2, 0, 0])
 
         // Walls
-        const wallMaterial = new THREE.MeshStandardMaterial({
-            color: 0xffffff,
+        const outerWidth = FIELD_WIDTH + WALL_THICKNESS
+        const outerLength = FIELD_LENGTH + WALL_THICKNESS * 2
+
+        // Create outer box (larger)
+        const outerGeometry = new THREE.BoxGeometry(outerWidth, WALL_HEIGHT, outerLength)
+        const outerMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.DoubleSide })
+        const outerBox = new THREE.Mesh(outerGeometry, outerMaterial)
+        outerBox.position.y = WALL_HEIGHT / 2
+        outerBox.castShadow = true
+        outerBox.receiveShadow = true
+        // this.scene.add(outerBox)
+
+        // Create inner box (smaller)
+        const innerGeometry = new THREE.BoxGeometry(FIELD_WIDTH, WALL_HEIGHT + 0.1, FIELD_LENGTH)
+        const innerMaterial = new THREE.MeshStandardMaterial({
+            color: 0x2e8b57, // Same color as the field
             side: THREE.DoubleSide
         })
-        const walls = []
+        const innerBox = new THREE.Mesh(innerGeometry, innerMaterial)
+        innerBox.position.y = WALL_HEIGHT / 2
+        innerBox.castShadow = true
+        innerBox.receiveShadow = true
+        // this.scene.add(innerBox)
 
-        // Create walls
-        const wallPositions = [
-            {
-                position: [0, WALL_HEIGHT / 2, FIELD_LENGTH / 2] as [number, number, number],
-                rotation: [0, 0, 0] as [number, number, number],
-                size: [FIELD_WIDTH, WALL_HEIGHT, 1] as [number, number, number]
-            }, // North
-            {
-                position: [0, WALL_HEIGHT / 2, -FIELD_LENGTH / 2] as [number, number, number],
-                rotation: [0, Math.PI, 0] as [number, number, number],
-                size: [FIELD_WIDTH, WALL_HEIGHT, 1] as [number, number, number]
-            }, // South
-            {
-                position: [FIELD_WIDTH / 2, WALL_HEIGHT / 2, 0] as [number, number, number],
-                rotation: [0, Math.PI / 2, 0] as [number, number, number],
-                size: [FIELD_LENGTH, WALL_HEIGHT, 1] as [number, number, number]
-            }, // East
-            {
-                position: [-FIELD_WIDTH / 2, WALL_HEIGHT / 2, 0] as [number, number, number],
-                rotation: [0, -Math.PI / 2, 0] as [number, number, number],
-                size: [FIELD_LENGTH, WALL_HEIGHT, 1] as [number, number, number]
-            } // West
-        ]
+        // Add wireframe edges to the outer box
+        const wireframeGeometry = new THREE.EdgesGeometry(outerGeometry)
+        const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0x000000 })
+        const wireframe = new THREE.LineSegments(wireframeGeometry, wireframeMaterial)
+        wireframe.position.y = WALL_HEIGHT / 2
+        this.scene.add(wireframe)
 
-        wallPositions.forEach(({ position, rotation, size }) => {
-            const wallGeometry = new THREE.BoxGeometry(...size)
-            const wall = new THREE.Mesh(wallGeometry, wallMaterial)
-            wall.position.set(...position)
-            wall.rotation.set(...rotation)
-            wall.castShadow = true
-            wall.receiveShadow = true
-            walls.push(wall)
-            this.scene.add(wall)
-
-            // Add wireframe edges
-            const wireframeGeometry = new THREE.EdgesGeometry(wallGeometry)
-            const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0x000000 })
-            const wireframe = new THREE.LineSegments(wireframeGeometry, wireframeMaterial)
-            wireframe.position.set(...position)
-            wireframe.rotation.set(...rotation)
-            this.scene.add(wireframe)
-        })
+        // Add wireframe edges to the inner box
+        const innerWireframeGeometry = new THREE.EdgesGeometry(innerGeometry)
+        const innerWireframe = new THREE.LineSegments(innerWireframeGeometry, wireframeMaterial)
+        innerWireframe.position.y = WALL_HEIGHT / 2
+        // this.scene.add(innerWireframe)
     }
 
     private createClouds() {
