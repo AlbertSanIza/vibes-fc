@@ -1,19 +1,20 @@
 import * as THREE from 'three'
 
 import {
+    FIELD_EXTENDED_LENGTH,
+    FIELD_EXTENDED_WIDTH,
     FIELD_EXTRA_LENGTH,
     FIELD_EXTRA_WIDTH,
     FIELD_GOAL_HEIGHT,
     FIELD_GOAL_POST_RADIUS,
     FIELD_GOAL_WIDTH,
     FIELD_LENGTH,
+    FIELD_LENGTH_HALF,
     FIELD_LINE_COLOR,
     FIELD_LINE_THICKNESS,
-    FIELD_WIDTH
+    FIELD_WIDTH,
+    FIELD_WIDTH_HALF
 } from './constants'
-
-const HALF_WIDTH = FIELD_WIDTH / 2
-const HALF_LENGTH = FIELD_LENGTH / 2
 
 export class Scene {
     public scene: THREE.Scene
@@ -201,16 +202,16 @@ export class Scene {
             this.scene.add(crossbar)
         }
 
-        createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: HALF_LENGTH }) // Outer Line North
-        createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: -HALF_LENGTH }) // Outer Line South
-        createFieldLine(FIELD_LINE_THICKNESS, FIELD_LENGTH + FIELD_LINE_THICKNESS, { x: -HALF_WIDTH, z: 0 }) // Outer Line East
-        createFieldLine(FIELD_LINE_THICKNESS, FIELD_LENGTH + FIELD_LINE_THICKNESS, { x: HALF_WIDTH, z: 0 }) // Outer Line West
+        createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: FIELD_LENGTH_HALF }) // Outer Line North
+        createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: -FIELD_LENGTH_HALF }) // Outer Line South
+        createFieldLine(FIELD_LINE_THICKNESS, FIELD_LENGTH + FIELD_LINE_THICKNESS, { x: -FIELD_WIDTH_HALF, z: 0 }) // Outer Line East
+        createFieldLine(FIELD_LINE_THICKNESS, FIELD_LENGTH + FIELD_LINE_THICKNESS, { x: FIELD_WIDTH_HALF, z: 0 }) // Outer Line West
         createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: 0 }) // Center Line
 
-        createQuarterCircle({ x: -HALF_WIDTH, z: HALF_LENGTH }, 0) // Quarter Circle Northeast
-        createQuarterCircle({ x: HALF_WIDTH, z: HALF_LENGTH }, Math.PI / 2) // Quarter Circle Northwest
-        createQuarterCircle({ x: -HALF_WIDTH, z: -HALF_LENGTH }, -Math.PI / 2) // Quarter Circle Southeast
-        createQuarterCircle({ x: HALF_WIDTH, z: -HALF_LENGTH }, Math.PI) // Quarter Circle Southwest
+        createQuarterCircle({ x: -FIELD_WIDTH_HALF, z: FIELD_LENGTH_HALF }, 0) // Quarter Circle Northeast
+        createQuarterCircle({ x: FIELD_WIDTH_HALF, z: FIELD_LENGTH_HALF }, Math.PI / 2) // Quarter Circle Northwest
+        createQuarterCircle({ x: -FIELD_WIDTH_HALF, z: -FIELD_LENGTH_HALF }, -Math.PI / 2) // Quarter Circle Southeast
+        createQuarterCircle({ x: FIELD_WIDTH_HALF, z: -FIELD_LENGTH_HALF }, Math.PI) // Quarter Circle Southwest
 
         // Center Circle
         const centerCircleRadius = 9.15 / 2
@@ -222,30 +223,30 @@ export class Scene {
         this.scene.add(centerCircle)
 
         createSpot({ x: 0, z: 0 }) // Center Spot
-        createSpot({ x: 0, z: HALF_LENGTH - 11 }) // Penalty Spot North
-        createSpot({ x: 0, z: -HALF_LENGTH + 11 }) // Penalty Spot South
+        createSpot({ x: 0, z: FIELD_LENGTH_HALF - 11 }) // Penalty Spot North
+        createSpot({ x: 0, z: -FIELD_LENGTH_HALF + 11 }) // Penalty Spot South
 
         // Penalty Area North
-        createFieldLine(40.3, FIELD_LINE_THICKNESS, { x: 0, z: HALF_LENGTH - 16.5 })
-        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, { x: 20.15, z: HALF_LENGTH - 8.25 })
-        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, { x: -20.15, z: HALF_LENGTH - 8.25 })
+        createFieldLine(40.3, FIELD_LINE_THICKNESS, { x: 0, z: FIELD_LENGTH_HALF - 16.5 })
+        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, { x: 20.15, z: FIELD_LENGTH_HALF - 8.25 })
+        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, { x: -20.15, z: FIELD_LENGTH_HALF - 8.25 })
         // Goal Area North
-        createFieldLine(18.32, FIELD_LINE_THICKNESS, { x: 0, z: HALF_LENGTH - 5.5 })
-        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, { x: 9.16, z: HALF_LENGTH - 2.75 })
-        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, { x: -9.16, z: HALF_LENGTH - 2.75 })
+        createFieldLine(18.32, FIELD_LINE_THICKNESS, { x: 0, z: FIELD_LENGTH_HALF - 5.5 })
+        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, { x: 9.16, z: FIELD_LENGTH_HALF - 2.75 })
+        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, { x: -9.16, z: FIELD_LENGTH_HALF - 2.75 })
         // Penalty South
-        createFieldLine(40.3, FIELD_LINE_THICKNESS, { x: 0, z: -HALF_LENGTH + 16.5 })
-        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, { x: 20.15, z: -HALF_LENGTH + 8.25 })
-        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, { x: -20.15, z: -HALF_LENGTH + 8.25 })
+        createFieldLine(40.3, FIELD_LINE_THICKNESS, { x: 0, z: -FIELD_LENGTH_HALF + 16.5 })
+        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, { x: 20.15, z: -FIELD_LENGTH_HALF + 8.25 })
+        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, { x: -20.15, z: -FIELD_LENGTH_HALF + 8.25 })
         // Penalty Box South
-        createFieldLine(18.32, FIELD_LINE_THICKNESS, { x: 0, z: -HALF_LENGTH + 5.5 })
-        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, { x: 9.16, z: -HALF_LENGTH + 2.75 })
-        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, { x: -9.16, z: -HALF_LENGTH + 2.75 })
+        createFieldLine(18.32, FIELD_LINE_THICKNESS, { x: 0, z: -FIELD_LENGTH_HALF + 5.5 })
+        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, { x: 9.16, z: -FIELD_LENGTH_HALF + 2.75 })
+        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, { x: -9.16, z: -FIELD_LENGTH_HALF + 2.75 })
 
-        createCornerFlagPole({ x: HALF_WIDTH, z: HALF_LENGTH }) // Northeast corner
-        createCornerFlagPole({ x: -HALF_WIDTH, z: HALF_LENGTH }) // Northwest corner
-        createCornerFlagPole({ x: HALF_WIDTH, z: -HALF_LENGTH }) // Southeast corner
-        createCornerFlagPole({ x: -HALF_WIDTH, z: -HALF_LENGTH }) // Southwest corner
+        createCornerFlagPole({ x: FIELD_WIDTH_HALF, z: FIELD_LENGTH_HALF }) // Northeast corner
+        createCornerFlagPole({ x: -FIELD_WIDTH_HALF, z: FIELD_LENGTH_HALF }) // Northwest corner
+        createCornerFlagPole({ x: FIELD_WIDTH_HALF, z: -FIELD_LENGTH_HALF }) // Southeast corner
+        createCornerFlagPole({ x: -FIELD_WIDTH_HALF, z: -FIELD_LENGTH_HALF }) // Southwest corner
 
         createGoal([0, 0, FIELD_LENGTH / 2]) // North Goal
         createGoal([0, 0, -FIELD_LENGTH / 2]) // South Goal
@@ -318,10 +319,18 @@ export class Scene {
             this.scene.add(tree)
         }
 
-        // Add 100 random trees outside of (FIELD_WIDTH + FIELD_EXTRA_WIDTH) and (FIELD_LENGTH + FIELD_EXTRA_LENGTH)
+        const groundRadius = Math.max(FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_LENGTH) * 1.2
+
+        // Add trees randomly within the ground circle but outside the extended field
         for (let i = 0; i < 100; i++) {
-            const x = Math.random() * (FIELD_WIDTH + FIELD_EXTRA_WIDTH) * 3 - (FIELD_WIDTH + FIELD_EXTRA_WIDTH) * 1.5
-            const z = Math.random() * (FIELD_LENGTH + FIELD_EXTRA_LENGTH) * 3 - (FIELD_LENGTH + FIELD_EXTRA_LENGTH) * 1.5
+            // Generate random angle and radius in polar coordinates
+            const angle = Math.random() * Math.PI * 2
+            const minRadius = Math.max(FIELD_EXTENDED_WIDTH / 2, FIELD_EXTENDED_LENGTH / 2) * 1.1 // 10% buffer from field
+            const maxRadius = groundRadius * 0.9 // 10% buffer from edge
+            const radius = minRadius + Math.random() * (maxRadius - minRadius)
+            // Convert to Cartesian coordinates
+            const x = radius * Math.cos(angle)
+            const z = radius * Math.sin(angle)
             createTree({ x, z }, 3 + Math.random() * 3, 2 + Math.random() * 2)
         }
     }

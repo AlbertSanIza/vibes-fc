@@ -1,8 +1,12 @@
 // Stadium
 export const FIELD_WIDTH = 75
 export const FIELD_LENGTH = 110
+export const FIELD_WIDTH_HALF = FIELD_WIDTH / 2
+export const FIELD_LENGTH_HALF = FIELD_LENGTH / 2
 export const FIELD_EXTRA_WIDTH = 10
 export const FIELD_EXTRA_LENGTH = 10
+export const FIELD_EXTENDED_WIDTH = FIELD_WIDTH + FIELD_EXTRA_WIDTH
+export const FIELD_EXTENDED_LENGTH = FIELD_LENGTH + FIELD_EXTRA_LENGTH
 export const FIELD_LINE_THICKNESS = 0.12
 export const FIELD_LINE_COLOR = 0xffffff
 export const FIELD_GOAL_WIDTH = 7.32
