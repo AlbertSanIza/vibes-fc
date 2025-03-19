@@ -1,5 +1,8 @@
 import * as THREE from 'three'
 
+const FIELD_WIDTH = 20
+const FIELD_LENGTH = 30
+
 export class Scene {
     public scene: THREE.Scene
     public camera: THREE.PerspectiveCamera
@@ -49,19 +52,11 @@ export class Scene {
     }
 
     private createGround() {
-        const fieldWidth = 10
-        const fieldLength = 110
-
-        // Ground plane (extends beyond field)
-        const groundGeometry = new THREE.PlaneGeometry(fieldWidth * 3, fieldLength * 3)
-        const groundMaterial = new THREE.MeshStandardMaterial({
-            color: 0x90ee90, // Light green
-            side: THREE.DoubleSide
-        })
+        const groundRadius = Math.max(FIELD_WIDTH, FIELD_LENGTH) * 2
+        const groundGeometry = new THREE.CircleGeometry(groundRadius, 16)
+        const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x90ee90, side: THREE.DoubleSide }) // Light Freen
         const ground = new THREE.Mesh(groundGeometry, groundMaterial)
-        ground.rotation.x = -Math.PI / 2
-        ground.position.y = -0.1 // Slightly below field to prevent z-fighting
-        ground.receiveShadow = true
+        ground.rotation.x = Math.PI / 2
         this.scene.add(ground)
     }
 
