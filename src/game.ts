@@ -48,6 +48,11 @@ class Game {
     private ballBounce: number = BALL_BOUNCE
     private ballRadius: number = BALL_RADIUS
     private pushStrength: number = BALL_PUSH_STRENGTH
+    private cameraHeight: number = 5
+    private minCameraDistance: number = 5
+    private maxCameraDistance: number = 15
+    private minCameraHeight: number = 5
+    private maxCameraHeight: number = 15
 
     constructor() {
         // Get existing scene, camera, and renderer from main.ts
@@ -231,20 +236,24 @@ class Game {
         }
 
         // Keep player within wider bounds (including extra area)
-        const maxX = (FIELD_WIDTH + FIELD_EXTRA_WIDTH) / 2 - PLAYER_BODY_RADIUS // Include extra width
-        const maxZ = (FIELD_LENGTH + FIELD_EXTRA_LENGTH) / 2 - PLAYER_BODY_RADIUS // Include extra length
+        const maxX = (FIELD_WIDTH + FIELD_EXTRA_WIDTH) / 2 - PLAYER_BODY_RADIUS
+        const maxZ = (FIELD_LENGTH + FIELD_EXTRA_LENGTH) / 2 - PLAYER_BODY_RADIUS
         this.player.position.x = Math.max(-maxX, Math.min(maxX, this.player.position.x))
         this.player.position.z = Math.max(-maxZ, Math.min(maxZ, this.player.position.z))
 
-        // Update camera position
-        const cameraOffset = new THREE.Vector3(0, 5, 10)
-        cameraOffset.applyQuaternion(this.player.quaternion)
-        this.camera.position.copy(this.player.position).add(cameraOffset)
-        this.camera.lookAt(this.player.position)
+        // Update camera after player movement
+        this.updateCamera()
     }
 
     private handleWheel(event: WheelEvent) {
-        this.cameraDistance = Math.max(3, Math.min(10, this.cameraDistance + event.deltaY * 0.01))
+        // Update both distance and height based on scroll
+        const scrollFactor = event.deltaY * 0.01
+        this.cameraDistance = Math.max(this.minCameraDistance, Math.min(this.maxCameraDistance, this.cameraDistance + scrollFactor))
+
+        // Adjust height proportionally with distance
+        const heightProgress = (this.cameraDistance - this.minCameraDistance) / (this.maxCameraDistance - this.minCameraDistance)
+        this.cameraHeight = this.minCameraHeight + (this.maxCameraHeight - this.minCameraHeight) * heightProgress
+
         this.updateCamera()
     }
 
@@ -282,23 +291,23 @@ class Game {
         // Calculate camera position relative to player's rotation
         const x = this.player.position.x + Math.sin(this.playerRotation) * this.cameraDistance
         const z = this.player.position.z + Math.cos(this.playerRotation) * this.cameraDistance
-        this.camera.position.set(x, 2, z)
+
+        // Use the dynamic height
+        this.camera.position.set(x, this.cameraHeight, z)
         this.camera.lookAt(this.player.position)
     }
 
     private animate() {
         const currentTime = performance.now()
-        const deltaTime = (currentTime - this.lastTime) / 1000 // Convert to seconds
+        const deltaTime = (currentTime - this.lastTime) / 1000
         this.lastTime = currentTime
 
-        // Begin stats measurement
         this.stats.begin()
 
         this.updatePlayer(deltaTime)
         this.updateBall(deltaTime)
         this.renderer.render(this.scene, this.camera)
 
-        // End stats measurement
         this.stats.end()
 
         requestAnimationFrame(this.animate.bind(this))
