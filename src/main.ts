@@ -12,7 +12,6 @@ class Main {
     }
 
     setupEventListeners() {
-        // Handle window resize
         window.addEventListener('resize', () => {
             this.scene.camera.aspect = window.innerWidth / window.innerHeight
             this.scene.camera.updateProjectionMatrix()
