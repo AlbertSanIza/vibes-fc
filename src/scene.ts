@@ -26,11 +26,11 @@ export class Scene {
         const LAYER_GENERAL = 0 // Default layer
         const LAYER_DYNAMIC = 1 // Layer for player and ball
 
-        // Lighting
+        // Global Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 1)
         this.scene.add(ambientLight)
 
-        // Top-down light for player and ball shadows
+        // Top Down Lighting (Players and Ball)
         const topLight = new THREE.DirectionalLight(0xffffff, 1)
         topLight.position.set(0, 10, 0)
         topLight.castShadow = true
@@ -94,49 +94,90 @@ export class Scene {
     }
 
     private createGround() {
-        const groundRadius = Math.max(FIELD_WIDTH + FIELD_EXTRA_WIDTH, FIELD_LENGTH + FIELD_EXTRA_LENGTH) * 1.5
-        const groundGeometry = new THREE.CircleGeometry(groundRadius, 32)
+        const groundGeometry = new THREE.CircleGeometry(Math.max(FIELD_WIDTH + FIELD_EXTRA_WIDTH, FIELD_LENGTH + FIELD_EXTRA_LENGTH) * 1.5, 32)
         const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x90ee90 }) // Light Green
         const ground = new THREE.Mesh(groundGeometry, groundMaterial)
         ground.rotation.x = -Math.PI / 2
         ground.position.y = -0.1
-        ground.receiveShadow = true // Make sure ground receives shadows
-        // Ground should receive shadows from both layers
+        ground.receiveShadow = true
         ground.layers.enable((window as any).LAYER_GENERAL)
-        ground.layers.enable((window as any).LAYER_DYNAMIC)
         this.scene.add(ground)
     }
 
     private createSoccerField() {
-        const fieldGeometry = new THREE.PlaneGeometry(FIELD_WIDTH + FIELD_EXTRA_WIDTH, FIELD_LENGTH + FIELD_EXTRA_LENGTH)
-        const fieldMaterial = new THREE.MeshStandardMaterial({ color: 0x2e8b57 }) // Forest green
-        const field = new THREE.Mesh(fieldGeometry, fieldMaterial)
-        field.rotation.x = -Math.PI / 2
-        field.receiveShadow = true
-        this.scene.add(field)
+        // North: Positive Z
+        // South: Negative Z
+        // East: Negative X
+        // West: Positive X
 
-        // Field Lines
-        const createFieldLine = (width: number, length: number, position: [number, number, number], rotation: [number, number, number]) => {
-            const lineGeometry = new THREE.PlaneGeometry(width, length)
-            const lineMaterial = new THREE.MeshStandardMaterial({ color: FIELD_LINE_COLOR })
-            const line = new THREE.Mesh(lineGeometry, lineMaterial)
-            line.rotation.set(...rotation)
-            line.position.set(...position)
-            line.receiveShadow = true
-            this.scene.add(line)
+        const halfWidth = FIELD_WIDTH / 2
+        const halfLength = FIELD_LENGTH / 2
+
+        // Main Field
+        const mainFieldGeometry = new THREE.PlaneGeometry(FIELD_WIDTH + FIELD_EXTRA_WIDTH, FIELD_LENGTH + FIELD_EXTRA_LENGTH)
+        const mainFieldMaterial = new THREE.MeshStandardMaterial({ color: 0x2e8b57 }) // Forest green
+        const mainField = new THREE.Mesh(mainFieldGeometry, mainFieldMaterial)
+        mainField.rotation.x = -Math.PI / 2
+        mainField.receiveShadow = true
+        this.scene.add(mainField)
+
+        const createFieldLine = (width: number, length: number, position: { x: number; z: number }) => {
+            const fieldLineGeometry = new THREE.PlaneGeometry(width, length)
+            const fieldLineMaterial = new THREE.MeshStandardMaterial({ color: FIELD_LINE_COLOR })
+            const fieldLine = new THREE.Mesh(fieldLineGeometry, fieldLineMaterial)
+            fieldLine.rotation.x = -Math.PI / 2
+            fieldLine.position.set(position.x, 0.01, position.z)
+            fieldLine.receiveShadow = true
+            this.scene.add(fieldLine)
         }
 
-        // Outer Line North
-        createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, [0, 0.01, FIELD_LENGTH / 2], [-Math.PI / 2, 0, 0])
-        // Outer Line South
-        createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, [0, 0.01, -FIELD_LENGTH / 2], [-Math.PI / 2, 0, 0])
-        // Outer Line East
-        createFieldLine(FIELD_LINE_THICKNESS, FIELD_LENGTH + FIELD_LINE_THICKNESS, [FIELD_WIDTH / 2, 0.01, 0], [-Math.PI / 2, 0, 0])
-        // Outer Line West
-        createFieldLine(FIELD_LINE_THICKNESS, FIELD_LENGTH + FIELD_LINE_THICKNESS, [-FIELD_WIDTH / 2, 0.01, 0], [-Math.PI / 2, 0, 0])
+        const createQuarterCircle = (position: { x: number; z: number }, rotation: number) => {
+            const radius = 1
+            const quarterCircleGeometry = new THREE.RingGeometry(radius - FIELD_LINE_THICKNESS / 2, radius + FIELD_LINE_THICKNESS / 2, 32, 1, 0, Math.PI / 2)
+            const quarterCircleMaterial = new THREE.MeshStandardMaterial({ color: FIELD_LINE_COLOR })
+            const quarterCircle = new THREE.Mesh(quarterCircleGeometry, quarterCircleMaterial)
+            quarterCircle.rotation.x = -Math.PI / 2
+            quarterCircle.rotation.z = rotation
+            quarterCircle.position.set(position.x, 0.01, position.z)
+            this.scene.add(quarterCircle)
+        }
 
-        // Center Line
-        createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, [0, 0.01, 0], [-Math.PI / 2, 0, 0])
+        const createSpot = (position: { x: number; z: number }) => {
+            const centerSpotGeometry = new THREE.CircleGeometry(FIELD_LINE_THICKNESS, 32)
+            const centerSpotMaterial = new THREE.MeshStandardMaterial({ color: FIELD_LINE_COLOR })
+            const centerSpot = new THREE.Mesh(centerSpotGeometry, centerSpotMaterial)
+            centerSpot.rotation.x = -Math.PI / 2
+            centerSpot.position.set(position.x, 0.01, position.z)
+            this.scene.add(centerSpot)
+        }
+
+        const createCornerFlagPole = (position: { x: number; z: number }) => {
+            const cornerFlagPole = new THREE.Group()
+            const cornerPoleGeometry = new THREE.CylinderGeometry(0.05, 0.05, 1.5)
+            const cornerPoleMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff })
+            const cornerPole = new THREE.Mesh(cornerPoleGeometry, cornerPoleMaterial)
+            cornerPole.position.set(position.x, 0.75, position.z)
+            cornerPole.castShadow = true
+            cornerFlagPole.add(cornerPole)
+            const cornerFlagGeometry = new THREE.PlaneGeometry(0.4, 0.3)
+            const cornerFlagMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, side: THREE.DoubleSide })
+            const cornerFlag = new THREE.Mesh(cornerFlagGeometry, cornerFlagMaterial)
+            cornerFlag.position.set(position.x - 0.2, 1.7, position.z)
+            cornerFlag.castShadow = true
+            cornerFlagPole.add(cornerFlag)
+            this.scene.add(cornerFlagPole)
+        }
+
+        createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: halfLength }) // Outer Line North
+        createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: -halfLength }) // Outer Line South
+        createFieldLine(FIELD_LINE_THICKNESS, FIELD_LENGTH + FIELD_LINE_THICKNESS, { x: -halfWidth, z: 0 }) // Outer Line East
+        createFieldLine(FIELD_LINE_THICKNESS, FIELD_LENGTH + FIELD_LINE_THICKNESS, { x: halfWidth, z: 0 }) // Outer Line West
+        createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: 0 }) // Center Line
+
+        createQuarterCircle({ x: -halfWidth, z: halfLength }, 0) // Quarter Circle Northeast
+        createQuarterCircle({ x: halfWidth, z: halfLength }, Math.PI / 2) // Quarter Circle Northwest
+        createQuarterCircle({ x: -halfWidth, z: -halfLength }, -Math.PI / 2) // Quarter Circle Southeast
+        createQuarterCircle({ x: halfWidth, z: -halfLength }, Math.PI) // Quarter Circle Southwest
 
         // Center Circle
         const centerCircleRadius = 9.15 / 2
@@ -147,102 +188,31 @@ export class Scene {
         centerCircle.position.y = 0.01
         this.scene.add(centerCircle)
 
-        // Spots
-        const createSpot = (x: number, z: number) => {
-            const centerSpotGeometry = new THREE.CircleGeometry(FIELD_LINE_THICKNESS, 32)
-            const centerSpotMaterial = new THREE.MeshStandardMaterial({ color: FIELD_LINE_COLOR })
-            const centerSpot = new THREE.Mesh(centerSpotGeometry, centerSpotMaterial)
-            centerSpot.rotation.x = -Math.PI / 2
-            centerSpot.position.set(x, 0.01, z)
-            this.scene.add(centerSpot)
-        }
-        // Center Spot
-        createSpot(0, 0)
-        // Penalty Spot North
-        createSpot(0, FIELD_LENGTH / 2 - 11)
-        // Penalty Spot South
-        createSpot(0, -FIELD_LENGTH / 2 + 11)
+        createSpot({ x: 0, z: 0 }) // Center Spot
+        createSpot({ x: 0, z: halfLength - 11 }) // Penalty Spot North
+        createSpot({ x: 0, z: -halfLength + 11 }) // Penalty Spot South
 
         // Penalty Area North
-        createFieldLine(40.3, FIELD_LINE_THICKNESS, [0, 0.01, FIELD_LENGTH / 2 - 16.5], [-Math.PI / 2, 0, 0])
-        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, [20.15, 0.01, FIELD_LENGTH / 2 - 8.25], [-Math.PI / 2, 0, 0])
-        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, [-20.15, 0.01, FIELD_LENGTH / 2 - 8.25], [-Math.PI / 2, 0, 0])
+        createFieldLine(40.3, FIELD_LINE_THICKNESS, { x: 0, z: halfLength - 16.5 })
+        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, { x: 20.15, z: halfLength - 8.25 })
+        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, { x: -20.15, z: halfLength - 8.25 })
         // Goal Area North
-        createFieldLine(18.32, FIELD_LINE_THICKNESS, [0, 0.01, FIELD_LENGTH / 2 - 5.5], [-Math.PI / 2, 0, 0])
-        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, [9.16, 0.01, FIELD_LENGTH / 2 - 2.75], [-Math.PI / 2, 0, 0])
-        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, [-9.16, 0.01, FIELD_LENGTH / 2 - 2.75], [-Math.PI / 2, 0, 0])
+        createFieldLine(18.32, FIELD_LINE_THICKNESS, { x: 0, z: halfLength - 5.5 })
+        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, { x: 9.16, z: halfLength - 2.75 })
+        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, { x: -9.16, z: halfLength - 2.75 })
         // Penalty South
-        createFieldLine(40.3, FIELD_LINE_THICKNESS, [0, 0.01, -FIELD_LENGTH / 2 + 16.5], [-Math.PI / 2, 0, 0])
-        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, [20.15, 0.01, -FIELD_LENGTH / 2 + 8.25], [-Math.PI / 2, 0, 0])
-        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, [-20.15, 0.01, -FIELD_LENGTH / 2 + 8.25], [-Math.PI / 2, 0, 0])
+        createFieldLine(40.3, FIELD_LINE_THICKNESS, { x: 0, z: -halfLength + 16.5 })
+        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, { x: 20.15, z: -halfLength + 8.25 })
+        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, { x: -20.15, z: -halfLength + 8.25 })
         // Penalty Box South
-        createFieldLine(18.32, FIELD_LINE_THICKNESS, [0, 0.01, -FIELD_LENGTH / 2 + 5.5], [-Math.PI / 2, 0, 0])
-        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, [9.16, 0.01, -FIELD_LENGTH / 2 + 2.75], [-Math.PI / 2, 0, 0])
-        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, [-9.16, 0.01, -FIELD_LENGTH / 2 + 2.75], [-Math.PI / 2, 0, 0])
+        createFieldLine(18.32, FIELD_LINE_THICKNESS, { x: 0, z: -halfLength + 5.5 })
+        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, { x: 9.16, z: -halfLength + 2.75 })
+        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, { x: -9.16, z: -halfLength + 2.75 })
 
-        // Add corner flags and quarter circles
-        const createCornerFlag = (x: number, z: number) => {
-            // Flag pole
-            const poleGeometry = new THREE.CylinderGeometry(0.05, 0.05, 2, 8)
-            const poleMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff })
-            const pole = new THREE.Mesh(poleGeometry, poleMaterial)
-            pole.position.set(x, 1, z)
-            pole.castShadow = true
-            pole.receiveShadow = true
-            this.scene.add(pole)
-
-            // Flag
-            const flagGeometry = new THREE.PlaneGeometry(0.4, 0.3)
-            const flagMaterial = new THREE.MeshStandardMaterial({
-                color: 0xff0000,
-                side: THREE.DoubleSide
-            })
-            const flag = new THREE.Mesh(flagGeometry, flagMaterial)
-            flag.position.set(x - 0.2, 1.7, z)
-            flag.rotation.y = Math.PI / 4
-            flag.castShadow = true
-            flag.receiveShadow = true
-            this.scene.add(flag)
-
-            // Corner quarter circle
-            const quarterCircleRadius = 1
-            const quarterCircleGeometry = new THREE.RingGeometry(
-                quarterCircleRadius - FIELD_LINE_THICKNESS / 2,
-                quarterCircleRadius + FIELD_LINE_THICKNESS / 2,
-                8,
-                1,
-                0,
-                Math.PI / 2
-            )
-            const quarterCircleMaterial = new THREE.MeshStandardMaterial({ color: FIELD_LINE_COLOR })
-            const quarterCircle = new THREE.Mesh(quarterCircleGeometry, quarterCircleMaterial)
-            quarterCircle.rotation.x = -Math.PI / 2
-            quarterCircle.position.y = 0.01
-
-            // Rotate and position quarter circle based on corner position
-            if (x > 0 && z > 0) {
-                quarterCircle.rotation.y = Math.PI
-                quarterCircle.position.set(x - 1, 0.01, z - 1)
-            } else if (x < 0 && z > 0) {
-                quarterCircle.rotation.y = Math.PI / 2
-                quarterCircle.position.set(x + 1, 0.01, z - 1)
-            } else if (x > 0 && z < 0) {
-                quarterCircle.rotation.y = -Math.PI / 2
-                quarterCircle.position.set(x - 1, 0.01, z + 1)
-            } else {
-                quarterCircle.position.set(x + 1, 0.01, z + 1)
-            }
-
-            this.scene.add(quarterCircle)
-        }
-
-        // Create corner flags at each corner
-        const halfWidth = FIELD_WIDTH / 2
-        const halfLength = FIELD_LENGTH / 2
-        createCornerFlag(halfWidth, halfLength) // Northeast corner
-        createCornerFlag(-halfWidth, halfLength) // Northwest corner
-        createCornerFlag(halfWidth, -halfLength) // Southeast corner
-        createCornerFlag(-halfWidth, -halfLength) // Southwest corner
+        createCornerFlagPole({ x: halfWidth, z: halfLength }) // Northeast corner
+        createCornerFlagPole({ x: -halfWidth, z: halfLength }) // Northwest corner
+        createCornerFlagPole({ x: halfWidth, z: -halfLength }) // Southeast corner
+        createCornerFlagPole({ x: -halfWidth, z: -halfLength }) // Southwest corner
     }
 
     private createClouds() {
