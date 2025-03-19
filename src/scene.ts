@@ -1,15 +1,6 @@
 import * as THREE from 'three'
 
-import {
-    FIELD_EXTRA_LENGTH,
-    FIELD_EXTRA_WIDTH,
-    FIELD_LENGTH,
-    FIELD_LINE_COLOR,
-    FIELD_LINE_THICKNESS,
-    FIELD_WIDTH,
-    WALL_HEIGHT,
-    WALL_THICKNESS
-} from './constants'
+import { FIELD_EXTRA_LENGTH, FIELD_EXTRA_WIDTH, FIELD_LENGTH, FIELD_LINE_COLOR, FIELD_LINE_THICKNESS, FIELD_WIDTH } from './constants'
 
 export class Scene {
     public scene: THREE.Scene
@@ -189,44 +180,6 @@ export class Scene {
         createFieldLine(18.32, FIELD_LINE_THICKNESS, [0, 0.01, -FIELD_LENGTH / 2 + 5.5], [-Math.PI / 2, 0, 0])
         createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, [9.16, 0.01, -FIELD_LENGTH / 2 + 2.75], [-Math.PI / 2, 0, 0])
         createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, [-9.16, 0.01, -FIELD_LENGTH / 2 + 2.75], [-Math.PI / 2, 0, 0])
-
-        // Walls
-        const outerWidth = FIELD_WIDTH + WALL_THICKNESS
-        const outerLength = FIELD_LENGTH + WALL_THICKNESS * 2
-
-        // Create outer box (larger)
-        const outerGeometry = new THREE.BoxGeometry(outerWidth, WALL_HEIGHT, outerLength)
-        const outerMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.DoubleSide })
-        const outerBox = new THREE.Mesh(outerGeometry, outerMaterial)
-        outerBox.position.y = WALL_HEIGHT / 2
-        outerBox.castShadow = true
-        outerBox.receiveShadow = true
-        // this.scene.add(outerBox)
-
-        // Create inner box (smaller)
-        const innerGeometry = new THREE.BoxGeometry(FIELD_WIDTH, WALL_HEIGHT + 0.1, FIELD_LENGTH)
-        const innerMaterial = new THREE.MeshStandardMaterial({
-            color: 0x2e8b57, // Same color as the field
-            side: THREE.DoubleSide
-        })
-        const innerBox = new THREE.Mesh(innerGeometry, innerMaterial)
-        innerBox.position.y = WALL_HEIGHT / 2
-        innerBox.castShadow = true
-        innerBox.receiveShadow = true
-        // this.scene.add(innerBox)
-
-        // Add wireframe edges to the outer box
-        const wireframeGeometry = new THREE.EdgesGeometry(outerGeometry)
-        const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0x000000 })
-        const wireframe = new THREE.LineSegments(wireframeGeometry, wireframeMaterial)
-        wireframe.position.y = WALL_HEIGHT / 2
-        this.scene.add(wireframe)
-
-        // Add wireframe edges to the inner box
-        const innerWireframeGeometry = new THREE.EdgesGeometry(innerGeometry)
-        const innerWireframe = new THREE.LineSegments(innerWireframeGeometry, wireframeMaterial)
-        innerWireframe.position.y = WALL_HEIGHT / 2
-        // this.scene.add(innerWireframe)
     }
 
     private createClouds() {

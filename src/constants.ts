@@ -5,9 +5,6 @@ export const FIELD_EXTRA_WIDTH = 10
 export const FIELD_EXTRA_LENGTH = 10
 export const FIELD_LINE_THICKNESS = 0.12
 export const FIELD_LINE_COLOR = 0xffffff
-export const WALL_HEIGHT = 3
-export const WALL_THICKNESS = 0.5
-export const WALL_COLOR = 0x000000
 
 // Player
 export const PLAYER_BODY_HEIGHT = 1.7
