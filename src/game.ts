@@ -69,6 +69,7 @@ class Game {
         const bodyMaterial = new THREE.MeshPhongMaterial({ color: PLAYER_COLOR, shininess: PLAYER_SHININESS })
         const body = new THREE.Mesh(bodyGeometry, bodyMaterial)
         body.position.y = PLAYER_BODY_RADIUS
+        body.castShadow = true // Enable shadow casting for body
         playerGroup.add(body)
 
         // Top hemisphere
@@ -76,6 +77,7 @@ class Game {
         const topMaterial = new THREE.MeshPhongMaterial({ color: PLAYER_COLOR, shininess: PLAYER_SHININESS })
         const top = new THREE.Mesh(topGeometry, topMaterial)
         top.position.y = PLAYER_BODY_HEIGHT - PLAYER_BODY_RADIUS
+        top.castShadow = true // Enable shadow casting for top hemisphere
         playerGroup.add(top)
 
         // Bottom hemisphere
@@ -83,6 +85,7 @@ class Game {
         const bottomMaterial = new THREE.MeshPhongMaterial({ color: PLAYER_COLOR, shininess: PLAYER_SHININESS })
         const bottom = new THREE.Mesh(bottomGeometry, bottomMaterial)
         bottom.position.y = 0
+        bottom.castShadow = true // Enable shadow casting for bottom hemisphere
         playerGroup.add(bottom)
 
         // Add the group to the scene
