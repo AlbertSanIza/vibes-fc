@@ -312,31 +312,53 @@ export class Scene {
     }
 
     private createTrees() {
-        const createTree = (x: number, z: number, height: number = 2, crownSize: number = 1) => {
-            const trunkGeometry = new THREE.CylinderGeometry(0.2, 0.4, height, 8)
+        const createTree = (x: number, z: number, height: number = 4, crownSize: number = 2.5) => {
+            // Thicker trunk
+            const trunkGeometry = new THREE.CylinderGeometry(0.4, 0.6, height, 8)
             const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 })
             const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial)
             trunk.position.set(x, height / 2, z)
             trunk.castShadow = true
             trunk.receiveShadow = true
 
-            const crownGeometry = new THREE.ConeGeometry(crownSize, crownSize * 2, 8)
-            const crownMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22 })
-            const crown = new THREE.Mesh(crownGeometry, crownMaterial)
-            crown.position.set(x, height + crownSize, z)
-            crown.castShadow = true
-            crown.receiveShadow = true
+            // Create tree crown using multiple spheres like clouds
+            const crownMaterial = new THREE.MeshStandardMaterial({
+                color: 0x228b22,
+                roughness: 0.8
+            })
+
+            // Create multiple overlapping spheres for a fuller look
+            const numSpheres = 4 + Math.floor(Math.random() * 3) // 4-6 spheres per crown
+            for (let i = 0; i < numSpheres; i++) {
+                const size = crownSize * (0.7 + Math.random() * 0.6)
+                const sphereGeometry = new THREE.SphereGeometry(size, 8, 8)
+                const sphere = new THREE.Mesh(sphereGeometry, crownMaterial)
+
+                // Random offset from center
+                const offsetX = (Math.random() - 0.5) * crownSize
+                const offsetY = (Math.random() - 0.5) * crownSize * 0.5
+                const offsetZ = (Math.random() - 0.5) * crownSize
+
+                sphere.position.set(x + offsetX, height + crownSize + offsetY, z + offsetZ)
+                sphere.castShadow = true
+                sphere.receiveShadow = true
+                this.scene.add(sphere)
+            }
 
             this.scene.add(trunk)
-            this.scene.add(crown)
         }
 
-        // Add trees around the field
-        createTree(-15, -20, 2.5, 1.2)
-        createTree(15, -20, 2.2, 1)
-        createTree(-15, 20, 2.8, 1.3)
-        createTree(15, 20, 2.4, 1.1)
-        createTree(-20, 0, 2.6, 1.2)
-        createTree(20, 0, 2.3, 1)
+        // Add bigger trees around the field with varied sizes
+        createTree(-25, -30, 5, 3)
+        createTree(25, -30, 4.5, 2.8)
+        createTree(-25, 30, 5.5, 3.2)
+        createTree(25, 30, 5, 3)
+        createTree(-30, 0, 4.8, 2.9)
+        createTree(30, 0, 5.2, 3.1)
+
+        // Add some smaller trees for variety
+        createTree(-20, -15, 4, 2.5)
+        createTree(20, 15, 3.8, 2.4)
+        createTree(-15, 20, 4.2, 2.6)
     }
 }
