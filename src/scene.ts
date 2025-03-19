@@ -12,6 +12,9 @@ import {
     FIELD_WIDTH
 } from './constants'
 
+const HALF_WIDTH = FIELD_WIDTH / 2
+const HALF_LENGTH = FIELD_LENGTH / 2
+
 export class Scene {
     public scene: THREE.Scene
     public camera: THREE.PerspectiveCamera
@@ -113,9 +116,6 @@ export class Scene {
         // East: Negative X
         // West: Positive X
 
-        const halfWidth = FIELD_WIDTH / 2
-        const halfLength = FIELD_LENGTH / 2
-
         // Main Field
         const mainFieldGeometry = new THREE.PlaneGeometry(FIELD_WIDTH + FIELD_EXTRA_WIDTH, FIELD_LENGTH + FIELD_EXTRA_LENGTH)
         const mainFieldMaterial = new THREE.MeshStandardMaterial({ color: 0x2e8b57 }) // Forest green
@@ -201,16 +201,16 @@ export class Scene {
             this.scene.add(crossbar)
         }
 
-        createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: halfLength }) // Outer Line North
-        createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: -halfLength }) // Outer Line South
-        createFieldLine(FIELD_LINE_THICKNESS, FIELD_LENGTH + FIELD_LINE_THICKNESS, { x: -halfWidth, z: 0 }) // Outer Line East
-        createFieldLine(FIELD_LINE_THICKNESS, FIELD_LENGTH + FIELD_LINE_THICKNESS, { x: halfWidth, z: 0 }) // Outer Line West
+        createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: HALF_LENGTH }) // Outer Line North
+        createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: -HALF_LENGTH }) // Outer Line South
+        createFieldLine(FIELD_LINE_THICKNESS, FIELD_LENGTH + FIELD_LINE_THICKNESS, { x: -HALF_WIDTH, z: 0 }) // Outer Line East
+        createFieldLine(FIELD_LINE_THICKNESS, FIELD_LENGTH + FIELD_LINE_THICKNESS, { x: HALF_WIDTH, z: 0 }) // Outer Line West
         createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: 0 }) // Center Line
 
-        createQuarterCircle({ x: -halfWidth, z: halfLength }, 0) // Quarter Circle Northeast
-        createQuarterCircle({ x: halfWidth, z: halfLength }, Math.PI / 2) // Quarter Circle Northwest
-        createQuarterCircle({ x: -halfWidth, z: -halfLength }, -Math.PI / 2) // Quarter Circle Southeast
-        createQuarterCircle({ x: halfWidth, z: -halfLength }, Math.PI) // Quarter Circle Southwest
+        createQuarterCircle({ x: -HALF_WIDTH, z: HALF_LENGTH }, 0) // Quarter Circle Northeast
+        createQuarterCircle({ x: HALF_WIDTH, z: HALF_LENGTH }, Math.PI / 2) // Quarter Circle Northwest
+        createQuarterCircle({ x: -HALF_WIDTH, z: -HALF_LENGTH }, -Math.PI / 2) // Quarter Circle Southeast
+        createQuarterCircle({ x: HALF_WIDTH, z: -HALF_LENGTH }, Math.PI) // Quarter Circle Southwest
 
         // Center Circle
         const centerCircleRadius = 9.15 / 2
@@ -222,30 +222,30 @@ export class Scene {
         this.scene.add(centerCircle)
 
         createSpot({ x: 0, z: 0 }) // Center Spot
-        createSpot({ x: 0, z: halfLength - 11 }) // Penalty Spot North
-        createSpot({ x: 0, z: -halfLength + 11 }) // Penalty Spot South
+        createSpot({ x: 0, z: HALF_LENGTH - 11 }) // Penalty Spot North
+        createSpot({ x: 0, z: -HALF_LENGTH + 11 }) // Penalty Spot South
 
         // Penalty Area North
-        createFieldLine(40.3, FIELD_LINE_THICKNESS, { x: 0, z: halfLength - 16.5 })
-        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, { x: 20.15, z: halfLength - 8.25 })
-        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, { x: -20.15, z: halfLength - 8.25 })
+        createFieldLine(40.3, FIELD_LINE_THICKNESS, { x: 0, z: HALF_LENGTH - 16.5 })
+        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, { x: 20.15, z: HALF_LENGTH - 8.25 })
+        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, { x: -20.15, z: HALF_LENGTH - 8.25 })
         // Goal Area North
-        createFieldLine(18.32, FIELD_LINE_THICKNESS, { x: 0, z: halfLength - 5.5 })
-        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, { x: 9.16, z: halfLength - 2.75 })
-        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, { x: -9.16, z: halfLength - 2.75 })
+        createFieldLine(18.32, FIELD_LINE_THICKNESS, { x: 0, z: HALF_LENGTH - 5.5 })
+        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, { x: 9.16, z: HALF_LENGTH - 2.75 })
+        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, { x: -9.16, z: HALF_LENGTH - 2.75 })
         // Penalty South
-        createFieldLine(40.3, FIELD_LINE_THICKNESS, { x: 0, z: -halfLength + 16.5 })
-        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, { x: 20.15, z: -halfLength + 8.25 })
-        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, { x: -20.15, z: -halfLength + 8.25 })
+        createFieldLine(40.3, FIELD_LINE_THICKNESS, { x: 0, z: -HALF_LENGTH + 16.5 })
+        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, { x: 20.15, z: -HALF_LENGTH + 8.25 })
+        createFieldLine(FIELD_LINE_THICKNESS, 16.5 + FIELD_LINE_THICKNESS, { x: -20.15, z: -HALF_LENGTH + 8.25 })
         // Penalty Box South
-        createFieldLine(18.32, FIELD_LINE_THICKNESS, { x: 0, z: -halfLength + 5.5 })
-        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, { x: 9.16, z: -halfLength + 2.75 })
-        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, { x: -9.16, z: -halfLength + 2.75 })
+        createFieldLine(18.32, FIELD_LINE_THICKNESS, { x: 0, z: -HALF_LENGTH + 5.5 })
+        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, { x: 9.16, z: -HALF_LENGTH + 2.75 })
+        createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, { x: -9.16, z: -HALF_LENGTH + 2.75 })
 
-        createCornerFlagPole({ x: halfWidth, z: halfLength }) // Northeast corner
-        createCornerFlagPole({ x: -halfWidth, z: halfLength }) // Northwest corner
-        createCornerFlagPole({ x: halfWidth, z: -halfLength }) // Southeast corner
-        createCornerFlagPole({ x: -halfWidth, z: -halfLength }) // Southwest corner
+        createCornerFlagPole({ x: HALF_WIDTH, z: HALF_LENGTH }) // Northeast corner
+        createCornerFlagPole({ x: -HALF_WIDTH, z: HALF_LENGTH }) // Northwest corner
+        createCornerFlagPole({ x: HALF_WIDTH, z: -HALF_LENGTH }) // Southeast corner
+        createCornerFlagPole({ x: -HALF_WIDTH, z: -HALF_LENGTH }) // Southwest corner
 
         createGoal([0, 0, FIELD_LENGTH / 2]) // North Goal
         createGoal([0, 0, -FIELD_LENGTH / 2]) // South Goal
@@ -254,11 +254,7 @@ export class Scene {
     private createClouds() {
         const createCloud = (x: number, y: number, z: number, baseSize: number) => {
             const cloudGroup = new THREE.Group()
-            const cloudMaterial = new THREE.MeshStandardMaterial({
-                color: 0xffffff,
-                transparent: true,
-                opacity: 0.8
-            })
+            const cloudMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 })
 
             // Create multiple spheres for each cloud
             const numSpheres = 5 + Math.floor(Math.random() * 3) // Random number between 5-7 spheres
@@ -286,64 +282,47 @@ export class Scene {
         }
 
         // Add more clouds with varying sizes and positions
-        createCloud(-15, 8, -10, 2)
-        createCloud(15, 10, 5, 2.5)
-        createCloud(0, 12, -15, 3)
-        createCloud(-10, 9, 15, 2.2)
-        createCloud(10, 11, -20, 2.8)
-        createCloud(-20, 13, 0, 2.3)
-        createCloud(20, 9, -25, 2.6)
-        createCloud(-5, 11, 25, 2.4)
+        createCloud(-15, 10, -10, 2)
+        createCloud(15, 12, 5, 2.5)
+        createCloud(0, 14, -15, 3)
+        createCloud(-10, 11, 15, 2.2)
+        createCloud(10, 13, -20, 2.8)
+        createCloud(-20, 15, 0, 2.3)
+        createCloud(20, 10, -25, 2.6)
+        createCloud(-5, 13, 25, 2.4)
     }
 
     private createTrees() {
-        const createTree = (x: number, z: number, height: number = 4, crownSize: number = 2.5) => {
-            // Thicker trunk
+        const createTree = (position: { x: number; z: number }, height: number = 4, crownSize: number = 2.5) => {
+            const tree = new THREE.Group()
+            // Trunk
             const trunkGeometry = new THREE.CylinderGeometry(0.4, 0.6, height, 8)
-            const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 })
+            const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 }) // Saddle Brown
             const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial)
-            trunk.position.set(x, height / 2, z)
-            trunk.castShadow = true
-            trunk.receiveShadow = true
+            trunk.position.set(position.x, height / 2, position.z)
+            tree.add(trunk)
 
-            // Create tree crown using multiple spheres like clouds
-            const crownMaterial = new THREE.MeshStandardMaterial({
-                color: 0x228b22,
-                roughness: 0.8
-            })
-
-            // Create multiple overlapping spheres for a fuller look
-            const numSpheres = 4 + Math.floor(Math.random() * 3) // 4-6 spheres per crown
-            for (let i = 0; i < numSpheres; i++) {
-                const size = crownSize * (0.7 + Math.random() * 0.6)
-                const sphereGeometry = new THREE.SphereGeometry(size, 8, 8)
+            // Crown
+            const crownMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22, roughness: 0.8 })
+            for (let i = 0; i < 4 + Math.floor(Math.random() * 3); i++) {
+                const sphereGeometry = new THREE.SphereGeometry(crownSize * (0.7 + Math.random() * 0.6), 8, 8)
                 const sphere = new THREE.Mesh(sphereGeometry, crownMaterial)
-
-                // Random offset from center
                 const offsetX = (Math.random() - 0.5) * crownSize
                 const offsetY = (Math.random() - 0.5) * crownSize * 0.5
                 const offsetZ = (Math.random() - 0.5) * crownSize
-
-                sphere.position.set(x + offsetX, height + crownSize + offsetY, z + offsetZ)
+                sphere.position.set(position.x + offsetX, height + crownSize + offsetY, position.z + offsetZ)
                 sphere.castShadow = true
-                sphere.receiveShadow = true
-                this.scene.add(sphere)
+                tree.add(sphere)
             }
 
-            this.scene.add(trunk)
+            this.scene.add(tree)
         }
 
-        // Add bigger trees around the field with varied sizes
-        createTree(-25, -30, 5, 3)
-        createTree(25, -30, 4.5, 2.8)
-        createTree(-25, 30, 5.5, 3.2)
-        createTree(25, 30, 5, 3)
-        createTree(-30, 0, 4.8, 2.9)
-        createTree(30, 0, 5.2, 3.1)
-
-        // Add some smaller trees for variety
-        createTree(-20, -15, 4, 2.5)
-        createTree(20, 15, 3.8, 2.4)
-        createTree(-15, 20, 4.2, 2.6)
+        // Add 100 random trees outside of (FIELD_WIDTH + FIELD_EXTRA_WIDTH) and (FIELD_LENGTH + FIELD_EXTRA_LENGTH)
+        for (let i = 0; i < 100; i++) {
+            const x = Math.random() * (FIELD_WIDTH + FIELD_EXTRA_WIDTH) * 3 - (FIELD_WIDTH + FIELD_EXTRA_WIDTH) * 1.5
+            const z = Math.random() * (FIELD_LENGTH + FIELD_EXTRA_LENGTH) * 3 - (FIELD_LENGTH + FIELD_EXTRA_LENGTH) * 1.5
+            createTree({ x, z }, 3 + Math.random() * 3, 2 + Math.random() * 2)
+        }
     }
 }
