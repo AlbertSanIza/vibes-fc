@@ -1,10 +1,6 @@
 import * as THREE from 'three'
 
-const FIELD_WIDTH = 75
-const FIELD_LENGTH = 110
-const FIELD_LINE_WIDTH = 0.12
-const FIELD_LINE_COLOR = 0xffffff
-const WALL_HEIGHT = 3
+import { FIELD_WIDTH, FIELD_LENGTH, FIELD_LINE_WIDTH, FIELD_LINE_COLOR, WALL_HEIGHT } from './constants'
 
 export class Scene {
     public scene: THREE.Scene
@@ -64,7 +60,7 @@ export class Scene {
 
     private createSoccerField() {
         const fieldGeometry = new THREE.PlaneGeometry(FIELD_WIDTH, FIELD_LENGTH)
-        const fieldMaterial = new THREE.MeshStandardMaterial({ color: 0x2e8b57 })
+        const fieldMaterial = new THREE.MeshStandardMaterial({ color: 0x2e8b57 }) // Forest green
         const field = new THREE.Mesh(fieldGeometry, fieldMaterial)
         field.rotation.x = -Math.PI / 2
         field.receiveShadow = true
