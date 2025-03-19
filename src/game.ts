@@ -82,6 +82,23 @@ class Game {
         body.layers.set((window as any).LAYER_DYNAMIC)
         playerGroup.add(body)
 
+        // Add direction indicator triangle
+        const triangleShape = new THREE.Shape()
+        triangleShape.moveTo(0, 0.4)
+        triangleShape.lineTo(0.2, 0)
+        triangleShape.lineTo(-0.2, 0)
+        triangleShape.lineTo(0, 0.4)
+
+        const triangleGeometry = new THREE.ShapeGeometry(triangleShape)
+        const triangleMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 }) // Yellow color
+        const triangle = new THREE.Mesh(triangleGeometry, triangleMaterial)
+
+        // Position the triangle in front of the player
+        triangle.rotation.x = -Math.PI / 2
+        triangle.position.set(0, 0.1, PLAYER_BODY_RADIUS + 0.2)
+        triangle.layers.set((window as any).LAYER_DYNAMIC)
+        playerGroup.add(triangle)
+
         // Top hemisphere
         const topGeometry = new THREE.SphereGeometry(PLAYER_BODY_RADIUS, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2)
         const topMaterial = new THREE.MeshPhongMaterial({ color: PLAYER_COLOR, shininess: PLAYER_SHININESS })

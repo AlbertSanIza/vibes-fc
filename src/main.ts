@@ -8,7 +8,6 @@ class Main {
     constructor() {
         this.scene = new Scene()
         this.setupEventListeners()
-        this.animate = this.animate.bind(this)
         this.animate()
     }
 
