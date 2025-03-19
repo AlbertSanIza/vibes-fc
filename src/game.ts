@@ -8,6 +8,8 @@ import {
     BALL_RADIUS,
     BALL_SHININESS,
     CAMERA_DISTANCE,
+    FIELD_EXTRA_LENGTH,
+    FIELD_EXTRA_WIDTH,
     FIELD_LENGTH,
     FIELD_WIDTH,
     PLAYER_BODY_HEIGHT,
@@ -143,13 +145,19 @@ class Game {
             this.ballVelocity.y = -this.ballVelocity.y * this.ballBounce
         }
 
-        // Check for collision with walls
-        if (Math.abs(this.ball.position.x) > FIELD_WIDTH / 2 - this.ballRadius) {
-            this.ball.position.x = Math.sign(this.ball.position.x) * (FIELD_WIDTH / 2 - this.ballRadius)
+        // Check for collision with field boundaries (not walls)
+        const fieldBoundaryX = FIELD_WIDTH / 2 - this.ballRadius
+        const fieldBoundaryZ = FIELD_LENGTH / 2 - this.ballRadius
+
+        // X-axis boundaries (width)
+        if (Math.abs(this.ball.position.x) > fieldBoundaryX) {
+            this.ball.position.x = Math.sign(this.ball.position.x) * fieldBoundaryX
             this.ballVelocity.x *= -this.ballBounce
         }
-        if (Math.abs(this.ball.position.z) > FIELD_LENGTH / 2 - this.ballRadius) {
-            this.ball.position.z = Math.sign(this.ball.position.z) * (FIELD_LENGTH / 2 - this.ballRadius)
+
+        // Z-axis boundaries (length)
+        if (Math.abs(this.ball.position.z) > fieldBoundaryZ) {
+            this.ball.position.z = Math.sign(this.ball.position.z) * fieldBoundaryZ
             this.ballVelocity.z *= -this.ballBounce
         }
 
@@ -216,9 +224,9 @@ class Game {
             }
         }
 
-        // Keep player within bounds
-        const maxX = FIELD_WIDTH / 2 - 1 // Half of field width minus player size
-        const maxZ = FIELD_LENGTH / 2 - 1 // Half of field length minus player size
+        // Keep player within wider bounds (including extra area)
+        const maxX = (FIELD_WIDTH + FIELD_EXTRA_WIDTH) / 2 - PLAYER_BODY_RADIUS // Include extra width
+        const maxZ = (FIELD_LENGTH + FIELD_EXTRA_LENGTH) / 2 - PLAYER_BODY_RADIUS // Include extra length
         this.player.position.x = Math.max(-maxX, Math.min(maxX, this.player.position.x))
         this.player.position.z = Math.max(-maxZ, Math.min(maxZ, this.player.position.z))
 
