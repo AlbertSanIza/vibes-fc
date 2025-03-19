@@ -11,24 +11,24 @@ export class Scene {
         this.scene.background = new THREE.Color(0x87ceeb) // Sky blue background
 
         // Camera setup
-        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-        this.camera.position.set(0, 10, 20)
-        this.camera.lookAt(0, 0, 0)
+        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight)
 
         // Renderer setup
         this.renderer = new THREE.WebGLRenderer({ antialias: true })
         this.renderer.setSize(window.innerWidth, window.innerHeight)
-        this.renderer.shadowMap.enabled = true
+        // this.renderer.shadowMap.enabled = true
         document.body.appendChild(this.renderer.domElement)
 
         // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1)
         this.scene.add(ambientLight)
-
         const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
         directionalLight.position.set(5, 5, 5)
         directionalLight.castShadow = true
         this.scene.add(directionalLight)
+
+        // Ground plane
+        this.createGround()
 
         // Clouds
         this.createClouds()
@@ -39,9 +39,6 @@ export class Scene {
         // Goals
         this.createGoals()
 
-        // Ground plane
-        this.createGround()
-
         // Trees
         this.createTrees()
 
@@ -49,6 +46,23 @@ export class Scene {
         ;(window as any).scene = this.scene
         ;(window as any).camera = this.camera
         ;(window as any).renderer = this.renderer
+    }
+
+    private createGround() {
+        const fieldWidth = 10
+        const fieldLength = 110
+
+        // Ground plane (extends beyond field)
+        const groundGeometry = new THREE.PlaneGeometry(fieldWidth * 3, fieldLength * 3)
+        const groundMaterial = new THREE.MeshStandardMaterial({
+            color: 0x90ee90, // Light green
+            side: THREE.DoubleSide
+        })
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial)
+        ground.rotation.x = -Math.PI / 2
+        ground.position.y = -0.1 // Slightly below field to prevent z-fighting
+        ground.receiveShadow = true
+        this.scene.add(ground)
     }
 
     private createClouds() {
@@ -274,23 +288,6 @@ export class Scene {
         goalPositions.forEach(({ position }) => {
             createGoal(position)
         })
-    }
-
-    private createGround() {
-        const fieldWidth = 20
-        const fieldLength = 30
-
-        // Ground plane (extends beyond field)
-        const groundGeometry = new THREE.PlaneGeometry(fieldWidth * 3, fieldLength * 3)
-        const groundMaterial = new THREE.MeshStandardMaterial({
-            color: 0x90ee90, // Light green
-            side: THREE.DoubleSide
-        })
-        const ground = new THREE.Mesh(groundGeometry, groundMaterial)
-        ground.rotation.x = -Math.PI / 2
-        ground.position.y = -0.1 // Slightly below field to prevent z-fighting
-        ground.receiveShadow = true
-        this.scene.add(ground)
     }
 
     private createTrees() {
