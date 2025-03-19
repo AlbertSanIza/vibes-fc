@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import Stats from 'three/examples/jsm/libs/stats.module.js'
 
 class Game {
     private scene: THREE.Scene
@@ -6,6 +7,7 @@ class Game {
     private renderer: THREE.WebGLRenderer
     private player!: THREE.Mesh
     private ball!: THREE.Mesh
+    private stats: Stats = new Stats()
     private moveSpeed: number = 5.0
     private cameraDistance: number = 5
     private playerRotation: number = 0
@@ -35,6 +37,9 @@ class Game {
             console.error('Scene, camera, or renderer not initialized')
             return
         }
+
+        // Initialize stats
+        document.body.appendChild(this.stats.dom)
 
         // Create player (blue rectangle)
         const geometry = new THREE.BoxGeometry(1, 1, 1)
@@ -225,9 +230,15 @@ class Game {
         const deltaTime = (currentTime - this.lastTime) / 1000 // Convert to seconds
         this.lastTime = currentTime
 
+        // Begin stats measurement
+        this.stats.begin()
+
         this.updatePlayer(deltaTime)
         this.updateBall(deltaTime)
         this.renderer.render(this.scene, this.camera)
+
+        // End stats measurement
+        this.stats.end()
 
         requestAnimationFrame(this.animate.bind(this))
     }
