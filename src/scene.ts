@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 
-const FIELD_WIDTH = 20
-const FIELD_LENGTH = 30
+const FIELD_WIDTH = 75
+const FIELD_LENGTH = 110
 
 export class Scene {
     public scene: THREE.Scene
@@ -50,7 +50,7 @@ export class Scene {
     }
 
     private createGround() {
-        const groundRadius = Math.max(FIELD_WIDTH, FIELD_LENGTH) * 2
+        const groundRadius = Math.max(FIELD_WIDTH, FIELD_LENGTH) * 1.5
         const groundGeometry = new THREE.CircleGeometry(groundRadius, 16)
         const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x90ee90, side: THREE.DoubleSide }) // Light Freen
         const ground = new THREE.Mesh(groundGeometry, groundMaterial)
@@ -60,14 +60,12 @@ export class Scene {
 
     private createSoccerField() {
         // Soccer field dimensions
-        const fieldWidth = 20
-        const fieldLength = 30
         const wallHeight = 2
         const lineWidth = 0.2
         const lineColor = 0xffffff
 
         // Field (green plane)
-        const fieldGeometry = new THREE.PlaneGeometry(fieldWidth, fieldLength)
+        const fieldGeometry = new THREE.PlaneGeometry(FIELD_WIDTH, FIELD_LENGTH)
         const fieldMaterial = new THREE.MeshStandardMaterial({
             color: 0x2e8b57, // Forest green
             side: THREE.DoubleSide
@@ -89,7 +87,7 @@ export class Scene {
         }
 
         // Center line
-        createFieldLine(fieldWidth, lineWidth, [0, 0.01, 0], [-Math.PI / 2, 0, 0])
+        createFieldLine(FIELD_WIDTH, lineWidth, [0, 0.01, 0], [-Math.PI / 2, 0, 0])
 
         // Center circle
         const centerCircleRadius = 3
@@ -106,11 +104,11 @@ export class Scene {
         const penaltyAreaLength = 4
         const penaltyAreaPositions = [
             {
-                position: [0, 0.01, fieldLength / 2 - penaltyAreaLength / 2] as [number, number, number],
+                position: [0, 0.01, FIELD_LENGTH / 2 - penaltyAreaLength / 2] as [number, number, number],
                 rotation: [-Math.PI / 2, 0, 0] as [number, number, number]
             },
             {
-                position: [0, 0.01, -fieldLength / 2 + penaltyAreaLength / 2] as [number, number, number],
+                position: [0, 0.01, -FIELD_LENGTH / 2 + penaltyAreaLength / 2] as [number, number, number],
                 rotation: [-Math.PI / 2, 0, 0] as [number, number, number]
             }
         ]
@@ -130,24 +128,24 @@ export class Scene {
         // Create walls
         const wallPositions = [
             {
-                position: [0, wallHeight / 2, fieldLength / 2] as [number, number, number],
+                position: [0, wallHeight / 2, FIELD_LENGTH / 2] as [number, number, number],
                 rotation: [0, 0, 0] as [number, number, number],
-                size: [fieldWidth, wallHeight, 1] as [number, number, number]
+                size: [FIELD_WIDTH, wallHeight, 1] as [number, number, number]
             }, // North
             {
-                position: [0, wallHeight / 2, -fieldLength / 2] as [number, number, number],
+                position: [0, wallHeight / 2, -FIELD_LENGTH / 2] as [number, number, number],
                 rotation: [0, Math.PI, 0] as [number, number, number],
-                size: [fieldWidth, wallHeight, 1] as [number, number, number]
+                size: [FIELD_WIDTH, wallHeight, 1] as [number, number, number]
             }, // South
             {
-                position: [fieldWidth / 2, wallHeight / 2, 0] as [number, number, number],
+                position: [FIELD_WIDTH / 2, wallHeight / 2, 0] as [number, number, number],
                 rotation: [0, Math.PI / 2, 0] as [number, number, number],
-                size: [fieldLength, wallHeight, 1] as [number, number, number]
+                size: [FIELD_LENGTH, wallHeight, 1] as [number, number, number]
             }, // East
             {
-                position: [-fieldWidth / 2, wallHeight / 2, 0] as [number, number, number],
+                position: [-FIELD_WIDTH / 2, wallHeight / 2, 0] as [number, number, number],
                 rotation: [0, -Math.PI / 2, 0] as [number, number, number],
-                size: [fieldLength, wallHeight, 1] as [number, number, number]
+                size: [FIELD_LENGTH, wallHeight, 1] as [number, number, number]
             } // West
         ]
 
