@@ -133,51 +133,48 @@ class Game {
     }
 
     private updatePlayer(deltaTime: number) {
-        const newPosition = this.player.position.clone()
-        let moved = false
-
         // Handle rotation
         if (this.keys['ArrowLeft']) {
-            this.playerRotation += this.rotationSpeed * deltaTime
-            this.player.rotation.y = this.playerRotation
-            moved = true
+            this.player.rotation.y += this.rotationSpeed * deltaTime
         }
         if (this.keys['ArrowRight']) {
-            this.playerRotation -= this.rotationSpeed * deltaTime
-            this.player.rotation.y = this.playerRotation
-            moved = true
+            this.player.rotation.y -= this.rotationSpeed * deltaTime
         }
 
         // Handle movement
         if (this.keys['ArrowUp']) {
-            newPosition.z -= Math.cos(this.playerRotation) * this.moveSpeed * deltaTime
-            newPosition.x -= Math.sin(this.playerRotation) * this.moveSpeed * deltaTime
-            moved = true
+            this.player.position.x -= Math.sin(this.player.rotation.y) * this.moveSpeed * deltaTime
+            this.player.position.z -= Math.cos(this.player.rotation.y) * this.moveSpeed * deltaTime
         }
         if (this.keys['ArrowDown']) {
-            newPosition.z += Math.cos(this.playerRotation) * this.moveSpeed * deltaTime
-            newPosition.x += Math.sin(this.playerRotation) * this.moveSpeed * deltaTime
-            moved = true
+            this.player.position.x += Math.sin(this.player.rotation.y) * this.moveSpeed * deltaTime
+            this.player.position.z += Math.cos(this.player.rotation.y) * this.moveSpeed * deltaTime
         }
 
-        // Handle jumping
+        // Apply gravity and handle jumping
         if (this.isJumping) {
+            this.player.position.y += this.jumpVelocity * deltaTime
             this.jumpVelocity -= this.gravity * deltaTime
-            newPosition.y += this.jumpVelocity * deltaTime
 
-            // Check if landed
-            if (newPosition.y <= this.groundLevel) {
-                newPosition.y = this.groundLevel
+            // Check for landing
+            if (this.player.position.y <= this.groundLevel) {
+                this.player.position.y = this.groundLevel
                 this.isJumping = false
                 this.jumpVelocity = 0
             }
         }
 
-        // Check if new position is within bounds (inside the field)
-        if (moved && Math.abs(newPosition.x) < 9 && Math.abs(newPosition.z) < 14) {
-            this.player.position.copy(newPosition)
-            this.updateCamera()
-        }
+        // Keep player within bounds
+        const maxX = 9.5 // Half of field width minus player size
+        const maxZ = 14.5 // Half of field length minus player size
+        this.player.position.x = Math.max(-maxX, Math.min(maxX, this.player.position.x))
+        this.player.position.z = Math.max(-maxZ, Math.min(maxZ, this.player.position.z))
+
+        // Update camera position
+        const cameraOffset = new THREE.Vector3(0, 5, 10)
+        cameraOffset.applyQuaternion(this.player.quaternion)
+        this.camera.position.copy(this.player.position).add(cameraOffset)
+        this.camera.lookAt(this.player.position)
     }
 
     private handleWheel(event: WheelEvent) {
