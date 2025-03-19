@@ -13,8 +13,7 @@ export class Scene {
         this.scene.background = new THREE.Color(0x87ceeb) // Sky blue background
 
         // Camera
-        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight)
-        // Make camera see all layers
+        this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight)
         this.camera.layers.enableAll()
 
         // Renderer
@@ -180,6 +179,70 @@ export class Scene {
         createFieldLine(18.32, FIELD_LINE_THICKNESS, [0, 0.01, -FIELD_LENGTH / 2 + 5.5], [-Math.PI / 2, 0, 0])
         createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, [9.16, 0.01, -FIELD_LENGTH / 2 + 2.75], [-Math.PI / 2, 0, 0])
         createFieldLine(FIELD_LINE_THICKNESS, 5.5 + FIELD_LINE_THICKNESS, [-9.16, 0.01, -FIELD_LENGTH / 2 + 2.75], [-Math.PI / 2, 0, 0])
+
+        // Add corner flags and quarter circles
+        const createCornerFlag = (x: number, z: number) => {
+            // Flag pole
+            const poleGeometry = new THREE.CylinderGeometry(0.05, 0.05, 2, 8)
+            const poleMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff })
+            const pole = new THREE.Mesh(poleGeometry, poleMaterial)
+            pole.position.set(x, 1, z)
+            pole.castShadow = true
+            pole.receiveShadow = true
+            this.scene.add(pole)
+
+            // Flag
+            const flagGeometry = new THREE.PlaneGeometry(0.4, 0.3)
+            const flagMaterial = new THREE.MeshStandardMaterial({
+                color: 0xff0000,
+                side: THREE.DoubleSide
+            })
+            const flag = new THREE.Mesh(flagGeometry, flagMaterial)
+            flag.position.set(x - 0.2, 1.7, z)
+            flag.rotation.y = Math.PI / 4
+            flag.castShadow = true
+            flag.receiveShadow = true
+            this.scene.add(flag)
+
+            // Corner quarter circle
+            const quarterCircleRadius = 1
+            const quarterCircleGeometry = new THREE.RingGeometry(
+                quarterCircleRadius - FIELD_LINE_THICKNESS / 2,
+                quarterCircleRadius + FIELD_LINE_THICKNESS / 2,
+                8,
+                1,
+                0,
+                Math.PI / 2
+            )
+            const quarterCircleMaterial = new THREE.MeshStandardMaterial({ color: FIELD_LINE_COLOR })
+            const quarterCircle = new THREE.Mesh(quarterCircleGeometry, quarterCircleMaterial)
+            quarterCircle.rotation.x = -Math.PI / 2
+            quarterCircle.position.y = 0.01
+
+            // Rotate and position quarter circle based on corner position
+            if (x > 0 && z > 0) {
+                quarterCircle.rotation.y = Math.PI
+                quarterCircle.position.set(x - 1, 0.01, z - 1)
+            } else if (x < 0 && z > 0) {
+                quarterCircle.rotation.y = Math.PI / 2
+                quarterCircle.position.set(x + 1, 0.01, z - 1)
+            } else if (x > 0 && z < 0) {
+                quarterCircle.rotation.y = -Math.PI / 2
+                quarterCircle.position.set(x - 1, 0.01, z + 1)
+            } else {
+                quarterCircle.position.set(x + 1, 0.01, z + 1)
+            }
+
+            this.scene.add(quarterCircle)
+        }
+
+        // Create corner flags at each corner
+        const halfWidth = FIELD_WIDTH / 2
+        const halfLength = FIELD_LENGTH / 2
+        createCornerFlag(halfWidth, halfLength) // Northeast corner
+        createCornerFlag(-halfWidth, halfLength) // Northwest corner
+        createCornerFlag(halfWidth, -halfLength) // Southeast corner
+        createCornerFlag(-halfWidth, -halfLength) // Southwest corner
     }
 
     private createClouds() {
