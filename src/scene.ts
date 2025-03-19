@@ -34,8 +34,19 @@ export class Scene {
         const ambientLight = new THREE.AmbientLight(0xffffff, 1)
         this.scene.add(ambientLight)
         const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
-        directionalLight.position.set(5, 5, 5)
+        directionalLight.position.set(0, 10, 10)
         directionalLight.castShadow = true
+
+        // Configure shadow properties for better quality
+        directionalLight.shadow.mapSize.width = 2048
+        directionalLight.shadow.mapSize.height = 2048
+        directionalLight.shadow.camera.near = 0.5
+        directionalLight.shadow.camera.far = 50
+        directionalLight.shadow.camera.left = -30
+        directionalLight.shadow.camera.right = 30
+        directionalLight.shadow.camera.top = 30
+        directionalLight.shadow.camera.bottom = -30
+
         this.scene.add(directionalLight)
 
         // Elements

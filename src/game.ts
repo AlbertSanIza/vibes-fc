@@ -95,6 +95,7 @@ class Game {
         const ballMaterial = new THREE.MeshPhongMaterial({ color: BALL_COLOR, shininess: BALL_SHININESS })
         this.ball = new THREE.Mesh(ballGeometry, ballMaterial)
         this.ball.position.set(2, this.ballRadius, 0) // Position ball slightly to the right
+        this.ball.castShadow = true // Enable shadow casting for the ball
         this.scene.add(this.ball)
 
         // Event listeners
