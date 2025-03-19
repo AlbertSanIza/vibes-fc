@@ -5,7 +5,7 @@ class Game {
     private scene: THREE.Scene
     private camera: THREE.PerspectiveCamera
     private renderer: THREE.WebGLRenderer
-    private player!: THREE.Mesh
+    private player!: THREE.Group
     private ball!: THREE.Mesh
     private stats: Stats = new Stats()
     private moveSpeed: number = 5.0
@@ -41,11 +41,44 @@ class Game {
         // Initialize stats
         document.body.appendChild(this.stats.dom)
 
-        // Create player (blue rectangle)
-        const geometry = new THREE.BoxGeometry(1, 1, 1)
-        const material = new THREE.MeshPhongMaterial({ color: 0x0000ff })
-        this.player = new THREE.Mesh(geometry, material)
-        this.player.position.set(0, this.groundLevel, 0) // Position at center of field
+        // Create player (Fall Guys-like character)
+        const playerGroup = new THREE.Group()
+
+        // Main body (cylinder)
+        const bodyHeight = 1.2
+        const bodyRadius = 0.4
+        const bodyGeometry = new THREE.CylinderGeometry(bodyRadius, bodyRadius, bodyHeight, 16)
+        const bodyMaterial = new THREE.MeshPhongMaterial({
+            color: 0x0000ff,
+            shininess: 30
+        })
+        const body = new THREE.Mesh(bodyGeometry, bodyMaterial)
+        body.position.y = bodyHeight / 2
+        playerGroup.add(body)
+
+        // Top hemisphere
+        const topGeometry = new THREE.SphereGeometry(bodyRadius, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2)
+        const topMaterial = new THREE.MeshPhongMaterial({
+            color: 0x0000ff,
+            shininess: 30
+        })
+        const top = new THREE.Mesh(topGeometry, topMaterial)
+        top.position.y = bodyHeight
+        playerGroup.add(top)
+
+        // Bottom hemisphere
+        const bottomGeometry = new THREE.SphereGeometry(bodyRadius, 16, 16, 0, Math.PI * 2, Math.PI / 2, Math.PI)
+        const bottomMaterial = new THREE.MeshPhongMaterial({
+            color: 0x0000ff,
+            shininess: 30
+        })
+        const bottom = new THREE.Mesh(bottomGeometry, bottomMaterial)
+        bottom.position.y = 0
+        playerGroup.add(bottom)
+
+        // Add the group to the scene
+        this.player = playerGroup
+        this.player.position.set(0, this.groundLevel, 0)
         this.scene.add(this.player)
 
         // Create ball
