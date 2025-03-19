@@ -1,6 +1,10 @@
 import * as THREE from 'three'
 import Stats from 'three/examples/jsm/libs/stats.module.js'
 
+const FIELD_WIDTH = 75
+const FIELD_LENGTH = 110
+const WALL_HEIGHT = 3
+
 class Game {
     private scene: THREE.Scene
     private camera: THREE.PerspectiveCamera
@@ -134,12 +138,12 @@ class Game {
         }
 
         // Check for collision with walls
-        if (Math.abs(this.ball.position.x) > 9 - this.ballRadius) {
-            this.ball.position.x = Math.sign(this.ball.position.x) * (9 - this.ballRadius)
+        if (Math.abs(this.ball.position.x) > FIELD_WIDTH / 2 - this.ballRadius) {
+            this.ball.position.x = Math.sign(this.ball.position.x) * (FIELD_WIDTH / 2 - this.ballRadius)
             this.ballVelocity.x *= -this.ballBounce
         }
-        if (Math.abs(this.ball.position.z) > 14 - this.ballRadius) {
-            this.ball.position.z = Math.sign(this.ball.position.z) * (14 - this.ballRadius)
+        if (Math.abs(this.ball.position.z) > FIELD_LENGTH / 2 - this.ballRadius) {
+            this.ball.position.z = Math.sign(this.ball.position.z) * (FIELD_LENGTH / 2 - this.ballRadius)
             this.ballVelocity.z *= -this.ballBounce
         }
 
@@ -205,8 +209,8 @@ class Game {
         }
 
         // Keep player within bounds
-        const maxX = 9.5 // Half of field width minus player size
-        const maxZ = 14.5 // Half of field length minus player size
+        const maxX = FIELD_WIDTH / 2 - 1 // Half of field width minus player size
+        const maxZ = FIELD_LENGTH / 2 - 1 // Half of field length minus player size
         this.player.position.x = Math.max(-maxX, Math.min(maxX, this.player.position.x))
         this.player.position.z = Math.max(-maxZ, Math.min(maxZ, this.player.position.z))
 
