@@ -297,7 +297,7 @@ export class Scene {
         const createTree = (position: { x: number; z: number }, height: number = 4, crownSize: number = 2.5) => {
             const tree = new THREE.Group()
             // Trunk
-            const trunkGeometry = new THREE.CylinderGeometry(0.4, 0.6, height, 8)
+            const trunkGeometry = new THREE.CylinderGeometry(0.4, 0.6, height, 5)
             const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 }) // Saddle Brown
             const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial)
             trunk.position.set(position.x, height / 2, position.z)
@@ -322,10 +322,10 @@ export class Scene {
         const groundRadius = Math.max(FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_LENGTH) * 1.2
 
         // Add trees randomly within the ground circle but outside the extended field
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 200; i++) {
             // Generate random angle and radius in polar coordinates
             const angle = Math.random() * Math.PI * 2
-            const minRadius = Math.max(FIELD_EXTENDED_WIDTH / 2, FIELD_EXTENDED_LENGTH / 2) * 1.1 // 10% buffer from field
+            const minRadius = Math.max(FIELD_EXTENDED_WIDTH / 2, FIELD_EXTENDED_LENGTH / 2) * 1.2
             const maxRadius = groundRadius * 0.9 // 10% buffer from edge
             const radius = minRadius + Math.random() * (maxRadius - minRadius)
             // Convert to Cartesian coordinates
