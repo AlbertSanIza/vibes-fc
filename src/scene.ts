@@ -3,8 +3,6 @@ import * as THREE from 'three'
 import {
     FIELD_EXTENDED_LENGTH,
     FIELD_EXTENDED_WIDTH,
-    FIELD_EXTRA_LENGTH,
-    FIELD_EXTRA_WIDTH,
     FIELD_GOAL_HEIGHT,
     FIELD_GOAL_POST_RADIUS,
     FIELD_GOAL_WIDTH,
@@ -54,8 +52,8 @@ export class Scene {
         topLight.shadow.mapSize.height = 4096
         topLight.shadow.camera.near = 0.5
         topLight.shadow.camera.far = 50
-        const shadowWidth = (FIELD_WIDTH + FIELD_EXTRA_WIDTH) / 2
-        const shadowLength = (FIELD_LENGTH + FIELD_EXTRA_LENGTH) / 2
+        const shadowWidth = FIELD_EXTENDED_WIDTH / 2
+        const shadowLength = FIELD_EXTENDED_LENGTH / 2
         topLight.shadow.camera.left = -shadowWidth
         topLight.shadow.camera.right = shadowWidth
         topLight.shadow.camera.top = shadowLength
@@ -101,7 +99,7 @@ export class Scene {
     }
 
     private createGround() {
-        const groundGeometry = new THREE.CircleGeometry(Math.max(FIELD_WIDTH + FIELD_EXTRA_WIDTH, FIELD_LENGTH + FIELD_EXTRA_LENGTH) * 1.5, 32)
+        const groundGeometry = new THREE.CircleGeometry(Math.max(FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_LENGTH) * 1.5, 32)
         const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x90ee90 }) // Light Green
         const ground = new THREE.Mesh(groundGeometry, groundMaterial)
         ground.rotation.x = -Math.PI / 2
@@ -118,7 +116,7 @@ export class Scene {
         // West: Positive X
 
         // Main Field
-        const mainFieldGeometry = new THREE.PlaneGeometry(FIELD_WIDTH + FIELD_EXTRA_WIDTH, FIELD_LENGTH + FIELD_EXTRA_LENGTH)
+        const mainFieldGeometry = new THREE.PlaneGeometry(FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_LENGTH)
         const mainFieldMaterial = new THREE.MeshStandardMaterial({ color: 0x2e8b57 }) // Forest green
         const mainField = new THREE.Mesh(mainFieldGeometry, mainFieldMaterial)
         mainField.rotation.x = -Math.PI / 2

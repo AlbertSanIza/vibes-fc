@@ -8,8 +8,7 @@ import {
     BALL_RADIUS,
     BALL_SHININESS,
     CAMERA_DISTANCE,
-    FIELD_EXTRA_LENGTH,
-    FIELD_EXTRA_WIDTH,
+    FIELD_EXTENDED_WIDTH,
     FIELD_LENGTH,
     FIELD_WIDTH,
     PLAYER_BODY_HEIGHT,
@@ -250,8 +249,8 @@ class Game {
         }
 
         // Keep player within wider bounds (including extra area)
-        const maxX = (FIELD_WIDTH + FIELD_EXTRA_WIDTH) / 2 - PLAYER_BODY_RADIUS
-        const maxZ = (FIELD_LENGTH + FIELD_EXTRA_LENGTH) / 2 - PLAYER_BODY_RADIUS
+        const maxX = FIELD_EXTENDED_WIDTH / 2 - PLAYER_BODY_RADIUS
+        const maxZ = FIELD_EXTENDED_LENGTH / 2 - PLAYER_BODY_RADIUS
         this.player.position.x = Math.max(-maxX, Math.min(maxX, this.player.position.x))
         this.player.position.z = Math.max(-maxZ, Math.min(maxZ, this.player.position.z))
 
