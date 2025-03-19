@@ -2,6 +2,9 @@ import * as THREE from 'three'
 
 const FIELD_WIDTH = 75
 const FIELD_LENGTH = 110
+const FIELD_LINE_WIDTH = 0.12
+const FIELD_LINE_COLOR = 0xffffff
+const WALL_HEIGHT = 3
 
 export class Scene {
     public scene: THREE.Scene
@@ -51,25 +54,17 @@ export class Scene {
 
     private createGround() {
         const groundRadius = Math.max(FIELD_WIDTH, FIELD_LENGTH) * 1.5
-        const groundGeometry = new THREE.CircleGeometry(groundRadius, 16)
-        const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x90ee90, side: THREE.DoubleSide }) // Light Freen
+        const groundGeometry = new THREE.CircleGeometry(groundRadius, 32)
+        const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x90ee90 }) // Light Green
         const ground = new THREE.Mesh(groundGeometry, groundMaterial)
-        ground.rotation.x = Math.PI / 2
+        ground.rotation.x = -Math.PI / 2
+        ground.position.y = -0.1
         this.scene.add(ground)
     }
 
     private createSoccerField() {
-        // Soccer field dimensions
-        const wallHeight = 2
-        const lineWidth = 0.2
-        const lineColor = 0xffffff
-
-        // Field (green plane)
         const fieldGeometry = new THREE.PlaneGeometry(FIELD_WIDTH, FIELD_LENGTH)
-        const fieldMaterial = new THREE.MeshStandardMaterial({
-            color: 0x2e8b57, // Forest green
-            side: THREE.DoubleSide
-        })
+        const fieldMaterial = new THREE.MeshStandardMaterial({ color: 0x2e8b57 })
         const field = new THREE.Mesh(fieldGeometry, fieldMaterial)
         field.rotation.x = -Math.PI / 2
         field.receiveShadow = true
@@ -78,26 +73,32 @@ export class Scene {
         // Field lines
         const createFieldLine = (width: number, length: number, position: [number, number, number], rotation: [number, number, number]) => {
             const lineGeometry = new THREE.PlaneGeometry(width, length)
-            const lineMaterial = new THREE.MeshStandardMaterial({ color: lineColor })
+            const lineMaterial = new THREE.MeshStandardMaterial({ color: FIELD_LINE_COLOR })
             const line = new THREE.Mesh(lineGeometry, lineMaterial)
             line.position.set(...position)
             line.rotation.set(...rotation)
-            line.receiveShadow = true
             this.scene.add(line)
         }
 
         // Center line
-        createFieldLine(FIELD_WIDTH, lineWidth, [0, 0.01, 0], [-Math.PI / 2, 0, 0])
+        createFieldLine(FIELD_WIDTH, FIELD_LINE_WIDTH, [0, 0.01, 0], [-Math.PI / 2, 0, 0])
 
         // Center circle
-        const centerCircleRadius = 3
-        const centerCircleGeometry = new THREE.RingGeometry(centerCircleRadius - lineWidth / 2, centerCircleRadius + lineWidth / 2, 32)
-        const centerCircleMaterial = new THREE.MeshStandardMaterial({ color: lineColor })
+        const centerCircleRadius = 9.15 / 2
+        const centerCircleGeometry = new THREE.RingGeometry(centerCircleRadius - FIELD_LINE_WIDTH / 2, centerCircleRadius + FIELD_LINE_WIDTH / 2, 32)
+        const centerCircleMaterial = new THREE.MeshStandardMaterial({ color: FIELD_LINE_COLOR })
         const centerCircle = new THREE.Mesh(centerCircleGeometry, centerCircleMaterial)
         centerCircle.rotation.x = -Math.PI / 2
         centerCircle.position.y = 0.01
-        centerCircle.receiveShadow = true
         this.scene.add(centerCircle)
+
+        // Center spot
+        const centerSpotGeometry = new THREE.CircleGeometry(FIELD_LINE_WIDTH, 32)
+        const centerSpotMaterial = new THREE.MeshStandardMaterial({ color: FIELD_LINE_COLOR })
+        const centerSpot = new THREE.Mesh(centerSpotGeometry, centerSpotMaterial)
+        centerSpot.rotation.x = -Math.PI / 2
+        centerSpot.position.y = 0.01
+        this.scene.add(centerSpot)
 
         // Penalty areas
         const penaltyAreaWidth = 8
@@ -114,8 +115,8 @@ export class Scene {
         ]
 
         penaltyAreaPositions.forEach(({ position, rotation }) => {
-            createFieldLine(penaltyAreaWidth, lineWidth, position, rotation)
-            createFieldLine(lineWidth, penaltyAreaLength, position, rotation)
+            createFieldLine(penaltyAreaWidth, FIELD_LINE_WIDTH, position, rotation)
+            createFieldLine(FIELD_LINE_WIDTH, penaltyAreaLength, position, rotation)
         })
 
         // Walls
@@ -128,24 +129,24 @@ export class Scene {
         // Create walls
         const wallPositions = [
             {
-                position: [0, wallHeight / 2, FIELD_LENGTH / 2] as [number, number, number],
+                position: [0, WALL_HEIGHT / 2, FIELD_LENGTH / 2] as [number, number, number],
                 rotation: [0, 0, 0] as [number, number, number],
-                size: [FIELD_WIDTH, wallHeight, 1] as [number, number, number]
+                size: [FIELD_WIDTH, WALL_HEIGHT, 1] as [number, number, number]
             }, // North
             {
-                position: [0, wallHeight / 2, -FIELD_LENGTH / 2] as [number, number, number],
+                position: [0, WALL_HEIGHT / 2, -FIELD_LENGTH / 2] as [number, number, number],
                 rotation: [0, Math.PI, 0] as [number, number, number],
-                size: [FIELD_WIDTH, wallHeight, 1] as [number, number, number]
+                size: [FIELD_WIDTH, WALL_HEIGHT, 1] as [number, number, number]
             }, // South
             {
-                position: [FIELD_WIDTH / 2, wallHeight / 2, 0] as [number, number, number],
+                position: [FIELD_WIDTH / 2, WALL_HEIGHT / 2, 0] as [number, number, number],
                 rotation: [0, Math.PI / 2, 0] as [number, number, number],
-                size: [FIELD_LENGTH, wallHeight, 1] as [number, number, number]
+                size: [FIELD_LENGTH, WALL_HEIGHT, 1] as [number, number, number]
             }, // East
             {
-                position: [-FIELD_WIDTH / 2, wallHeight / 2, 0] as [number, number, number],
+                position: [-FIELD_WIDTH / 2, WALL_HEIGHT / 2, 0] as [number, number, number],
                 rotation: [0, -Math.PI / 2, 0] as [number, number, number],
-                size: [FIELD_LENGTH, wallHeight, 1] as [number, number, number]
+                size: [FIELD_LENGTH, WALL_HEIGHT, 1] as [number, number, number]
             } // West
         ]
 
