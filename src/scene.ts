@@ -1,6 +1,16 @@
 import * as THREE from 'three'
 
-import { FIELD_EXTRA_LENGTH, FIELD_EXTRA_WIDTH, FIELD_LENGTH, FIELD_LINE_COLOR, FIELD_LINE_THICKNESS, FIELD_WIDTH } from './constants'
+import {
+    FIELD_EXTRA_LENGTH,
+    FIELD_EXTRA_WIDTH,
+    FIELD_GOAL_HEIGHT,
+    FIELD_GOAL_POST_RADIUS,
+    FIELD_GOAL_WIDTH,
+    FIELD_LENGTH,
+    FIELD_LINE_COLOR,
+    FIELD_LINE_THICKNESS,
+    FIELD_WIDTH
+} from './constants'
 
 export class Scene {
     public scene: THREE.Scene
@@ -77,15 +87,8 @@ export class Scene {
         // Elements
         this.createGround()
         this.createSoccerField()
-
-        // Clouds
-        this.createClouds()
-
-        // Goals
-        this.createGoals()
-
-        // Trees
         this.createTrees()
+        this.createClouds()
 
         // Expose scene, camera, and renderer to window object for game.ts
         ;(window as any).scene = this.scene
@@ -168,6 +171,36 @@ export class Scene {
             this.scene.add(cornerFlagPole)
         }
 
+        const createGoal = (position: [number, number, number]) => {
+            // Goal posts
+            const postGeometry = new THREE.CylinderGeometry(FIELD_GOAL_POST_RADIUS, FIELD_GOAL_POST_RADIUS, FIELD_GOAL_HEIGHT, 8)
+            const postMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.5, roughness: 0.2 })
+
+            // Left post
+            const leftPost = new THREE.Mesh(postGeometry, postMaterial)
+            leftPost.position.set(position[0] - FIELD_GOAL_WIDTH / 2, position[1] + FIELD_GOAL_HEIGHT / 2, position[2])
+            leftPost.castShadow = true
+            leftPost.receiveShadow = true
+
+            // Right post
+            const rightPost = new THREE.Mesh(postGeometry, postMaterial)
+            rightPost.position.set(position[0] + FIELD_GOAL_WIDTH / 2, position[1] + FIELD_GOAL_HEIGHT / 2, position[2])
+            rightPost.castShadow = true
+            rightPost.receiveShadow = true
+
+            // Crossbar
+            const crossbarGeometry = new THREE.CylinderGeometry(FIELD_GOAL_POST_RADIUS, FIELD_GOAL_POST_RADIUS, FIELD_GOAL_WIDTH, 8)
+            const crossbar = new THREE.Mesh(crossbarGeometry, postMaterial)
+            crossbar.position.set(position[0], position[1] + FIELD_GOAL_HEIGHT, position[2])
+            crossbar.rotation.z = Math.PI / 2
+            crossbar.castShadow = true
+            crossbar.receiveShadow = true
+
+            this.scene.add(leftPost)
+            this.scene.add(rightPost)
+            this.scene.add(crossbar)
+        }
+
         createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: halfLength }) // Outer Line North
         createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: -halfLength }) // Outer Line South
         createFieldLine(FIELD_LINE_THICKNESS, FIELD_LENGTH + FIELD_LINE_THICKNESS, { x: -halfWidth, z: 0 }) // Outer Line East
@@ -213,6 +246,9 @@ export class Scene {
         createCornerFlagPole({ x: -halfWidth, z: halfLength }) // Northwest corner
         createCornerFlagPole({ x: halfWidth, z: -halfLength }) // Southeast corner
         createCornerFlagPole({ x: -halfWidth, z: -halfLength }) // Southwest corner
+
+        createGoal([0, 0, FIELD_LENGTH / 2]) // North Goal
+        createGoal([0, 0, -FIELD_LENGTH / 2]) // South Goal
     }
 
     private createClouds() {
@@ -258,73 +294,6 @@ export class Scene {
         createCloud(-20, 13, 0, 2.3)
         createCloud(20, 9, -25, 2.6)
         createCloud(-5, 11, 25, 2.4)
-    }
-
-    private createGoals() {
-        const goalWidth = 4
-        const goalHeight = 2
-        const goalDepth = 2
-        const goalPostRadius = 0.1
-        const goalNetColor = 0xffffff
-        const fieldLength = 30
-
-        const createGoal = (position: [number, number, number]) => {
-            // Goal posts
-            const postGeometry = new THREE.CylinderGeometry(goalPostRadius, goalPostRadius, goalHeight, 8)
-            const postMaterial = new THREE.MeshStandardMaterial({
-                color: 0xffffff,
-                metalness: 0.5,
-                roughness: 0.2
-            })
-
-            // Left post
-            const leftPost = new THREE.Mesh(postGeometry, postMaterial)
-            leftPost.position.set(position[0] - goalWidth / 2, position[1] + goalHeight / 2, position[2])
-            leftPost.castShadow = true
-            leftPost.receiveShadow = true
-
-            // Right post
-            const rightPost = new THREE.Mesh(postGeometry, postMaterial)
-            rightPost.position.set(position[0] + goalWidth / 2, position[1] + goalHeight / 2, position[2])
-            rightPost.castShadow = true
-            rightPost.receiveShadow = true
-
-            // Crossbar
-            const crossbarGeometry = new THREE.CylinderGeometry(goalPostRadius, goalPostRadius, goalWidth, 8)
-            const crossbar = new THREE.Mesh(crossbarGeometry, postMaterial)
-            crossbar.position.set(position[0], position[1] + goalHeight, position[2])
-            crossbar.rotation.z = Math.PI / 2
-            crossbar.castShadow = true
-            crossbar.receiveShadow = true
-
-            // Goal net (simplified)
-            const netGeometry = new THREE.BoxGeometry(goalWidth, goalHeight, goalDepth)
-            const netMaterial = new THREE.MeshStandardMaterial({
-                color: goalNetColor,
-                transparent: true,
-                opacity: 0.5,
-                side: THREE.DoubleSide
-            })
-            const net = new THREE.Mesh(netGeometry, netMaterial)
-            net.position.set(position[0], position[1] + goalHeight / 2, position[2] + goalDepth / 2)
-            net.castShadow = true
-            net.receiveShadow = true
-
-            this.scene.add(leftPost)
-            this.scene.add(rightPost)
-            this.scene.add(crossbar)
-            this.scene.add(net)
-        }
-
-        // Create goals
-        const goalPositions = [
-            { position: [0, 0, fieldLength / 2 - goalDepth / 2] as [number, number, number] }, // North goal
-            { position: [0, 0, -fieldLength / 2 + goalDepth / 2] as [number, number, number] } // South goal
-        ]
-
-        goalPositions.forEach(({ position }) => {
-            createGoal(position)
-        })
     }
 
     private createTrees() {

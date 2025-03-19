@@ -5,6 +5,9 @@ export const FIELD_EXTRA_WIDTH = 10
 export const FIELD_EXTRA_LENGTH = 10
 export const FIELD_LINE_THICKNESS = 0.12
 export const FIELD_LINE_COLOR = 0xffffff
+export const FIELD_GOAL_WIDTH = 7.32
+export const FIELD_GOAL_HEIGHT = 2.44
+export const FIELD_GOAL_POST_RADIUS = 0.1
 
 // Player
 export const PLAYER_BODY_HEIGHT = 1.8
