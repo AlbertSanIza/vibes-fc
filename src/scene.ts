@@ -159,7 +159,10 @@ export class Scene {
         })
 
         // Walls
-        const wallMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff })
+        const wallMaterial = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            side: THREE.DoubleSide
+        })
         const walls = []
 
         // Create walls
@@ -195,6 +198,14 @@ export class Scene {
             wall.receiveShadow = true
             walls.push(wall)
             this.scene.add(wall)
+
+            // Add wireframe edges
+            const wireframeGeometry = new THREE.EdgesGeometry(wallGeometry)
+            const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0x000000 })
+            const wireframe = new THREE.LineSegments(wireframeGeometry, wireframeMaterial)
+            wireframe.position.set(...position)
+            wireframe.rotation.set(...rotation)
+            this.scene.add(wireframe)
         })
     }
 
