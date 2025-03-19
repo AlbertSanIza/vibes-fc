@@ -1,5 +1,7 @@
 {
     "recommendations": [
+        "bradlc.vscode-tailwindcss",
+        "ChakrounAnas.turbo-console-log",
         "esbenp.prettier-vscode",
         "formulahendry.auto-rename-tag",
         "GitHub.copilot",
