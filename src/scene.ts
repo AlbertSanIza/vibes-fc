@@ -34,20 +34,28 @@ export class Scene {
         const ambientLight = new THREE.AmbientLight(0xffffff, 1)
         this.scene.add(ambientLight)
         const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
-        directionalLight.position.set(0, 10, 10)
+        directionalLight.position.set(0, 10, 0) // Keep light directly above
         directionalLight.castShadow = true
 
-        // Configure shadow properties for better quality
-        directionalLight.shadow.mapSize.width = 2048
-        directionalLight.shadow.mapSize.height = 2048
+        // Calculate the required shadow camera dimensions based on field size
+        const shadowWidth = (FIELD_WIDTH + FIELD_EXTRA_WIDTH) / 2
+        const shadowLength = (FIELD_LENGTH + FIELD_EXTRA_LENGTH) / 2
+
+        // Configure shadow properties for better quality and larger area
+        directionalLight.shadow.mapSize.width = 4096 // Increased resolution
+        directionalLight.shadow.mapSize.height = 4096 // Increased resolution
         directionalLight.shadow.camera.near = 0.5
         directionalLight.shadow.camera.far = 50
-        directionalLight.shadow.camera.left = -30
-        directionalLight.shadow.camera.right = 30
-        directionalLight.shadow.camera.top = 30
-        directionalLight.shadow.camera.bottom = -30
+        directionalLight.shadow.camera.left = -shadowWidth
+        directionalLight.shadow.camera.right = shadowWidth
+        directionalLight.shadow.camera.top = shadowLength
+        directionalLight.shadow.camera.bottom = -shadowLength
 
         this.scene.add(directionalLight)
+
+        // Optional: Visualize the shadow camera (helpful for debugging)
+        // const helper = new THREE.CameraHelper(directionalLight.shadow.camera)
+        // this.scene.add(helper)
 
         // Elements
         this.createGround()
@@ -75,6 +83,7 @@ export class Scene {
         const ground = new THREE.Mesh(groundGeometry, groundMaterial)
         ground.rotation.x = -Math.PI / 2
         ground.position.y = -0.1
+        ground.receiveShadow = true // Make sure ground receives shadows
         this.scene.add(ground)
     }
 
@@ -91,8 +100,9 @@ export class Scene {
             const lineGeometry = new THREE.PlaneGeometry(width, length)
             const lineMaterial = new THREE.MeshStandardMaterial({ color: FIELD_LINE_COLOR })
             const line = new THREE.Mesh(lineGeometry, lineMaterial)
-            line.position.set(...position)
             line.rotation.set(...rotation)
+            line.position.set(...position)
+            line.receiveShadow = true
             this.scene.add(line)
         }
 
