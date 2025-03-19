@@ -157,10 +157,12 @@ class Game {
         const playerToBall = this.ball.position.clone().sub(this.player.position)
         const distance = playerToBall.length()
 
-        if (distance < 1 + this.ballRadius) {
+        // Change from hardcoded 1 to PLAYER_BODY_RADIUS + this.ballRadius
+        const collisionDistance = PLAYER_BODY_RADIUS + this.ballRadius
+        if (distance < collisionDistance) {
             // Collision response
             playerToBall.normalize()
-            const overlap = (1 + this.ballRadius - distance) * 0.5
+            const overlap = (collisionDistance - distance) * 0.5
             this.ball.position.add(playerToBall.clone().multiplyScalar(overlap))
             this.player.position.sub(playerToBall.clone().multiplyScalar(overlap))
 
