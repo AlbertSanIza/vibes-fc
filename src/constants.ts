@@ -1,6 +1,8 @@
 // Stadium
 export const FIELD_WIDTH = 75
 export const FIELD_LENGTH = 110
+export const FIELD_EXTRA_WIDTH = 10
+export const FIELD_EXTRA_LENGTH = 10
 export const FIELD_LINE_THICKNESS = 0.12
 export const FIELD_LINE_COLOR = 0xffffff
 export const WALL_HEIGHT = 3

@@ -1,6 +1,15 @@
 import * as THREE from 'three'
 
-import { FIELD_LENGTH, FIELD_LINE_COLOR, FIELD_LINE_THICKNESS, FIELD_WIDTH, WALL_HEIGHT, WALL_THICKNESS } from './constants'
+import {
+    FIELD_EXTRA_LENGTH,
+    FIELD_EXTRA_WIDTH,
+    FIELD_LENGTH,
+    FIELD_LINE_COLOR,
+    FIELD_LINE_THICKNESS,
+    FIELD_WIDTH,
+    WALL_HEIGHT,
+    WALL_THICKNESS
+} from './constants'
 
 export class Scene {
     public scene: THREE.Scene
@@ -40,7 +49,7 @@ export class Scene {
         // this.createGoals()
 
         // Trees
-        // this.createTrees()
+        this.createTrees()
 
         // Expose scene, camera, and renderer to window object for game.ts
         ;(window as any).scene = this.scene
@@ -49,7 +58,7 @@ export class Scene {
     }
 
     private createGround() {
-        const groundRadius = Math.max(FIELD_WIDTH, FIELD_LENGTH) * 1.5
+        const groundRadius = Math.max(FIELD_WIDTH + FIELD_EXTRA_WIDTH, FIELD_LENGTH + FIELD_EXTRA_LENGTH) * 1.5
         const groundGeometry = new THREE.CircleGeometry(groundRadius, 32)
         const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x90ee90 }) // Light Green
         const ground = new THREE.Mesh(groundGeometry, groundMaterial)
@@ -59,7 +68,7 @@ export class Scene {
     }
 
     private createSoccerField() {
-        const fieldGeometry = new THREE.PlaneGeometry(FIELD_WIDTH, FIELD_LENGTH)
+        const fieldGeometry = new THREE.PlaneGeometry(FIELD_WIDTH + FIELD_EXTRA_WIDTH, FIELD_LENGTH + FIELD_EXTRA_LENGTH)
         const fieldMaterial = new THREE.MeshStandardMaterial({ color: 0x2e8b57 }) // Forest green
         const field = new THREE.Mesh(fieldGeometry, fieldMaterial)
         field.rotation.x = -Math.PI / 2
@@ -75,6 +84,15 @@ export class Scene {
             line.rotation.set(...rotation)
             this.scene.add(line)
         }
+
+        // Outer Line North
+        createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, [0, 0.01, FIELD_LENGTH / 2], [-Math.PI / 2, 0, 0])
+        // Outer Line South
+        createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, [0, 0.01, -FIELD_LENGTH / 2], [-Math.PI / 2, 0, 0])
+        // Outer Line East
+        createFieldLine(FIELD_LINE_THICKNESS, FIELD_LENGTH + FIELD_LINE_THICKNESS, [FIELD_WIDTH / 2, 0.01, 0], [-Math.PI / 2, 0, 0])
+        // Outer Line West
+        createFieldLine(FIELD_LINE_THICKNESS, FIELD_LENGTH + FIELD_LINE_THICKNESS, [-FIELD_WIDTH / 2, 0.01, 0], [-Math.PI / 2, 0, 0])
 
         // Center Line
         createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, [0, 0.01, 0], [-Math.PI / 2, 0, 0])
