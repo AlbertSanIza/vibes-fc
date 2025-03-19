@@ -23,6 +23,8 @@ export class Scene {
 
         // Camera
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight)
+        // Make camera see all layers
+        this.camera.layers.enableAll()
 
         // Renderer
         this.renderer = new THREE.WebGLRenderer({ antialias: true })
@@ -30,32 +32,57 @@ export class Scene {
         this.renderer.shadowMap.enabled = true
         document.body.appendChild(this.renderer.domElement)
 
+        // Create layers
+        const LAYER_GENERAL = 0 // Default layer
+        const LAYER_DYNAMIC = 1 // Layer for player and ball
+
         // Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 1)
         this.scene.add(ambientLight)
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
-        directionalLight.position.set(0, 10, 0) // Keep light directly above
-        directionalLight.castShadow = true
 
-        // Calculate the required shadow camera dimensions based on field size
+        // Top-down light for player and ball shadows
+        const topLight = new THREE.DirectionalLight(0xffffff, 1)
+        topLight.position.set(0, 10, 0)
+        topLight.castShadow = true
+
+        // Configure shadow properties for top light
+        topLight.shadow.mapSize.width = 4096
+        topLight.shadow.mapSize.height = 4096
+        topLight.shadow.camera.near = 0.5
+        topLight.shadow.camera.far = 50
         const shadowWidth = (FIELD_WIDTH + FIELD_EXTRA_WIDTH) / 2
         const shadowLength = (FIELD_LENGTH + FIELD_EXTRA_LENGTH) / 2
+        topLight.shadow.camera.left = -shadowWidth
+        topLight.shadow.camera.right = shadowWidth
+        topLight.shadow.camera.top = shadowLength
+        topLight.shadow.camera.bottom = -shadowLength
 
-        // Configure shadow properties for better quality and larger area
-        directionalLight.shadow.mapSize.width = 4096 // Increased resolution
-        directionalLight.shadow.mapSize.height = 4096 // Increased resolution
-        directionalLight.shadow.camera.near = 0.5
-        directionalLight.shadow.camera.far = 50
-        directionalLight.shadow.camera.left = -shadowWidth
-        directionalLight.shadow.camera.right = shadowWidth
-        directionalLight.shadow.camera.top = shadowLength
-        directionalLight.shadow.camera.bottom = -shadowLength
+        // Set top light to only affect dynamic objects (player and ball)
+        topLight.layers.set(LAYER_DYNAMIC)
+        this.scene.add(topLight)
 
-        this.scene.add(directionalLight)
+        // Angled light for environment objects
+        const angledLight = new THREE.DirectionalLight(0xffffff, 0.8)
+        angledLight.position.set(-10, 8, -10)
+        angledLight.castShadow = true
 
-        // Optional: Visualize the shadow camera (helpful for debugging)
-        // const helper = new THREE.CameraHelper(directionalLight.shadow.camera)
-        // this.scene.add(helper)
+        // Configure shadow properties for angled light
+        angledLight.shadow.mapSize.width = 4096
+        angledLight.shadow.mapSize.height = 4096
+        angledLight.shadow.camera.near = 0.5
+        angledLight.shadow.camera.far = 50
+        angledLight.shadow.camera.left = -shadowWidth * 1.5
+        angledLight.shadow.camera.right = shadowWidth * 1.5
+        angledLight.shadow.camera.top = shadowLength * 1.5
+        angledLight.shadow.camera.bottom = -shadowLength * 1.5
+
+        // Set angled light to only affect general objects
+        angledLight.layers.set(LAYER_GENERAL)
+        this.scene.add(angledLight)
+
+        // Store layers in window for access from game.ts
+        ;(window as any).LAYER_GENERAL = LAYER_GENERAL
+        ;(window as any).LAYER_DYNAMIC = LAYER_DYNAMIC
 
         // Elements
         this.createGround()
@@ -84,6 +111,9 @@ export class Scene {
         ground.rotation.x = -Math.PI / 2
         ground.position.y = -0.1
         ground.receiveShadow = true // Make sure ground receives shadows
+        // Ground should receive shadows from both layers
+        ground.layers.enable((window as any).LAYER_GENERAL)
+        ground.layers.enable((window as any).LAYER_DYNAMIC)
         this.scene.add(ground)
     }
 

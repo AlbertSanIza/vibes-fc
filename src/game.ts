@@ -63,15 +63,18 @@ class Game {
         // Initialize stats
         document.body.appendChild(this.stats.dom)
 
-        // Create player (Fall Guys-like character)
+        // Create player
         const playerGroup = new THREE.Group()
+        // Set player and all its parts to dynamic layer
+        playerGroup.layers.set((window as any).LAYER_DYNAMIC)
 
         // Main body (cylinder)
         const bodyGeometry = new THREE.CylinderGeometry(PLAYER_BODY_RADIUS, PLAYER_BODY_RADIUS, PLAYER_BODY_HEIGHT - PLAYER_BODY_RADIUS * 2, 16)
         const bodyMaterial = new THREE.MeshPhongMaterial({ color: PLAYER_COLOR, shininess: PLAYER_SHININESS })
         const body = new THREE.Mesh(bodyGeometry, bodyMaterial)
         body.position.y = PLAYER_BODY_RADIUS
-        body.castShadow = true // Enable shadow casting for body
+        body.castShadow = true
+        body.layers.set((window as any).LAYER_DYNAMIC)
         playerGroup.add(body)
 
         // Top hemisphere
@@ -79,7 +82,8 @@ class Game {
         const topMaterial = new THREE.MeshPhongMaterial({ color: PLAYER_COLOR, shininess: PLAYER_SHININESS })
         const top = new THREE.Mesh(topGeometry, topMaterial)
         top.position.y = PLAYER_BODY_HEIGHT - PLAYER_BODY_RADIUS
-        top.castShadow = true // Enable shadow casting for top hemisphere
+        top.castShadow = true
+        top.layers.set((window as any).LAYER_DYNAMIC)
         playerGroup.add(top)
 
         // Bottom hemisphere
@@ -87,7 +91,8 @@ class Game {
         const bottomMaterial = new THREE.MeshPhongMaterial({ color: PLAYER_COLOR, shininess: PLAYER_SHININESS })
         const bottom = new THREE.Mesh(bottomGeometry, bottomMaterial)
         bottom.position.y = 0
-        bottom.castShadow = true // Enable shadow casting for bottom hemisphere
+        bottom.castShadow = true
+        bottom.layers.set((window as any).LAYER_DYNAMIC)
         playerGroup.add(bottom)
 
         // Add the group to the scene
@@ -99,8 +104,9 @@ class Game {
         const ballGeometry = new THREE.SphereGeometry(this.ballRadius, 32, 32)
         const ballMaterial = new THREE.MeshPhongMaterial({ color: BALL_COLOR, shininess: BALL_SHININESS })
         this.ball = new THREE.Mesh(ballGeometry, ballMaterial)
-        this.ball.position.set(2, this.ballRadius, 0) // Position ball slightly to the right
-        this.ball.castShadow = true // Enable shadow casting for the ball
+        this.ball.position.set(2, this.ballRadius, 0)
+        this.ball.castShadow = true
+        this.ball.layers.set((window as any).LAYER_DYNAMIC)
         this.scene.add(this.ball)
 
         // Event listeners
