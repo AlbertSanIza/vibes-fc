@@ -1,23 +1,30 @@
-import { Scene } from './scene'
 import './game'
+import { Scene } from './scene'
 import './style.css'
 
-// Create the scene
-new Scene()
+class Main {
+    scene: Scene
 
-// Animation loop
-function animate() {
-    requestAnimationFrame(animate)
-    ;(window as any).renderer.render((window as any).scene, (window as any).camera)
+    constructor() {
+        this.scene = new Scene()
+        this.setupEventListeners()
+        this.animate = this.animate.bind(this)
+        this.animate()
+    }
+
+    setupEventListeners() {
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            this.scene.camera.aspect = window.innerWidth / window.innerHeight
+            this.scene.camera.updateProjectionMatrix()
+            this.scene.renderer.setSize(window.innerWidth, window.innerHeight)
+        })
+    }
+
+    animate() {
+        this.scene.renderer.render(this.scene.scene, this.scene.camera)
+        requestAnimationFrame(() => this.animate())
+    }
 }
 
-// Handle window resize
-window.addEventListener('resize', () => {
-    const camera = (window as any).camera
-    camera.aspect = window.innerWidth / window.innerHeight
-    camera.updateProjectionMatrix()
-    ;(window as any).renderer.setSize(window.innerWidth, window.innerHeight)
-})
-
-// Start animation
-animate()
+new Main()
