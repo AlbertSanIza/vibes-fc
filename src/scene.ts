@@ -30,14 +30,12 @@ export class Scene {
         directionalLight.castShadow = true
         this.scene.add(directionalLight)
 
-        // Ground plane
+        // Elements
         this.createGround()
+        this.createSoccerField()
 
         // Clouds
         this.createClouds()
-
-        // Soccer field
-        this.createSoccerField()
 
         // Goals
         this.createGoals()
@@ -58,51 +56,6 @@ export class Scene {
         const ground = new THREE.Mesh(groundGeometry, groundMaterial)
         ground.rotation.x = Math.PI / 2
         this.scene.add(ground)
-    }
-
-    private createClouds() {
-        const createCloud = (x: number, y: number, z: number, baseSize: number) => {
-            const cloudGroup = new THREE.Group()
-            const cloudMaterial = new THREE.MeshStandardMaterial({
-                color: 0xffffff,
-                transparent: true,
-                opacity: 0.8
-            })
-
-            // Create multiple spheres for each cloud
-            const numSpheres = 5 + Math.floor(Math.random() * 3) // Random number between 5-7 spheres
-            const spheres = []
-
-            for (let i = 0; i < numSpheres; i++) {
-                const size = baseSize * (0.7 + Math.random() * 0.6) // Random size between 70% and 130% of base size
-                const sphereGeometry = new THREE.SphereGeometry(size, 8, 8)
-                const sphere = new THREE.Mesh(sphereGeometry, cloudMaterial)
-
-                // Random offset from center
-                const offsetX = (Math.random() - 0.5) * baseSize * 2
-                const offsetY = (Math.random() - 0.5) * baseSize
-                const offsetZ = (Math.random() - 0.5) * baseSize * 2
-
-                sphere.position.set(offsetX, offsetY, offsetZ)
-                sphere.castShadow = true
-                sphere.receiveShadow = true
-                spheres.push(sphere)
-                cloudGroup.add(sphere)
-            }
-
-            cloudGroup.position.set(x, y, z)
-            this.scene.add(cloudGroup)
-        }
-
-        // Add more clouds with varying sizes and positions
-        createCloud(-15, 8, -10, 2)
-        createCloud(15, 10, 5, 2.5)
-        createCloud(0, 12, -15, 3)
-        createCloud(-10, 9, 15, 2.2)
-        createCloud(10, 11, -20, 2.8)
-        createCloud(-20, 13, 0, 2.3)
-        createCloud(20, 9, -25, 2.6)
-        createCloud(-5, 11, 25, 2.4)
     }
 
     private createSoccerField() {
@@ -216,6 +169,51 @@ export class Scene {
             wireframe.rotation.set(...rotation)
             this.scene.add(wireframe)
         })
+    }
+
+    private createClouds() {
+        const createCloud = (x: number, y: number, z: number, baseSize: number) => {
+            const cloudGroup = new THREE.Group()
+            const cloudMaterial = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.8
+            })
+
+            // Create multiple spheres for each cloud
+            const numSpheres = 5 + Math.floor(Math.random() * 3) // Random number between 5-7 spheres
+            const spheres = []
+
+            for (let i = 0; i < numSpheres; i++) {
+                const size = baseSize * (0.7 + Math.random() * 0.6) // Random size between 70% and 130% of base size
+                const sphereGeometry = new THREE.SphereGeometry(size, 8, 8)
+                const sphere = new THREE.Mesh(sphereGeometry, cloudMaterial)
+
+                // Random offset from center
+                const offsetX = (Math.random() - 0.5) * baseSize * 2
+                const offsetY = (Math.random() - 0.5) * baseSize
+                const offsetZ = (Math.random() - 0.5) * baseSize * 2
+
+                sphere.position.set(offsetX, offsetY, offsetZ)
+                sphere.castShadow = true
+                sphere.receiveShadow = true
+                spheres.push(sphere)
+                cloudGroup.add(sphere)
+            }
+
+            cloudGroup.position.set(x, y, z)
+            this.scene.add(cloudGroup)
+        }
+
+        // Add more clouds with varying sizes and positions
+        createCloud(-15, 8, -10, 2)
+        createCloud(15, 10, 5, 2.5)
+        createCloud(0, 12, -15, 3)
+        createCloud(-10, 9, 15, 2.2)
+        createCloud(10, 11, -20, 2.8)
+        createCloud(-20, 13, 0, 2.3)
+        createCloud(20, 9, -25, 2.6)
+        createCloud(-5, 11, 25, 2.4)
     }
 
     private createGoals() {
