@@ -11,7 +11,7 @@ export const PLAYER_BODY_HEIGHT = 1.7
 export const PLAYER_BODY_RADIUS = 0.5
 export const PLAYER_COLOR = 0x0000ff
 export const PLAYER_SHININESS = 30
-export const PLAYER_MOVE_SPEED = 7
+export const PLAYER_MOVE_SPEED = 12
 export const PLAYER_ROTATION_SPEED = 3
 export const PLAYER_JUMP_FORCE = 10
 export const PLAYER_GRAVITY = 20
@@ -26,5 +26,5 @@ export const BALL_BOUNCE = 0.8
 export const BALL_PUSH_STRENGTH = 2.0
 
 // Camera
-export const CAMERA_DISTANCE = 5
-export const CAMERA_HEIGHT = 3
+export const CAMERA_DISTANCE = 25
+export const CAMERA_HEIGHT = 20
