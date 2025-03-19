@@ -43,10 +43,10 @@ export class Scene {
         this.createSoccerField()
 
         // Clouds
-        // this.createClouds()
+        this.createClouds()
 
         // Goals
-        // this.createGoals()
+        this.createGoals()
 
         // Trees
         this.createTrees()
