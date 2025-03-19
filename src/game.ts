@@ -154,19 +154,21 @@ class Game {
             this.ball.position.add(playerToBall.clone().multiplyScalar(overlap))
             this.player.position.sub(playerToBall.clone().multiplyScalar(overlap))
 
-            // Transfer momentum from player to ball with increased strength
+            // Transfer momentum from player to ball
             const playerVelocity = new THREE.Vector3()
             if (this.keys['ArrowUp']) {
-                playerVelocity.z -= Math.cos(this.playerRotation) * this.moveSpeed
-                playerVelocity.x -= Math.sin(this.playerRotation) * this.moveSpeed
+                playerVelocity.x -= Math.sin(this.player.rotation.y) * this.moveSpeed
+                playerVelocity.z -= Math.cos(this.player.rotation.y) * this.moveSpeed
             }
             if (this.keys['ArrowDown']) {
-                playerVelocity.z += Math.cos(this.playerRotation) * this.moveSpeed
-                playerVelocity.x += Math.sin(this.playerRotation) * this.moveSpeed
+                playerVelocity.x += Math.sin(this.player.rotation.y) * this.moveSpeed
+                playerVelocity.z += Math.cos(this.player.rotation.y) * this.moveSpeed
             }
 
-            // Apply stronger push force
-            this.ballVelocity.add(playerVelocity.multiplyScalar(this.pushStrength))
+            // Apply push force in the direction of collision
+            const pushDirection = playerToBall.clone()
+            const pushForce = this.pushStrength * (playerVelocity.length() + 1)
+            this.ballVelocity.add(pushDirection.multiplyScalar(pushForce))
         }
     }
 
