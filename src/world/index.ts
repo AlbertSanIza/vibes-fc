@@ -26,7 +26,7 @@ export class World {
         document.body.appendChild(this.renderer.domElement)
 
         // Ground Radius
-        this.groundRadius = Math.max(FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_LENGTH) * 2
+        this.groundRadius = Math.max(FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_LENGTH) * 1.4
 
         // Global Lighting
         this.scene.add(new AmbientLight())
