@@ -25,12 +25,14 @@ import {
     PLAYER_SHININESS,
     PLAYER_SPRINT_SPEED
 } from './constants'
+import { Player } from './player'
 
 export class Game {
     private scene: THREE.Scene
     private camera: THREE.PerspectiveCamera
     private renderer: THREE.WebGLRenderer
-    private player!: THREE.Group
+    private player!: Player
+    private player_old!: THREE.Group
     private ball?: THREE.Group
     private stats: Stats = new Stats()
     private moveSpeed: number = PLAYER_MOVE_SPEED
@@ -57,6 +59,7 @@ export class Game {
         this.scene = scene
         this.camera = camera
         this.renderer = renderer
+        this.player = new Player()
 
         // Initialize Stats
         document.body.appendChild(this.stats.dom)
@@ -96,9 +99,10 @@ export class Game {
         playerGroup.add(triangle)
 
         // Add the group to the scene
-        this.player = playerGroup
-        this.player.position.set(0, PLAYER_GROUND_LEVEL, 5)
-        this.scene.add(this.player)
+        this.player_old = playerGroup
+        this.player_old.position.set(0, PLAYER_GROUND_LEVEL, 5)
+        this.scene.add(this.player.mesh)
+        this.scene.add(this.player_old)
 
         // Try loading GLB first
         const gltfLoader = new GLTFLoader()
@@ -200,7 +204,7 @@ export class Game {
         }
 
         // Check for collision with player
-        const playerToBall = this.ball.position.clone().sub(this.player.position)
+        const playerToBall = this.ball.position.clone().sub(this.player.mesh.position)
         const distance = playerToBall.length()
 
         const collisionDistance = PLAYER_BODY_RADIUS + BALL_RADIUS
@@ -209,17 +213,17 @@ export class Game {
             playerToBall.normalize()
 
             // Move ball out of collision
-            this.ball.position.copy(this.player.position.clone().add(playerToBall.multiplyScalar(collisionDistance)))
+            this.ball.position.copy(this.player.mesh.position.clone().add(playerToBall.multiplyScalar(collisionDistance)))
 
             // Calculate kick force based on player movement
             const playerVelocity = new THREE.Vector3()
             if (this.keys['ArrowUp']) {
-                playerVelocity.x -= Math.sin(this.player.rotation.y) * this.moveSpeed
-                playerVelocity.z -= Math.cos(this.player.rotation.y) * this.moveSpeed
+                playerVelocity.x -= Math.sin(this.player.mesh.rotation.y) * this.moveSpeed
+                playerVelocity.z -= Math.cos(this.player.mesh.rotation.y) * this.moveSpeed
             }
             if (this.keys['ArrowDown']) {
-                playerVelocity.x += Math.sin(this.player.rotation.y) * this.moveSpeed
-                playerVelocity.z += Math.cos(this.player.rotation.y) * this.moveSpeed
+                playerVelocity.x += Math.sin(this.player.mesh.rotation.y) * this.moveSpeed
+                playerVelocity.z += Math.cos(this.player.mesh.rotation.y) * this.moveSpeed
             }
 
             // Apply kick force with reduced vertical component
@@ -232,30 +236,29 @@ export class Game {
     private updatePlayer(deltaTime: number) {
         // Handle rotation
         if (this.keys['ArrowLeft']) {
-            this.player.rotation.y += this.rotationSpeed * deltaTime
+            this.player.mesh.rotation.y += this.rotationSpeed * deltaTime
         }
         if (this.keys['ArrowRight']) {
-            this.player.rotation.y -= this.rotationSpeed * deltaTime
+            this.player.mesh.rotation.y -= this.rotationSpeed * deltaTime
         }
 
         // Handle movement
         if (this.keys['ArrowUp']) {
-            this.player.position.x -= Math.sin(this.player.rotation.y) * this.moveSpeed * deltaTime
-            this.player.position.z -= Math.cos(this.player.rotation.y) * this.moveSpeed * deltaTime
+            this.player.mesh.position.x -= Math.sin(this.player.mesh.rotation.y) * this.moveSpeed * deltaTime
+            this.player.mesh.position.z -= Math.cos(this.player.mesh.rotation.y) * this.moveSpeed * deltaTime
         }
-        if (this.keys['ArrowDown']) {
-            this.player.position.x += Math.sin(this.player.rotation.y) * this.moveSpeed * deltaTime
-            this.player.position.z += Math.cos(this.player.rotation.y) * this.moveSpeed * deltaTime
+        if (this.keys['ArrowRight']) {
+            this.player.mesh.rotation.y -= this.rotationSpeed * deltaTime
         }
 
         // Apply gravity and handle jumping
         if (this.isJumping) {
-            this.player.position.y += this.jumpVelocity * deltaTime
+            this.player.mesh.position.y += this.jumpVelocity * deltaTime
             this.jumpVelocity -= PLAYER_GRAVITY * deltaTime
 
             // Check for landing
-            if (this.player.position.y <= PLAYER_GROUND_LEVEL) {
-                this.player.position.y = PLAYER_GROUND_LEVEL
+            if (this.player.mesh.position.y <= PLAYER_GROUND_LEVEL) {
+                this.player.mesh.position.y = PLAYER_GROUND_LEVEL
                 this.isJumping = false
                 this.jumpVelocity = 0
             }
@@ -264,8 +267,8 @@ export class Game {
         // Keep player within wider bounds (including extra area)
         const maxX = FIELD_EXTENDED_WIDTH / 2 - PLAYER_BODY_RADIUS
         const maxZ = FIELD_EXTENDED_LENGTH / 2 - PLAYER_BODY_RADIUS
-        this.player.position.x = Math.max(-maxX, Math.min(maxX, this.player.position.x))
-        this.player.position.z = Math.max(-maxZ, Math.min(maxZ, this.player.position.z))
+        this.player.mesh.position.x = Math.max(-maxX, Math.min(maxX, this.player.mesh.position.x))
+        this.player.mesh.position.z = Math.max(-maxZ, Math.min(maxZ, this.player.mesh.position.z))
 
         // Update camera after player movement
         this.updateCamera()
@@ -297,7 +300,7 @@ export class Game {
         }
 
         this.playerRotation += deltaMove.x * 0.01
-        this.player.rotation.y = this.playerRotation
+        this.player.mesh.rotation.y = this.playerRotation
         this.updateCamera()
 
         this.previousMousePosition = { x: event.clientX, y: event.clientY }
@@ -309,14 +312,14 @@ export class Game {
 
     private updateCamera() {
         // Camera position always follows player
-        const x = this.player.position.x + Math.sin(this.playerRotation) * this.cameraDistance
-        const z = this.player.position.z + Math.cos(this.playerRotation) * this.cameraDistance
+        const x = this.player.mesh.position.x + Math.sin(this.playerRotation) * this.cameraDistance
+        const z = this.player.mesh.position.z + Math.cos(this.playerRotation) * this.cameraDistance
 
         // Update camera position
         this.camera.position.set(x, this.cameraHeight, z)
 
         // Look at ball or player based on toggle
-        const lookTarget = this.isCameraOnBall && this.ball ? this.ball.position : this.player.position
+        const lookTarget = this.isCameraOnBall && this.ball ? this.ball.position : this.player.mesh.position
         this.camera.lookAt(lookTarget)
     }
 
