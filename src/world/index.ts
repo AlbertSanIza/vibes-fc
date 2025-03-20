@@ -1,6 +1,7 @@
 import { AmbientLight, AxesHelper, CircleGeometry, Color, DirectionalLight, Mesh, MeshStandardMaterial, PerspectiveCamera, Scene, WebGLRenderer } from 'three'
 
 import { FIELD_EXTENDED_LENGTH, FIELD_EXTENDED_LENGTH_HALF, FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_WIDTH_HALF, MATH_PI_HALF } from '../constants'
+import { Cloud } from './cloud'
 
 export class World {
     scene: Scene
@@ -44,6 +45,7 @@ export class World {
 
         // Elements
         this.createGround()
+        this.createClouds()
     }
 
     private createGround() {
@@ -55,5 +57,13 @@ export class World {
         ground.receiveShadow = true
 
         this.scene.add(ground)
+    }
+
+    private createClouds() {
+        for (let i = 0; i < 100; i++) {
+            const cloud = new Cloud(1 + Math.random() * 3)
+            cloud.mesh.position.set((Math.random() - 0.5) * FIELD_EXTENDED_WIDTH, 20 + Math.random() * 10, (Math.random() - 0.5) * FIELD_EXTENDED_LENGTH)
+            this.scene.add(cloud.mesh)
+        }
     }
 }
