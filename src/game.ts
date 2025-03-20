@@ -125,7 +125,6 @@ export class Game {
         window.addEventListener('mousedown', this.handleMouseDown.bind(this))
         window.addEventListener('mousemove', this.handleMouseMove.bind(this))
         window.addEventListener('mouseup', this.handleMouseUp.bind(this))
-        window.addEventListener('resize', this.handleResize.bind(this))
 
         // Start animation loop
         this.lastTime = performance.now()
@@ -294,12 +293,6 @@ export class Game {
 
     private handleMouseUp() {
         this.isDragging = false
-    }
-
-    private handleResize() {
-        this.camera.aspect = window.innerWidth / window.innerHeight
-        this.camera.updateProjectionMatrix()
-        this.renderer.setSize(window.innerWidth, window.innerHeight)
     }
 
     private updateCamera() {
