@@ -69,7 +69,7 @@ export class World {
         let generated = 0
         while (generated < 200) {
             const angle = Math.random() * Math.PI * 2
-            const radius = FIELD_EXTENDED_WIDTH_HALF + Math.random() * this.groundRadius
+            const radius = Math.random() * this.groundRadius
             const x = radius * Math.cos(angle)
             const z = radius * Math.sin(angle)
             if (Math.abs(x) <= FIELD_EXTENDED_WIDTH_HALF && Math.abs(z) <= FIELD_EXTENDED_LENGTH_HALF) {
