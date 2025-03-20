@@ -36,10 +36,6 @@ export class Scene {
         this.renderer.shadowMap.enabled = true
         document.body.appendChild(this.renderer.domElement)
 
-        // Create layers
-        const LAYER_GENERAL = 0 // Default layer
-        const LAYER_DYNAMIC = 1 // Layer for player and ball
-
         // Global Lighting
         const ambientLight = new THREE.AmbientLight()
         this.scene.add(ambientLight)
@@ -56,7 +52,6 @@ export class Scene {
         topLight.shadow.camera.right = FIELD_EXTENDED_WIDTH_HALF
         topLight.shadow.camera.top = FIELD_EXTENDED_LENGTH_HALF
         topLight.shadow.camera.bottom = -FIELD_EXTENDED_LENGTH_HALF
-        topLight.layers.set(LAYER_DYNAMIC)
         this.scene.add(topLight)
 
         const createAngleLight = (position: { x: number; y: number; z: number }) => {
@@ -71,7 +66,6 @@ export class Scene {
             angledLight.shadow.camera.right = FIELD_EXTENDED_WIDTH_HALF * 1.5
             angledLight.shadow.camera.top = FIELD_EXTENDED_LENGTH_HALF * 1.5
             angledLight.shadow.camera.bottom = -FIELD_EXTENDED_LENGTH_HALF * 1.5
-            angledLight.layers.set(LAYER_GENERAL)
             this.scene.add(angledLight)
             // Add helper to visualize shadow camera frustum (for debugging)
             // const shadowCameraHelper = new THREE.CameraHelper(angledLight.shadow.camera)
@@ -79,10 +73,6 @@ export class Scene {
         }
 
         createAngleLight({ x: FIELD_EXTENDED_WIDTH_HALF, y: 0, z: FIELD_EXTENDED_LENGTH_HALF }) // Northeast
-
-        // Store layers in window for access from game.ts
-        ;(window as any).LAYER_GENERAL = LAYER_GENERAL
-        ;(window as any).LAYER_DYNAMIC = LAYER_DYNAMIC
 
         // Elements
         this.createGround()
@@ -98,7 +88,7 @@ export class Scene {
         ground.rotation.x = -Math.PI / 2
         ground.position.y = -0.1
         ground.receiveShadow = true
-        ground.layers.enable((window as any).LAYER_GENERAL)
+
         this.scene.add(ground)
     }
 

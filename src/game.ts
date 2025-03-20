@@ -93,7 +93,6 @@ export class Game {
         const triangle = new THREE.Mesh(triangleGeometry, triangleMaterial)
         triangle.rotation.x = -Math.PI / 2
         triangle.position.set(0, 0.1, -PLAYER_BODY_RADIUS * 2)
-        triangle.layers.set((window as any).LAYER_DYNAMIC)
         playerGroup.add(triangle)
 
         // Add the group to the scene
@@ -122,7 +121,6 @@ export class Game {
                 // Position and scale the entire model
                 model.position.set(0, BALL_RADIUS + 0.1, 0)
                 model.scale.set(1, 1, 1)
-                model.layers.set((window as any).LAYER_DYNAMIC)
 
                 // Store reference to the ball
                 this.ball = model
