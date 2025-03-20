@@ -66,7 +66,6 @@ export class Game {
         const playerBodyMaterial = new THREE.MeshPhongMaterial({ color: PLAYER_COLOR, shininess: PLAYER_SHININESS })
         const playerBody = new THREE.Mesh(playerBodyGeometry, playerBodyMaterial)
         playerBody.position.y = PLAYER_BODY_HEIGHT / 2
-
         playerGroup.add(playerBody)
 
         // Bottom Body Hemisphere
