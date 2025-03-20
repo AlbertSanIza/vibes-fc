@@ -1,32 +1,32 @@
 import { Game } from './game'
-import { Scene } from './scene'
 import './style.css'
+import { World } from './world'
 
 // X Axis = Left/Right
 // Y Axis = Up/Down
 // Z Axis = Back/Forward
 
 class Main {
-    scene: Scene
+    world: World
     game: Game
 
     constructor() {
-        this.scene = new Scene()
-        this.game = new Game(this.scene.scene, this.scene.camera, this.scene.renderer)
+        this.world = new World()
+        this.game = new Game(this.world.scene, this.world.camera, this.world.renderer)
         this.setupEventListeners()
         this.animate()
     }
 
     setupEventListeners() {
         window.addEventListener('resize', () => {
-            this.scene.camera.aspect = window.innerWidth / window.innerHeight
-            this.scene.camera.updateProjectionMatrix()
-            this.scene.renderer.setSize(window.innerWidth, window.innerHeight)
+            this.world.camera.aspect = window.innerWidth / window.innerHeight
+            this.world.camera.updateProjectionMatrix()
+            this.world.renderer.setSize(window.innerWidth, window.innerHeight)
         })
     }
 
     animate() {
-        this.scene.renderer.render(this.scene.scene, this.scene.camera)
+        this.world.renderer.render(this.world.scene, this.world.camera)
         requestAnimationFrame(() => this.animate())
     }
 }
