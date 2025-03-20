@@ -17,10 +17,11 @@ export const FIELD_GOAL_POST_RADIUS = 0.1
 
 // Player
 export const PLAYER_BODY_HEIGHT = 1.8
-export const PLAYER_BODY_RADIUS = 0.5
+export const PLAYER_BODY_RADIUS = 0.6
 export const PLAYER_COLOR = 0x0000ff
 export const PLAYER_SHININESS = 30
 export const PLAYER_MOVE_SPEED = 16
+export const PLAYER_SPRINT_SPEED = 24 // 1.5x normal speed
 export const PLAYER_ROTATION_SPEED = 5
 export const PLAYER_JUMP_FORCE = 10
 export const PLAYER_GRAVITY = 20

@@ -22,7 +22,8 @@ import {
     PLAYER_JUMP_FORCE,
     PLAYER_MOVE_SPEED,
     PLAYER_ROTATION_SPEED,
-    PLAYER_SHININESS
+    PLAYER_SHININESS,
+    PLAYER_SPRINT_SPEED
 } from './constants'
 
 export class Game {
@@ -49,6 +50,7 @@ export class Game {
     private maxCameraDistance: number = 15
     private minCameraHeight: number = 5
     private maxCameraHeight: number = 15
+    private isSprinting: boolean = false
 
     constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer) {
         this.scene = scene
@@ -134,10 +136,18 @@ export class Game {
             this.jumpVelocity = this.jumpForce
             this.isJumping = true
         }
+        if (event.key === 'Shift') {
+            this.isSprinting = true
+            this.moveSpeed = PLAYER_SPRINT_SPEED
+        }
     }
 
     private handleKeyUp(event: KeyboardEvent) {
         this.keys[event.key] = false
+        if (event.key === 'Shift') {
+            this.isSprinting = false
+            this.moveSpeed = PLAYER_MOVE_SPEED
+        }
     }
 
     private updateBall(deltaTime: number) {
