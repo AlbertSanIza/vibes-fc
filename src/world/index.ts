@@ -8,6 +8,7 @@ export class World {
     scene: Scene
     camera: PerspectiveCamera
     renderer: WebGLRenderer
+    private groundRadius: number
 
     constructor() {
         // Scene
@@ -23,6 +24,9 @@ export class World {
         this.renderer.setSize(window.innerWidth, window.innerHeight)
         this.renderer.shadowMap.enabled = true
         document.body.appendChild(this.renderer.domElement)
+
+        // Ground Radius
+        this.groundRadius = Math.max(FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_LENGTH) * 2
 
         // Global Lighting
         this.scene.add(new AmbientLight())
@@ -51,7 +55,7 @@ export class World {
     }
 
     private createGround() {
-        const groundGeometry = new CircleGeometry(Math.max(FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_LENGTH) * 1.5, 32)
+        const groundGeometry = new CircleGeometry(this.groundRadius, 32)
         const groundMaterial = new MeshStandardMaterial({ color: 0x90ee90 }) // Light Green
         const ground = new Mesh(groundGeometry, groundMaterial)
         ground.rotation.x = -MATH_PI_HALF
@@ -71,8 +75,10 @@ export class World {
 
     private createClouds() {
         for (let i = 0; i < 100; i++) {
+            const angle = Math.random() * 2 * Math.PI
+            const radius = Math.random() * this.groundRadius
             const cloud = new Cloud(1 + Math.random() * 3)
-            cloud.mesh.position.set((Math.random() - 0.5) * FIELD_EXTENDED_WIDTH, 20 + Math.random() * 10, (Math.random() - 0.5) * FIELD_EXTENDED_LENGTH)
+            cloud.mesh.position.set(radius * Math.cos(angle), 20 + Math.random() * 10, radius * Math.sin(angle))
             this.scene.add(cloud.mesh)
         }
     }
