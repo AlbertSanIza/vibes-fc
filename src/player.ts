@@ -55,15 +55,15 @@ export class Player {
 
     private createDirection() {
         const triangleShape = new THREE.Shape()
-        triangleShape.moveTo(0, -0.3)
+        triangleShape.moveTo(0, 0.3)
         triangleShape.lineTo(0.3, 0)
         triangleShape.lineTo(-0.3, 0)
-        triangleShape.lineTo(0, -0.3)
+        triangleShape.lineTo(0, 0.3)
         const directionGeometry = new THREE.ShapeGeometry(triangleShape)
         const directionMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 })
         const direction = new THREE.Mesh(directionGeometry, directionMaterial)
         direction.rotation.x = -Math.PI / 2
-        direction.position.set(0, 0.1, this.radius * 2)
+        direction.position.set(0, 0.1, -this.radius * 2)
         return direction
     }
 }
