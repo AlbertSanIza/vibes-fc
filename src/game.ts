@@ -261,16 +261,26 @@ export class Game {
     }
 
     private updateCamera() {
-        // Camera position always follows player
-        const x = this.player.mesh.position.x + Math.sin(this.playerRotation) * this.cameraDistance
-        const z = this.player.mesh.position.z + Math.cos(this.playerRotation) * this.cameraDistance
+        if (this.isCameraOnBall && this.ball) {
+            // Calculate direction from player to ball
+            const playerToBall = new THREE.Vector3()
+            playerToBall.subVectors(this.ball.position, this.player.mesh.position).normalize()
 
-        // Update camera position
-        this.camera.position.set(x, this.cameraHeight, z)
+            // Position camera behind player relative to ball
+            const cameraOffset = playerToBall.clone().multiplyScalar(-this.cameraDistance)
+            const x = this.player.mesh.position.x + cameraOffset.x
+            const z = this.player.mesh.position.z + cameraOffset.z
 
-        // Look at ball or player based on toggle
-        const lookTarget = this.isCameraOnBall && this.ball ? this.ball.position : this.player.mesh.position
-        this.camera.lookAt(lookTarget)
+            // Update camera position
+            this.camera.position.set(x, this.cameraHeight, z)
+            this.camera.lookAt(this.ball.position)
+        } else {
+            // Original third-person camera behavior
+            const x = this.player.mesh.position.x + Math.sin(this.playerRotation) * this.cameraDistance
+            const z = this.player.mesh.position.z + Math.cos(this.playerRotation) * this.cameraDistance
+            this.camera.position.set(x, this.cameraHeight, z)
+            this.camera.lookAt(this.player.mesh.position)
+        }
     }
 
     private animate() {
