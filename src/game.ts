@@ -2,7 +2,6 @@ import * as THREE from 'three'
 import Stats from 'three/examples/jsm/libs/stats.module.js'
 import {
     BALL_BOUNCE,
-    BALL_COLOR,
     BALL_FRICTION,
     BALL_PUSH_STRENGTH,
     BALL_RADIUS,
@@ -103,11 +102,27 @@ export class Game {
         this.scene.add(this.player)
 
         // Create ball
-        const ballGeometry = new THREE.SphereGeometry(this.ballRadius, 32, 32)
-        const ballMaterial = new THREE.MeshPhongMaterial({ color: BALL_COLOR, shininess: BALL_SHININESS })
+        const ballGeometry = new THREE.SphereGeometry(BALL_RADIUS, 32, 32)
+
+        // Load soccer ball texture
+        const textureLoader = new THREE.TextureLoader()
+        const ballTexture = textureLoader.load('/vibes-fc/ball.jpg')
+        ballTexture.wrapS = THREE.RepeatWrapping
+        ballTexture.wrapT = THREE.RepeatWrapping
+        ballTexture.repeat.set(1, 1)
+
+        // Create ball material with the loaded texture
+        const ballMaterial = new THREE.MeshPhongMaterial({
+            map: ballTexture,
+            shininess: BALL_SHININESS,
+            bumpMap: ballTexture,
+            bumpScale: 0.01
+        })
+
         this.ball = new THREE.Mesh(ballGeometry, ballMaterial)
-        this.ball.position.set(2, this.ballRadius, 0)
         this.ball.castShadow = true
+        this.ball.receiveShadow = true
+        this.ball.position.set(2, BALL_RADIUS, 0)
         this.ball.layers.set((window as any).LAYER_DYNAMIC)
         this.scene.add(this.ball)
 
@@ -138,19 +153,27 @@ export class Game {
     }
 
     private updateBall(deltaTime: number) {
-        // Apply friction
+        // Apply friction to slow down the ball
         this.ballVelocity.multiplyScalar(this.ballFriction)
 
-        // Apply gravity
-        this.ballVelocity.y -= this.gravity * deltaTime
-
-        // Update ball position
+        // Update ball position based on velocity
         this.ball.position.add(this.ballVelocity.clone().multiplyScalar(deltaTime))
+
+        // Add ball rotation based on movement
+        const rotationAxis = new THREE.Vector3(this.ballVelocity.z, 0, -this.ballVelocity.x).normalize()
+        const rotationAngle = this.ballVelocity.length() * (deltaTime * 2) // Adjust the multiplier to control rotation speed
+        if (rotationAxis.length() > 0.001) {
+            // Check if the axis is not effectively zero
+            this.ball.rotateOnWorldAxis(rotationAxis, rotationAngle)
+        }
 
         // Check for collision with ground
         if (this.ball.position.y <= this.ballRadius) {
             this.ball.position.y = this.ballRadius
             this.ballVelocity.y = -this.ballVelocity.y * this.ballBounce
+        } else {
+            // Apply gravity
+            this.ballVelocity.y -= this.gravity * deltaTime
         }
 
         // Check for collision with field boundaries (not walls)
