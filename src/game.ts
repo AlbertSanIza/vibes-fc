@@ -15,13 +15,10 @@ import {
     FIELD_LENGTH,
     FIELD_LENGTH_HALF,
     FIELD_WIDTH,
-    PLAYER_BODY_RADIUS,
     PLAYER_GRAVITY,
-    PLAYER_GROUND_LEVEL,
     PLAYER_JUMP_FORCE,
     PLAYER_MOVE_SPEED,
-    PLAYER_ROTATION_SPEED,
-    PLAYER_SPRINT_SPEED
+    PLAYER_ROTATION_SPEED
 } from './constants'
 import { Player } from './player'
 
@@ -62,7 +59,7 @@ export class Game {
 
         // Add the group to the scene
 
-        this.player.mesh.position.set(0, PLAYER_GROUND_LEVEL, FIELD_LENGTH_HALF)
+        this.player.mesh.position.set(0, 0, FIELD_LENGTH_HALF)
         this.scene.add(this.player.mesh)
 
         // Try loading GLB first
@@ -103,7 +100,7 @@ export class Game {
             this.isJumping = true
         }
         if (event.key === 'Shift') {
-            this.moveSpeed = PLAYER_SPRINT_SPEED
+            this.moveSpeed = this.player.speed.move * 1.5
         }
         if (event.key === 'z' || event.key === 'Z') {
             this.isCameraOnBall = !this.isCameraOnBall
@@ -113,7 +110,7 @@ export class Game {
     private handleKeyUp(event: KeyboardEvent) {
         this.keys[event.key] = false
         if (event.key === 'Shift') {
-            this.moveSpeed = PLAYER_MOVE_SPEED
+            this.moveSpeed = this.player.speed.move
         }
     }
 
@@ -166,7 +163,7 @@ export class Game {
         const playerToBall = this.ball.position.clone().sub(this.player.mesh.position)
         const distance = playerToBall.length()
 
-        const collisionDistance = PLAYER_BODY_RADIUS + BALL_RADIUS
+        const collisionDistance = this.player.body.radius + BALL_RADIUS
         if (distance < collisionDistance) {
             // Normalize direction
             playerToBall.normalize()
@@ -216,16 +213,16 @@ export class Game {
             this.jumpVelocity -= PLAYER_GRAVITY * deltaTime
 
             // Check for landing
-            if (this.player.mesh.position.y <= PLAYER_GROUND_LEVEL) {
-                this.player.mesh.position.y = PLAYER_GROUND_LEVEL
+            if (this.player.mesh.position.y <= 0) {
+                this.player.mesh.position.y = 0
                 this.isJumping = false
                 this.jumpVelocity = 0
             }
         }
 
         // Keep player within wider bounds (including extra area)
-        const maxX = FIELD_EXTENDED_WIDTH / 2 - PLAYER_BODY_RADIUS
-        const maxZ = FIELD_EXTENDED_LENGTH / 2 - PLAYER_BODY_RADIUS
+        const maxX = FIELD_EXTENDED_WIDTH / 2 - this.player.body.radius
+        const maxZ = FIELD_EXTENDED_LENGTH / 2 - this.player.body.radius
         this.player.mesh.position.x = Math.max(-maxX, Math.min(maxX, this.player.mesh.position.x))
         this.player.mesh.position.z = Math.max(-maxZ, Math.min(maxZ, this.player.mesh.position.z))
 
