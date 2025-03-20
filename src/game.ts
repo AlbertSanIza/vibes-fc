@@ -51,6 +51,7 @@ export class Game {
     private minCameraHeight: number = 5
     private maxCameraHeight: number = 15
     private isSprinting: boolean = false
+    private isCameraOnBall: boolean = false
 
     constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer) {
         this.scene = scene
@@ -139,6 +140,9 @@ export class Game {
         if (event.key === 'Shift') {
             this.isSprinting = true
             this.moveSpeed = PLAYER_SPRINT_SPEED
+        }
+        if (event.key === 'z' || event.key === 'Z') {
+            this.isCameraOnBall = !this.isCameraOnBall
         }
     }
 
@@ -304,13 +308,16 @@ export class Game {
     }
 
     private updateCamera() {
-        // Calculate camera position relative to player's rotation
+        // Camera position always follows player
         const x = this.player.position.x + Math.sin(this.playerRotation) * this.cameraDistance
         const z = this.player.position.z + Math.cos(this.playerRotation) * this.cameraDistance
 
-        // Use the dynamic height
+        // Update camera position
         this.camera.position.set(x, this.cameraHeight, z)
-        this.camera.lookAt(this.player.position)
+
+        // Look at ball or player based on toggle
+        const lookTarget = this.isCameraOnBall && this.ball ? this.ball.position : this.player.position
+        this.camera.lookAt(lookTarget)
     }
 
     private animate() {
