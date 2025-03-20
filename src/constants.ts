@@ -31,7 +31,10 @@ export const BALL_RADIUS = 1
 export const BALL_COLOR = 0xff0000
 export const BALL_SHININESS = 100
 export const BALL_FRICTION = 0.99
-export const BALL_BOUNCE = 0.8
+export const BALL_BOUNCE = 0.7
+export const BALL_GRAVITY = 20
+export const BALL_KICK_FORCE = 15
+export const BALL_VERTICAL_FORCE = 5 // Reduced vertical force on kick
 export const BALL_PUSH_STRENGTH = 2.0
 
 // Camera

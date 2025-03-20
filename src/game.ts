@@ -5,8 +5,10 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import {
     BALL_BOUNCE,
     BALL_FRICTION,
-    BALL_PUSH_STRENGTH,
+    BALL_GRAVITY,
+    BALL_KICK_FORCE,
     BALL_RADIUS,
+    BALL_VERTICAL_FORCE,
     CAMERA_DISTANCE,
     FIELD_EXTENDED_LENGTH,
     FIELD_EXTENDED_WIDTH,
@@ -32,22 +34,17 @@ export class Game {
     private stats: Stats = new Stats()
     private moveSpeed: number = PLAYER_MOVE_SPEED
     private cameraDistance: number = CAMERA_DISTANCE
+    private cameraHeight: number = 5
     private playerRotation: number = 0
     private rotationSpeed: number = PLAYER_ROTATION_SPEED
-    private isDragging: boolean = false
-    private previousMousePosition: { x: number; y: number } = { x: 0, y: 0 }
     private keys: { [key: string]: boolean } = {}
-    private lastTime: number = 0
     private isJumping: boolean = false
     private jumpVelocity: number = 0
     private jumpForce: number = PLAYER_JUMP_FORCE
-    private gravity: number = PLAYER_GRAVITY
+    private lastTime: number = 0
+    private isDragging: boolean = false
+    private previousMousePosition: { x: number; y: number } = { x: 0, y: 0 }
     private ballVelocity = new THREE.Vector3(0, 0, 0)
-    private ballFriction: number = BALL_FRICTION
-    private ballBounce: number = BALL_BOUNCE
-    private ballRadius: number = BALL_RADIUS
-    private pushStrength: number = BALL_PUSH_STRENGTH
-    private cameraHeight: number = 5
     private minCameraDistance: number = 5
     private maxCameraDistance: number = 15
     private minCameraHeight: number = 5
@@ -144,62 +141,63 @@ export class Game {
     }
 
     private updateBall(deltaTime: number) {
-        // Skip ball updates if it hasn't loaded yet
         if (!this.ball) return
 
-        // Apply friction to slow down the ball
-        this.ballVelocity.multiplyScalar(this.ballFriction)
+        // Apply friction only when ball is on the ground
+        if (this.ball.position.y <= BALL_RADIUS) {
+            this.ballVelocity.multiplyScalar(BALL_FRICTION)
+        }
 
         // Update ball position based on velocity
         this.ball.position.add(this.ballVelocity.clone().multiplyScalar(deltaTime))
 
-        // Add ball rotation based on movement
-        const rotationAxis = new THREE.Vector3(this.ballVelocity.z, 0, -this.ballVelocity.x).normalize()
-        const rotationAngle = this.ballVelocity.length() * (deltaTime * 2) // Adjust the multiplier to control rotation speed
-        if (rotationAxis.length() > 0.001) {
-            // Check if the axis is not effectively zero
-            this.ball.rotateOnWorldAxis(rotationAxis, rotationAngle)
+        // Add ball rotation based on movement only if the ball is moving significantly
+        const speed = this.ballVelocity.length()
+        if (speed > 0.1) {
+            // Only rotate if moving faster than threshold
+            const rotationAxis = new THREE.Vector3(this.ballVelocity.z, 0, -this.ballVelocity.x).normalize()
+            const rotationAngle = speed * (deltaTime / BALL_RADIUS) // Adjust rotation based on ball size
+            if (rotationAxis.length() > 0.001) {
+                this.ball.rotateOnWorldAxis(rotationAxis, rotationAngle)
+            }
         }
 
         // Check for collision with ground
-        if (this.ball.position.y <= this.ballRadius) {
-            this.ball.position.y = this.ballRadius
-            this.ballVelocity.y = -this.ballVelocity.y * this.ballBounce
+        if (this.ball.position.y <= BALL_RADIUS) {
+            this.ball.position.y = BALL_RADIUS
+            this.ballVelocity.y = -this.ballVelocity.y * BALL_BOUNCE
         } else {
             // Apply gravity
-            this.ballVelocity.y -= this.gravity * deltaTime
+            this.ballVelocity.y -= BALL_GRAVITY * deltaTime
         }
 
-        // Check for collision with field boundaries (not walls)
-        const fieldBoundaryX = FIELD_WIDTH / 2 - this.ballRadius
-        const fieldBoundaryZ = FIELD_LENGTH / 2 - this.ballRadius
+        // Check for collision with field boundaries
+        const fieldBoundaryX = FIELD_WIDTH / 2 - BALL_RADIUS
+        const fieldBoundaryZ = FIELD_LENGTH / 2 - BALL_RADIUS
 
-        // X-axis boundaries (width)
         if (Math.abs(this.ball.position.x) > fieldBoundaryX) {
             this.ball.position.x = Math.sign(this.ball.position.x) * fieldBoundaryX
-            this.ballVelocity.x *= -this.ballBounce
+            this.ballVelocity.x *= -BALL_BOUNCE
         }
 
-        // Z-axis boundaries (length)
         if (Math.abs(this.ball.position.z) > fieldBoundaryZ) {
             this.ball.position.z = Math.sign(this.ball.position.z) * fieldBoundaryZ
-            this.ballVelocity.z *= -this.ballBounce
+            this.ballVelocity.z *= -BALL_BOUNCE
         }
 
         // Check for collision with player
         const playerToBall = this.ball.position.clone().sub(this.player.position)
         const distance = playerToBall.length()
 
-        // Change from hardcoded 1 to PLAYER_BODY_RADIUS + this.ballRadius
-        const collisionDistance = PLAYER_BODY_RADIUS + this.ballRadius
+        const collisionDistance = PLAYER_BODY_RADIUS + BALL_RADIUS
         if (distance < collisionDistance) {
-            // Collision response
+            // Normalize direction
             playerToBall.normalize()
-            const overlap = (collisionDistance - distance) * 0.5
-            this.ball.position.add(playerToBall.clone().multiplyScalar(overlap))
-            this.player.position.sub(playerToBall.clone().multiplyScalar(overlap))
 
-            // Transfer momentum from player to ball
+            // Move ball out of collision
+            this.ball.position.copy(this.player.position.clone().add(playerToBall.multiplyScalar(collisionDistance)))
+
+            // Calculate kick force based on player movement
             const playerVelocity = new THREE.Vector3()
             if (this.keys['ArrowUp']) {
                 playerVelocity.x -= Math.sin(this.player.rotation.y) * this.moveSpeed
@@ -210,10 +208,10 @@ export class Game {
                 playerVelocity.z += Math.cos(this.player.rotation.y) * this.moveSpeed
             }
 
-            // Apply push force in the direction of collision
-            const pushDirection = playerToBall.clone()
-            const pushForce = this.pushStrength * (playerVelocity.length() + 1)
-            this.ballVelocity.add(pushDirection.multiplyScalar(pushForce))
+            // Apply kick force with reduced vertical component
+            const kickStrength = BALL_KICK_FORCE * (1 + playerVelocity.length() / this.moveSpeed)
+            this.ballVelocity.copy(playerToBall.multiplyScalar(kickStrength))
+            this.ballVelocity.y = BALL_VERTICAL_FORCE // Use constant vertical force
         }
     }
 
@@ -239,7 +237,7 @@ export class Game {
         // Apply gravity and handle jumping
         if (this.isJumping) {
             this.player.position.y += this.jumpVelocity * deltaTime
-            this.jumpVelocity -= this.gravity * deltaTime
+            this.jumpVelocity -= PLAYER_GRAVITY * deltaTime
 
             // Check for landing
             if (this.player.position.y <= PLAYER_GROUND_LEVEL) {
