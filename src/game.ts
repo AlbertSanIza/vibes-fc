@@ -42,7 +42,6 @@ export class Game {
     private jumpVelocity: number = 0
     private jumpForce: number = PLAYER_JUMP_FORCE
     private gravity: number = PLAYER_GRAVITY
-    private groundLevel: number = PLAYER_GROUND_LEVEL
     private ballVelocity: THREE.Vector3 = new THREE.Vector3()
     private ballFriction: number = BALL_FRICTION
     private ballBounce: number = BALL_BOUNCE
@@ -59,63 +58,48 @@ export class Game {
         this.camera = camera
         this.renderer = renderer
 
-        if (!this.scene || !this.camera || !this.renderer) {
-            console.error('Scene, camera, or renderer not initialized')
-            return
-        }
-
         // Initialize stats
         document.body.appendChild(this.stats.dom)
 
-        // Create player
+        // Main Body
         const playerGroup = new THREE.Group()
-        // Set player and all its parts to dynamic layer
-        playerGroup.layers.set((window as any).LAYER_DYNAMIC)
+        const playerBodyGeometry = new THREE.CylinderGeometry(PLAYER_BODY_RADIUS, PLAYER_BODY_RADIUS, PLAYER_BODY_HEIGHT - PLAYER_BODY_RADIUS * 2, 32)
+        const playerBodyMaterial = new THREE.MeshPhongMaterial({ color: PLAYER_COLOR, shininess: PLAYER_SHININESS })
+        const playerBody = new THREE.Mesh(playerBodyGeometry, playerBodyMaterial)
+        playerBody.position.y = PLAYER_BODY_HEIGHT / 2
 
-        // Main body (cylinder)
-        const bodyGeometry = new THREE.CylinderGeometry(PLAYER_BODY_RADIUS, PLAYER_BODY_RADIUS, PLAYER_BODY_HEIGHT - PLAYER_BODY_RADIUS * 2, 16)
-        const bodyMaterial = new THREE.MeshPhongMaterial({ color: PLAYER_COLOR, shininess: PLAYER_SHININESS })
-        const body = new THREE.Mesh(bodyGeometry, bodyMaterial)
-        body.position.y = PLAYER_BODY_RADIUS
-        body.castShadow = true
-        body.layers.set((window as any).LAYER_DYNAMIC)
-        playerGroup.add(body)
+        playerGroup.add(playerBody)
+
+        // Bottom Body Hemisphere
+        const playerBottomGeometry = new THREE.SphereGeometry(PLAYER_BODY_RADIUS, 16, 16, 0, Math.PI * 2, Math.PI / 2, Math.PI)
+        const playerBottom = new THREE.Mesh(playerBottomGeometry, playerBodyMaterial)
+        playerBottom.position.y = PLAYER_BODY_RADIUS
+        playerBottom.castShadow = true
+        playerGroup.add(playerBottom)
+
+        // Top Body Hemisphere
+        const playerTopGeometry = new THREE.SphereGeometry(PLAYER_BODY_RADIUS, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2)
+        const playerTop = new THREE.Mesh(playerTopGeometry, playerBodyMaterial)
+        playerTop.position.y = PLAYER_BODY_HEIGHT - PLAYER_BODY_RADIUS
+        playerGroup.add(playerTop)
 
         // Add direction indicator triangle
         const triangleShape = new THREE.Shape()
-        triangleShape.moveTo(0, 0.2)
+        triangleShape.moveTo(0, 0.3)
         triangleShape.lineTo(0.3, 0)
         triangleShape.lineTo(-0.3, 0)
-        triangleShape.lineTo(0, 0.2)
+        triangleShape.lineTo(0, 0.3)
         const triangleGeometry = new THREE.ShapeGeometry(triangleShape)
         const triangleMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 }) // Yellow color
         const triangle = new THREE.Mesh(triangleGeometry, triangleMaterial)
         triangle.rotation.x = -Math.PI / 2
-        triangle.position.set(0, -PLAYER_BODY_RADIUS, -PLAYER_BODY_RADIUS * 2)
+        triangle.position.set(0, 0.1, -PLAYER_BODY_RADIUS * 2)
         triangle.layers.set((window as any).LAYER_DYNAMIC)
         playerGroup.add(triangle)
 
-        // Top hemisphere
-        const topGeometry = new THREE.SphereGeometry(PLAYER_BODY_RADIUS, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2)
-        const topMaterial = new THREE.MeshPhongMaterial({ color: PLAYER_COLOR, shininess: PLAYER_SHININESS })
-        const top = new THREE.Mesh(topGeometry, topMaterial)
-        top.position.y = PLAYER_BODY_HEIGHT - PLAYER_BODY_RADIUS
-        top.castShadow = true
-        top.layers.set((window as any).LAYER_DYNAMIC)
-        playerGroup.add(top)
-
-        // Bottom hemisphere
-        const bottomGeometry = new THREE.SphereGeometry(PLAYER_BODY_RADIUS, 16, 16, 0, Math.PI * 2, Math.PI / 2, Math.PI)
-        const bottomMaterial = new THREE.MeshPhongMaterial({ color: PLAYER_COLOR, shininess: PLAYER_SHININESS })
-        const bottom = new THREE.Mesh(bottomGeometry, bottomMaterial)
-        bottom.position.y = 0
-        bottom.castShadow = true
-        bottom.layers.set((window as any).LAYER_DYNAMIC)
-        playerGroup.add(bottom)
-
         // Add the group to the scene
         this.player = playerGroup
-        this.player.position.set(0, this.groundLevel, 0)
+        this.player.position.set(0, PLAYER_GROUND_LEVEL, 0)
         this.scene.add(this.player)
 
         // Create ball
@@ -241,8 +225,8 @@ export class Game {
             this.jumpVelocity -= this.gravity * deltaTime
 
             // Check for landing
-            if (this.player.position.y <= this.groundLevel) {
-                this.player.position.y = this.groundLevel
+            if (this.player.position.y <= PLAYER_GROUND_LEVEL) {
+                this.player.position.y = PLAYER_GROUND_LEVEL
                 this.isJumping = false
                 this.jumpVelocity = 0
             }

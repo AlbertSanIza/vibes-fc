@@ -24,7 +24,7 @@ export const PLAYER_MOVE_SPEED = 12
 export const PLAYER_ROTATION_SPEED = 4
 export const PLAYER_JUMP_FORCE = 10
 export const PLAYER_GRAVITY = 20
-export const PLAYER_GROUND_LEVEL = 0.5
+export const PLAYER_GROUND_LEVEL = 0
 
 // Ball
 export const BALL_RADIUS = 0.35
