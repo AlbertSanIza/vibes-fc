@@ -23,7 +23,7 @@ import {
     PLAYER_SHININESS
 } from './constants'
 
-class Game {
+export class Game {
     private scene: THREE.Scene
     private camera: THREE.PerspectiveCamera
     private renderer: THREE.WebGLRenderer
@@ -54,11 +54,10 @@ class Game {
     private minCameraHeight: number = 5
     private maxCameraHeight: number = 15
 
-    constructor() {
-        // Get existing scene, camera, and renderer from main.ts
-        this.scene = (window as any).scene
-        this.camera = (window as any).camera
-        this.renderer = (window as any).renderer
+    constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer) {
+        this.scene = scene
+        this.camera = camera
+        this.renderer = renderer
 
         if (!this.scene || !this.camera || !this.renderer) {
             console.error('Scene, camera, or renderer not initialized')
@@ -327,11 +326,3 @@ class Game {
         requestAnimationFrame(this.animate.bind(this))
     }
 }
-
-// Start the game when the page loads and scene is ready
-window.addEventListener('load', () => {
-    // Small delay to ensure scene is initialized
-    setTimeout(() => {
-        new Game()
-    }, 100)
-})

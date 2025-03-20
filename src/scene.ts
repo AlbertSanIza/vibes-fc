@@ -17,9 +17,9 @@ import {
 } from './constants'
 
 export class Scene {
-    public scene: THREE.Scene
-    public camera: THREE.PerspectiveCamera
-    public renderer: THREE.WebGLRenderer
+    scene: THREE.Scene
+    camera: THREE.PerspectiveCamera
+    renderer: THREE.WebGLRenderer
 
     constructor() {
         // Scene
@@ -89,11 +89,6 @@ export class Scene {
         this.createSoccerField()
         this.createTrees()
         this.createClouds()
-
-        // Expose scene, camera, and renderer to window object for game.ts
-        ;(window as any).scene = this.scene
-        ;(window as any).camera = this.camera
-        ;(window as any).renderer = this.renderer
     }
 
     private createGround() {
