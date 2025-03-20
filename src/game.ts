@@ -1,11 +1,12 @@
 import * as THREE from 'three'
 import Stats from 'three/examples/jsm/libs/stats.module.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+
 import {
     BALL_BOUNCE,
     BALL_FRICTION,
     BALL_PUSH_STRENGTH,
     BALL_RADIUS,
-    BALL_SHININESS,
     CAMERA_DISTANCE,
     FIELD_EXTENDED_LENGTH,
     FIELD_EXTENDED_WIDTH,
@@ -27,7 +28,7 @@ export class Game {
     private camera: THREE.PerspectiveCamera
     private renderer: THREE.WebGLRenderer
     private player!: THREE.Group
-    private ball!: THREE.Mesh
+    private ball?: THREE.Group
     private stats: Stats = new Stats()
     private moveSpeed: number = PLAYER_MOVE_SPEED
     private cameraDistance: number = CAMERA_DISTANCE
@@ -41,7 +42,7 @@ export class Game {
     private jumpVelocity: number = 0
     private jumpForce: number = PLAYER_JUMP_FORCE
     private gravity: number = PLAYER_GRAVITY
-    private ballVelocity: THREE.Vector3 = new THREE.Vector3()
+    private ballVelocity = new THREE.Vector3(0, 0, 0)
     private ballFriction: number = BALL_FRICTION
     private ballBounce: number = BALL_BOUNCE
     private ballRadius: number = BALL_RADIUS
@@ -100,30 +101,42 @@ export class Game {
         this.player.position.set(0, PLAYER_GROUND_LEVEL, 0)
         this.scene.add(this.player)
 
-        // Create ball
-        const ballGeometry = new THREE.SphereGeometry(BALL_RADIUS, 32, 32)
+        // Try loading GLB first
+        const gltfLoader = new GLTFLoader()
+        gltfLoader.load(
+            '/vibes-fc/ball.glb',
+            (gltf) => {
+                console.log('GLB model loaded:', gltf)
 
-        // Load soccer ball texture
-        const textureLoader = new THREE.TextureLoader()
-        const ballTexture = textureLoader.load('/vibes-fc/ball.jpg')
-        ballTexture.wrapS = THREE.RepeatWrapping
-        ballTexture.wrapT = THREE.RepeatWrapping
-        ballTexture.repeat.set(1, 1)
+                // Use the entire scene from the GLTF
+                const model = gltf.scene
+                model.traverse((child) => {
+                    if (child instanceof THREE.Mesh) {
+                        child.castShadow = true
+                        child.receiveShadow = true
+                        console.log('Mesh found in GLB:', child)
+                        console.log('Material:', child.material)
+                    }
+                })
 
-        // Create ball material with the loaded texture
-        const ballMaterial = new THREE.MeshPhongMaterial({
-            map: ballTexture,
-            shininess: BALL_SHININESS,
-            bumpMap: ballTexture,
-            bumpScale: 0.01
-        })
+                // Position and scale the entire model
+                model.position.set(0, BALL_RADIUS + 0.1, 0)
+                model.scale.set(1, 1, 1)
+                model.layers.set((window as any).LAYER_DYNAMIC)
 
-        this.ball = new THREE.Mesh(ballGeometry, ballMaterial)
-        this.ball.castShadow = true
-        this.ball.receiveShadow = true
-        this.ball.position.set(2, BALL_RADIUS, 0)
-        this.ball.layers.set((window as any).LAYER_DYNAMIC)
-        this.scene.add(this.ball)
+                // Store reference to the ball
+                this.ball = model
+                this.scene.add(model)
+
+                console.log('Ball model added to scene')
+            },
+            (progress) => {
+                console.log('Loading GLB model:', (progress.loaded / progress.total) * 100 + '%')
+            },
+            (error) => {
+                console.error('Error loading GLB model:', error)
+            }
+        )
 
         // Event listeners
         window.addEventListener('keydown', this.handleKeyDown.bind(this))
@@ -152,6 +165,9 @@ export class Game {
     }
 
     private updateBall(deltaTime: number) {
+        // Skip ball updates if it hasn't loaded yet
+        if (!this.ball) return
+
         // Apply friction to slow down the ball
         this.ballVelocity.multiplyScalar(this.ballFriction)
 
@@ -324,7 +340,11 @@ export class Game {
         this.stats.begin()
 
         this.updatePlayer(deltaTime)
-        this.updateBall(deltaTime)
+
+        // Only update ball if it exists
+        if (this.ball) {
+            this.updateBall(deltaTime)
+        }
         this.renderer.render(this.scene, this.camera)
 
         this.stats.end()
