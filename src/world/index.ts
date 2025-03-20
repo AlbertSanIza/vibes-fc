@@ -2,6 +2,7 @@ import { AmbientLight, AxesHelper, CircleGeometry, Color, DirectionalLight, Mesh
 
 import { FIELD_EXTENDED_LENGTH, FIELD_EXTENDED_LENGTH_HALF, FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_WIDTH_HALF, MATH_PI_HALF } from '../constants'
 import { Cloud } from './cloud'
+import { Tree } from './tree'
 
 export class World {
     scene: Scene
@@ -23,9 +24,6 @@ export class World {
         this.renderer.shadowMap.enabled = true
         document.body.appendChild(this.renderer.domElement)
 
-        // Axes Helper
-        this.scene.add(new AxesHelper(20))
-
         // Global Lighting
         this.scene.add(new AmbientLight())
 
@@ -45,7 +43,11 @@ export class World {
 
         // Elements
         this.createGround()
+        this.createTrees()
         this.createClouds()
+
+        // Axes Helper
+        this.scene.add(new AxesHelper(20))
     }
 
     private createGround() {
@@ -57,6 +59,14 @@ export class World {
         ground.receiveShadow = true
 
         this.scene.add(ground)
+    }
+
+    private createTrees() {
+        for (let i = 0; i < 200; i++) {
+            const tree = new Tree(3 + Math.random() * 3)
+            tree.mesh.position.set((Math.random() - 0.5) * FIELD_EXTENDED_WIDTH, 0, (Math.random() - 0.5) * FIELD_EXTENDED_LENGTH)
+            this.scene.add(tree.mesh)
+        }
     }
 
     private createClouds() {
