@@ -65,7 +65,7 @@ export class Player {
         const directionMaterial = new MeshBasicMaterial({ color: 0xffff00 })
         const direction = new Mesh(directionGeometry, directionMaterial)
         direction.rotation.x = -MATH_PI_HALF
-        direction.position.set(0, 0.1, -this.radius * 2)
+        direction.position.set(0, 0.1, -this.radius * 1.5)
         return direction
     }
 }
