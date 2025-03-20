@@ -112,7 +112,7 @@ export class Game {
             })
 
             model.position.set(0, 0, 0)
-            model.scale.set(1, 1, 1)
+            model.scale.set(BALL_RADIUS, BALL_RADIUS, BALL_RADIUS)
 
             this.ball = model
             this.scene.add(model)

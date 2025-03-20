@@ -20,14 +20,14 @@ export const PLAYER_BODY_HEIGHT = 1.8
 export const PLAYER_BODY_RADIUS = 0.5
 export const PLAYER_COLOR = 0x0000ff
 export const PLAYER_SHININESS = 30
-export const PLAYER_MOVE_SPEED = 12
-export const PLAYER_ROTATION_SPEED = 4
+export const PLAYER_MOVE_SPEED = 16
+export const PLAYER_ROTATION_SPEED = 5
 export const PLAYER_JUMP_FORCE = 10
 export const PLAYER_GRAVITY = 20
-export const PLAYER_GROUND_LEVEL = 0
+export const PLAYER_GROUND_LEVEL = 0.1
 
 // Ball
-export const BALL_RADIUS = 0.35
+export const BALL_RADIUS = 1
 export const BALL_COLOR = 0xff0000
 export const BALL_SHININESS = 100
 export const BALL_FRICTION = 0.99
