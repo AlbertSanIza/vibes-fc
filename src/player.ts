@@ -41,6 +41,7 @@ export class Player {
         const headMaterial = new MeshPhongMaterial({ color: this.body.color, shininess: this.body.shininess })
         const head = new Mesh(headGeometry, headMaterial)
         head.position.y = this.body.height - this.body.radius
+        head.castShadow = true
         return head
     }
 
@@ -49,6 +50,7 @@ export class Player {
         const torsoMaterial = new MeshPhongMaterial({ color: this.body.color, shininess: this.body.shininess })
         const torso = new Mesh(torsoGeometry, torsoMaterial)
         torso.position.y = this.body.height / 2
+        torso.castShadow = true
         return torso
     }
 
@@ -57,6 +59,7 @@ export class Player {
         const bottomMaterial = new MeshPhongMaterial({ color: this.body.color, shininess: this.body.shininess })
         const bottom = new Mesh(bottomGeometry, bottomMaterial)
         bottom.position.y = this.body.radius
+        bottom.castShadow = true
         return bottom
     }
 
