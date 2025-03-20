@@ -66,16 +66,25 @@ export class World {
     }
 
     private createTrees() {
-        for (let i = 0; i < 200; i++) {
+        let generated = 0
+        while (generated < 200) {
+            const angle = Math.random() * Math.PI * 2
+            const radius = FIELD_EXTENDED_WIDTH_HALF + Math.random() * this.groundRadius
+            const x = radius * Math.cos(angle)
+            const z = radius * Math.sin(angle)
+            if (Math.abs(x) <= FIELD_EXTENDED_WIDTH_HALF && Math.abs(z) <= FIELD_EXTENDED_LENGTH_HALF) {
+                continue
+            }
             const tree = new Tree(3 + Math.random() * 3)
-            tree.mesh.position.set((Math.random() - 0.5) * FIELD_EXTENDED_WIDTH, 0, (Math.random() - 0.5) * FIELD_EXTENDED_LENGTH)
+            tree.mesh.position.set(x, 0, z)
             this.scene.add(tree.mesh)
+            generated++
         }
     }
 
     private createClouds() {
-        for (let i = 0; i < 100; i++) {
-            const angle = Math.random() * 2 * Math.PI
+        for (let i = 0; i < 200; i++) {
+            const angle = Math.random() * Math.PI * 2
             const radius = Math.random() * this.groundRadius
             const cloud = new Cloud(1 + Math.random() * 3)
             cloud.mesh.position.set(radius * Math.cos(angle), 20 + Math.random() * 10, radius * Math.sin(angle))
