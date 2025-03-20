@@ -14,15 +14,12 @@ import {
     FIELD_EXTENDED_WIDTH,
     FIELD_LENGTH,
     FIELD_WIDTH,
-    PLAYER_BODY_HEIGHT,
     PLAYER_BODY_RADIUS,
-    PLAYER_COLOR,
     PLAYER_GRAVITY,
     PLAYER_GROUND_LEVEL,
     PLAYER_JUMP_FORCE,
     PLAYER_MOVE_SPEED,
     PLAYER_ROTATION_SPEED,
-    PLAYER_SHININESS,
     PLAYER_SPRINT_SPEED
 } from './constants'
 import { Player } from './player'
@@ -32,7 +29,6 @@ export class Game {
     private camera: THREE.PerspectiveCamera
     private renderer: THREE.WebGLRenderer
     private player!: Player
-    private player_old!: THREE.Group
     private ball?: THREE.Group
     private stats: Stats = new Stats()
     private moveSpeed: number = PLAYER_MOVE_SPEED
@@ -64,46 +60,10 @@ export class Game {
         // Initialize Stats
         document.body.appendChild(this.stats.dom)
 
-        // Main Body
-        const playerGroup = new THREE.Group()
-        const playerBodyGeometry = new THREE.CylinderGeometry(PLAYER_BODY_RADIUS, PLAYER_BODY_RADIUS, PLAYER_BODY_HEIGHT - PLAYER_BODY_RADIUS * 2, 32)
-        const playerBodyMaterial = new THREE.MeshPhongMaterial({ color: PLAYER_COLOR, shininess: PLAYER_SHININESS })
-        const playerBody = new THREE.Mesh(playerBodyGeometry, playerBodyMaterial)
-        playerBody.position.y = PLAYER_BODY_HEIGHT / 2
-        playerGroup.add(playerBody)
-
-        // Bottom Body Hemisphere
-        const playerBottomGeometry = new THREE.SphereGeometry(PLAYER_BODY_RADIUS, 16, 16, 0, Math.PI * 2, Math.PI / 2, Math.PI)
-        const playerBottom = new THREE.Mesh(playerBottomGeometry, playerBodyMaterial)
-        playerBottom.position.y = PLAYER_BODY_RADIUS
-        playerBottom.castShadow = true
-        playerGroup.add(playerBottom)
-
-        // Top Body Hemisphere
-        const playerTopGeometry = new THREE.SphereGeometry(PLAYER_BODY_RADIUS, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2)
-        const playerTop = new THREE.Mesh(playerTopGeometry, playerBodyMaterial)
-        playerTop.position.y = PLAYER_BODY_HEIGHT - PLAYER_BODY_RADIUS
-        playerGroup.add(playerTop)
-
-        // Add direction indicator triangle
-        const triangleShape = new THREE.Shape()
-        triangleShape.moveTo(0, 0.3)
-        triangleShape.lineTo(0.3, 0)
-        triangleShape.lineTo(-0.3, 0)
-        triangleShape.lineTo(0, 0.3)
-        const triangleGeometry = new THREE.ShapeGeometry(triangleShape)
-        const triangleMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 }) // Yellow color
-        const triangle = new THREE.Mesh(triangleGeometry, triangleMaterial)
-        triangle.rotation.x = -Math.PI / 2
-        triangle.position.set(0, 0.1, -PLAYER_BODY_RADIUS * 2)
-        playerGroup.add(triangle)
-
         // Add the group to the scene
-        this.player_old = playerGroup
-        this.player_old.position.set(0, PLAYER_GROUND_LEVEL, 5)
+
         this.player.mesh.position.set(0, PLAYER_GROUND_LEVEL, 5)
         this.scene.add(this.player.mesh)
-        this.scene.add(this.player_old)
 
         // Try loading GLB first
         const gltfLoader = new GLTFLoader()
