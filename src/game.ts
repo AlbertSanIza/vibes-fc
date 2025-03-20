@@ -58,7 +58,7 @@ export class Game {
         this.camera = camera
         this.renderer = renderer
 
-        // Initialize stats
+        // Initialize Stats
         document.body.appendChild(this.stats.dom)
 
         // Main Body
@@ -97,44 +97,26 @@ export class Game {
 
         // Add the group to the scene
         this.player = playerGroup
-        this.player.position.set(0, PLAYER_GROUND_LEVEL, 0)
+        this.player.position.set(0, PLAYER_GROUND_LEVEL, 5)
         this.scene.add(this.player)
 
         // Try loading GLB first
         const gltfLoader = new GLTFLoader()
-        gltfLoader.load(
-            '/vibes-fc/ball.glb',
-            (gltf) => {
-                console.log('GLB model loaded:', gltf)
+        gltfLoader.load('/vibes-fc/ball.glb', (gltf) => {
+            const model = gltf.scene
+            model.traverse((child) => {
+                if (child instanceof THREE.Mesh) {
+                    child.castShadow = true
+                    child.receiveShadow = true
+                }
+            })
 
-                // Use the entire scene from the GLTF
-                const model = gltf.scene
-                model.traverse((child) => {
-                    if (child instanceof THREE.Mesh) {
-                        child.castShadow = true
-                        child.receiveShadow = true
-                        console.log('Mesh found in GLB:', child)
-                        console.log('Material:', child.material)
-                    }
-                })
+            model.position.set(0, 0, 0)
+            model.scale.set(1, 1, 1)
 
-                // Position and scale the entire model
-                model.position.set(0, BALL_RADIUS + 0.1, 0)
-                model.scale.set(1, 1, 1)
-
-                // Store reference to the ball
-                this.ball = model
-                this.scene.add(model)
-
-                console.log('Ball model added to scene')
-            },
-            (progress) => {
-                console.log('Loading GLB model:', (progress.loaded / progress.total) * 100 + '%')
-            },
-            (error) => {
-                console.error('Error loading GLB model:', error)
-            }
-        )
+            this.ball = model
+            this.scene.add(model)
+        })
 
         // Event listeners
         window.addEventListener('keydown', this.handleKeyDown.bind(this))
