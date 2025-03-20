@@ -49,7 +49,6 @@ export class Game {
     private maxCameraDistance: number = 15
     private minCameraHeight: number = 5
     private maxCameraHeight: number = 15
-    private isSprinting: boolean = false
     private isCameraOnBall: boolean = false
 
     constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer) {
@@ -104,7 +103,6 @@ export class Game {
             this.isJumping = true
         }
         if (event.key === 'Shift') {
-            this.isSprinting = true
             this.moveSpeed = PLAYER_SPRINT_SPEED
         }
         if (event.key === 'z' || event.key === 'Z') {
@@ -115,7 +113,6 @@ export class Game {
     private handleKeyUp(event: KeyboardEvent) {
         this.keys[event.key] = false
         if (event.key === 'Shift') {
-            this.isSprinting = false
             this.moveSpeed = PLAYER_MOVE_SPEED
         }
     }
