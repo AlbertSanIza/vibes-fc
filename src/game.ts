@@ -17,7 +17,6 @@ import {
     FIELD_WIDTH,
     PLAYER_GRAVITY,
     PLAYER_JUMP_FORCE,
-    PLAYER_MOVE_SPEED,
     PLAYER_ROTATION_SPEED
 } from './constants'
 import { Player } from './player'
@@ -26,10 +25,9 @@ export class Game {
     private scene: THREE.Scene
     private camera: THREE.PerspectiveCamera
     private renderer: THREE.WebGLRenderer
-    private player!: Player
+    private player: Player
     private ball?: THREE.Group
     private stats: Stats = new Stats()
-    private moveSpeed: number = PLAYER_MOVE_SPEED
     private cameraDistance: number = CAMERA_DISTANCE
     private cameraHeight: number = 5
     private playerRotation: number = 0
@@ -57,9 +55,7 @@ export class Game {
         // Initialize Stats
         document.body.appendChild(this.stats.dom)
 
-        // Add the group to the scene
-
-        this.player.mesh.position.set(0, 0, FIELD_LENGTH_HALF)
+        this.player.mesh.position.set(0, 0, FIELD_LENGTH_HALF / 2)
         this.scene.add(this.player.mesh)
 
         // Try loading GLB first
@@ -100,7 +96,7 @@ export class Game {
             this.isJumping = true
         }
         if (event.key === 'Shift') {
-            this.moveSpeed = this.player.speed.move * 1.5
+            this.player.isRunning = true
         }
         if (event.key === 'z' || event.key === 'Z') {
             this.isCameraOnBall = !this.isCameraOnBall
@@ -110,7 +106,7 @@ export class Game {
     private handleKeyUp(event: KeyboardEvent) {
         this.keys[event.key] = false
         if (event.key === 'Shift') {
-            this.moveSpeed = this.player.speed.move
+            this.player.isRunning = false
         }
     }
 
@@ -174,16 +170,16 @@ export class Game {
             // Calculate kick force based on player movement
             const playerVelocity = new THREE.Vector3()
             if (this.keys['ArrowUp']) {
-                playerVelocity.x -= Math.sin(this.player.mesh.rotation.y) * this.moveSpeed
-                playerVelocity.z -= Math.cos(this.player.mesh.rotation.y) * this.moveSpeed
+                playerVelocity.x -= Math.sin(this.player.mesh.rotation.y) * this.player.speed.move
+                playerVelocity.z -= Math.cos(this.player.mesh.rotation.y) * this.player.speed.move
             }
             if (this.keys['ArrowDown']) {
-                playerVelocity.x += Math.sin(this.player.mesh.rotation.y) * this.moveSpeed
-                playerVelocity.z += Math.cos(this.player.mesh.rotation.y) * this.moveSpeed
+                playerVelocity.x += Math.sin(this.player.mesh.rotation.y) * this.player.speed.move
+                playerVelocity.z += Math.cos(this.player.mesh.rotation.y) * this.player.speed.move
             }
 
             // Apply kick force with reduced vertical component
-            const kickStrength = BALL_KICK_FORCE * (1 + playerVelocity.length() / this.moveSpeed)
+            const kickStrength = BALL_KICK_FORCE * (1 + playerVelocity.length() / this.player.speed.move)
             this.ballVelocity.copy(playerToBall.multiplyScalar(kickStrength))
             this.ballVelocity.y = BALL_VERTICAL_FORCE // Use constant vertical force
         }
@@ -200,8 +196,8 @@ export class Game {
 
         // Handle movement
         if (this.keys['ArrowUp']) {
-            this.player.mesh.position.x -= Math.sin(this.player.mesh.rotation.y) * this.moveSpeed * deltaTime
-            this.player.mesh.position.z -= Math.cos(this.player.mesh.rotation.y) * this.moveSpeed * deltaTime
+            this.player.mesh.position.x -= Math.sin(this.player.mesh.rotation.y) * this.player.speed.move * deltaTime
+            this.player.mesh.position.z -= Math.cos(this.player.mesh.rotation.y) * this.player.speed.move * deltaTime
         }
         if (this.keys['ArrowRight']) {
             this.player.mesh.rotation.y -= this.rotationSpeed * deltaTime
