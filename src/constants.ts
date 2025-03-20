@@ -1,3 +1,5 @@
+export const MATH_PI_HALF = Math.PI / 2
+
 // Stadium
 export const FIELD_WIDTH = 75
 export const FIELD_LENGTH = 110
@@ -26,12 +28,6 @@ export const PLAYER_ROTATION_SPEED = 5
 export const PLAYER_JUMP_FORCE = 10
 export const PLAYER_GRAVITY = 20
 export const PLAYER_GROUND_LEVEL = 0.1
-
-// Common Rotations (in radians)
-export const ROTATION_FLAT = -Math.PI / 2
-export const ROTATION_QUARTER = Math.PI / 2
-export const ROTATION_HALF = Math.PI
-export const ROTATION_FULL = Math.PI * 2
 
 // Ball
 export const BALL_RADIUS = 1

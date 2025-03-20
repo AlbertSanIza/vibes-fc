@@ -30,7 +30,8 @@ import {
     FIELD_LINE_COLOR,
     FIELD_LINE_THICKNESS,
     FIELD_WIDTH,
-    FIELD_WIDTH_HALF
+    FIELD_WIDTH_HALF,
+    MATH_PI_HALF
 } from './constants'
 
 export class Scene {
@@ -106,7 +107,7 @@ export class Scene {
         const groundGeometry = new CircleGeometry(Math.max(FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_LENGTH) * 1.5, 32)
         const groundMaterial = new MeshStandardMaterial({ color: 0x90ee90 }) // Light Green
         const ground = new Mesh(groundGeometry, groundMaterial)
-        ground.rotation.x = -Math.PI / 2
+        ground.rotation.x = -MATH_PI_HALF
         ground.position.y = -0.1
         ground.receiveShadow = true
 
@@ -123,7 +124,7 @@ export class Scene {
         const mainFieldGeometry = new PlaneGeometry(FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_LENGTH)
         const mainFieldMaterial = new MeshStandardMaterial({ color: 0x2e8b57 }) // Forest green
         const mainField = new Mesh(mainFieldGeometry, mainFieldMaterial)
-        mainField.rotation.x = -Math.PI / 2
+        mainField.rotation.x = -MATH_PI_HALF
         mainField.receiveShadow = true
         this.scene.add(mainField)
 
@@ -131,7 +132,7 @@ export class Scene {
             const fieldLineGeometry = new PlaneGeometry(width, length)
             const fieldLineMaterial = new MeshStandardMaterial({ color: FIELD_LINE_COLOR })
             const fieldLine = new Mesh(fieldLineGeometry, fieldLineMaterial)
-            fieldLine.rotation.x = -Math.PI / 2
+            fieldLine.rotation.x = -MATH_PI_HALF
             fieldLine.position.set(position.x, 0.01, position.z)
             fieldLine.receiveShadow = true
             this.scene.add(fieldLine)
@@ -139,10 +140,10 @@ export class Scene {
 
         const createQuarterCircle = (position: { x: number; z: number }, rotation: number) => {
             const radius = 1
-            const quarterCircleGeometry = new RingGeometry(radius - FIELD_LINE_THICKNESS / 2, radius + FIELD_LINE_THICKNESS / 2, 32, 1, 0, Math.PI / 2)
+            const quarterCircleGeometry = new RingGeometry(radius - FIELD_LINE_THICKNESS / 2, radius + FIELD_LINE_THICKNESS / 2, 32, 1, 0, MATH_PI_HALF)
             const quarterCircleMaterial = new MeshStandardMaterial({ color: FIELD_LINE_COLOR })
             const quarterCircle = new Mesh(quarterCircleGeometry, quarterCircleMaterial)
-            quarterCircle.rotation.x = -Math.PI / 2
+            quarterCircle.rotation.x = -MATH_PI_HALF
             quarterCircle.rotation.z = rotation
             quarterCircle.position.set(position.x, 0.01, position.z)
             this.scene.add(quarterCircle)
@@ -152,7 +153,7 @@ export class Scene {
             const centerSpotGeometry = new CircleGeometry(FIELD_LINE_THICKNESS, 32)
             const centerSpotMaterial = new MeshStandardMaterial({ color: FIELD_LINE_COLOR })
             const centerSpot = new Mesh(centerSpotGeometry, centerSpotMaterial)
-            centerSpot.rotation.x = -Math.PI / 2
+            centerSpot.rotation.x = -MATH_PI_HALF
             centerSpot.position.set(position.x, 0.01, position.z)
             this.scene.add(centerSpot)
         }
@@ -195,7 +196,7 @@ export class Scene {
             const crossbarGeometry = new CylinderGeometry(FIELD_GOAL_POST_RADIUS, FIELD_GOAL_POST_RADIUS, FIELD_GOAL_WIDTH, 8)
             const crossbar = new Mesh(crossbarGeometry, postMaterial)
             crossbar.position.set(position[0], position[1] + FIELD_GOAL_HEIGHT, position[2])
-            crossbar.rotation.z = Math.PI / 2
+            crossbar.rotation.z = MATH_PI_HALF
             crossbar.castShadow = true
             crossbar.receiveShadow = true
 
@@ -211,8 +212,8 @@ export class Scene {
         createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: 0 }) // Center Line
 
         createQuarterCircle({ x: -FIELD_WIDTH_HALF, z: FIELD_LENGTH_HALF }, 0) // Quarter Circle Northeast
-        createQuarterCircle({ x: FIELD_WIDTH_HALF, z: FIELD_LENGTH_HALF }, Math.PI / 2) // Quarter Circle Northwest
-        createQuarterCircle({ x: -FIELD_WIDTH_HALF, z: -FIELD_LENGTH_HALF }, -Math.PI / 2) // Quarter Circle Southeast
+        createQuarterCircle({ x: FIELD_WIDTH_HALF, z: FIELD_LENGTH_HALF }, MATH_PI_HALF) // Quarter Circle Northwest
+        createQuarterCircle({ x: -FIELD_WIDTH_HALF, z: -FIELD_LENGTH_HALF }, -MATH_PI_HALF) // Quarter Circle Southeast
         createQuarterCircle({ x: FIELD_WIDTH_HALF, z: -FIELD_LENGTH_HALF }, Math.PI) // Quarter Circle Southwest
 
         // Center Circle
@@ -220,7 +221,7 @@ export class Scene {
         const centerCircleGeometry = new RingGeometry(centerCircleRadius - FIELD_LINE_THICKNESS / 2, centerCircleRadius + FIELD_LINE_THICKNESS / 2, 32)
         const centerCircleMaterial = new MeshStandardMaterial({ color: FIELD_LINE_COLOR })
         const centerCircle = new Mesh(centerCircleGeometry, centerCircleMaterial)
-        centerCircle.rotation.x = -Math.PI / 2
+        centerCircle.rotation.x = -MATH_PI_HALF
         centerCircle.position.y = 0.01
         this.scene.add(centerCircle)
 

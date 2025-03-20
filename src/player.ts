@@ -1,5 +1,7 @@
 import { CylinderGeometry, Group, Mesh, MeshBasicMaterial, MeshPhongMaterial, Shape, ShapeGeometry, SphereGeometry } from 'three'
 
+import { MATH_PI_HALF } from './constants'
+
 export class Player {
     private _name: string
     private color: number
@@ -62,7 +64,7 @@ export class Player {
         const directionGeometry = new ShapeGeometry(triangleShape)
         const directionMaterial = new MeshBasicMaterial({ color: 0xffff00 })
         const direction = new Mesh(directionGeometry, directionMaterial)
-        direction.rotation.x = -Math.PI / 2
+        direction.rotation.x = -MATH_PI_HALF
         direction.position.set(0, 0.1, -this.radius * 2)
         return direction
     }
