@@ -54,8 +54,16 @@ export class Player {
     }
 
     private createDirection() {
-        const arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, -1), new THREE.Vector3(0, 0, 0), 1, 0xff0000)
-        arrow.position.y = this.height / 2
-        return arrow
+        const triangleShape = new THREE.Shape()
+        triangleShape.moveTo(0, -0.3)
+        triangleShape.lineTo(0.3, 0)
+        triangleShape.lineTo(-0.3, 0)
+        triangleShape.lineTo(0, -0.3)
+        const directionGeometry = new THREE.ShapeGeometry(triangleShape)
+        const directionMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 })
+        const direction = new THREE.Mesh(directionGeometry, directionMaterial)
+        direction.rotation.x = -Math.PI / 2
+        direction.position.set(0, 0.1, this.radius * 2)
+        return direction
     }
 }
