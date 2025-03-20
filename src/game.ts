@@ -16,8 +16,7 @@ import {
     FIELD_LENGTH_HALF,
     FIELD_WIDTH,
     PLAYER_GRAVITY,
-    PLAYER_JUMP_FORCE,
-    PLAYER_ROTATION_SPEED
+    PLAYER_JUMP_FORCE
 } from './constants'
 import { Player } from './player'
 
@@ -31,7 +30,6 @@ export class Game {
     private cameraDistance: number = CAMERA_DISTANCE
     private cameraHeight: number = 5
     private playerRotation: number = 0
-    private rotationSpeed: number = PLAYER_ROTATION_SPEED
     private keys: { [key: string]: boolean } = {}
     private isJumping: boolean = false
     private jumpVelocity: number = 0
@@ -188,10 +186,10 @@ export class Game {
     private updatePlayer(deltaTime: number) {
         // Handle rotation
         if (this.keys['ArrowLeft']) {
-            this.player.mesh.rotation.y += this.rotationSpeed * deltaTime
+            this.player.mesh.rotation.y += this.player.speed.rotate * deltaTime
         }
         if (this.keys['ArrowRight']) {
-            this.player.mesh.rotation.y -= this.rotationSpeed * deltaTime
+            this.player.mesh.rotation.y -= this.player.speed.rotate * deltaTime
         }
 
         // Handle movement
@@ -200,7 +198,7 @@ export class Game {
             this.player.mesh.position.z -= Math.cos(this.player.mesh.rotation.y) * this.player.speed.move * deltaTime
         }
         if (this.keys['ArrowRight']) {
-            this.player.mesh.rotation.y -= this.rotationSpeed * deltaTime
+            this.player.mesh.rotation.y -= this.player.speed.rotate * deltaTime
         }
 
         // Apply gravity and handle jumping
