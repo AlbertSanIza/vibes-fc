@@ -1,4 +1,21 @@
-import * as THREE from 'three'
+import {
+    AmbientLight,
+    AxesHelper,
+    CircleGeometry,
+    Color,
+    CylinderGeometry,
+    DirectionalLight,
+    DoubleSide,
+    Group,
+    Mesh,
+    MeshStandardMaterial,
+    PerspectiveCamera,
+    PlaneGeometry,
+    RingGeometry,
+    SphereGeometry,
+    Scene as TScene,
+    WebGLRenderer
+} from 'three'
 
 import {
     FIELD_EXTENDED_LENGTH,
@@ -17,35 +34,35 @@ import {
 } from './constants'
 
 export class Scene {
-    scene: THREE.Scene
-    camera: THREE.PerspectiveCamera
-    renderer: THREE.WebGLRenderer
+    scene: TScene
+    camera: PerspectiveCamera
+    renderer: WebGLRenderer
 
     constructor() {
         // Scene
-        this.scene = new THREE.Scene()
-        this.scene.background = new THREE.Color(0x87ceeb) // Sky blue background
+        this.scene = new TScene()
+        this.scene.background = new Color(0x87ceeb) // Sky blue background
 
         // Axes Helper
-        const axesHelper = new THREE.AxesHelper(20) // Size 5 units
+        const axesHelper = new AxesHelper(20) // Size 5 units
         this.scene.add(axesHelper)
 
         // Camera
-        this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight)
+        this.camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight)
         this.camera.layers.enableAll()
 
         // Renderer
-        this.renderer = new THREE.WebGLRenderer({ antialias: true })
+        this.renderer = new WebGLRenderer({ antialias: true })
         this.renderer.setSize(window.innerWidth, window.innerHeight)
         this.renderer.shadowMap.enabled = true
         document.body.appendChild(this.renderer.domElement)
 
         // Global Lighting
-        const ambientLight = new THREE.AmbientLight()
+        const ambientLight = new AmbientLight()
         this.scene.add(ambientLight)
 
         // Top Down Lighting (Players and Ball)
-        const topLight = new THREE.DirectionalLight()
+        const topLight = new DirectionalLight()
         topLight.position.set(0, 20, 0)
         topLight.castShadow = true
         topLight.shadow.mapSize.width = 1000
@@ -59,7 +76,7 @@ export class Scene {
         this.scene.add(topLight)
 
         const createAngleLight = (position: { x: number; y: number; z: number }) => {
-            const angledLight = new THREE.DirectionalLight()
+            const angledLight = new DirectionalLight()
             angledLight.position.set(position.x, position.y, position.z)
             angledLight.castShadow = true
             angledLight.shadow.mapSize.width = 1000
@@ -72,7 +89,7 @@ export class Scene {
             angledLight.shadow.camera.bottom = -FIELD_EXTENDED_LENGTH_HALF * 1.5
             this.scene.add(angledLight)
             // Add helper to visualize shadow camera frustum (for debugging)
-            // const shadowCameraHelper = new THREE.CameraHelper(angledLight.shadow.camera)
+            // const shadowCameraHelper = new CameraHelper(angledLight.shadow.camera)
             // this.scene.add(shadowCameraHelper)
         }
 
@@ -86,9 +103,9 @@ export class Scene {
     }
 
     private createGround() {
-        const groundGeometry = new THREE.CircleGeometry(Math.max(FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_LENGTH) * 1.5, 32)
-        const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x90ee90 }) // Light Green
-        const ground = new THREE.Mesh(groundGeometry, groundMaterial)
+        const groundGeometry = new CircleGeometry(Math.max(FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_LENGTH) * 1.5, 32)
+        const groundMaterial = new MeshStandardMaterial({ color: 0x90ee90 }) // Light Green
+        const ground = new Mesh(groundGeometry, groundMaterial)
         ground.rotation.x = -Math.PI / 2
         ground.position.y = -0.1
         ground.receiveShadow = true
@@ -103,17 +120,17 @@ export class Scene {
         // West: Positive X
 
         // Main Field
-        const mainFieldGeometry = new THREE.PlaneGeometry(FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_LENGTH)
-        const mainFieldMaterial = new THREE.MeshStandardMaterial({ color: 0x2e8b57 }) // Forest green
-        const mainField = new THREE.Mesh(mainFieldGeometry, mainFieldMaterial)
+        const mainFieldGeometry = new PlaneGeometry(FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_LENGTH)
+        const mainFieldMaterial = new MeshStandardMaterial({ color: 0x2e8b57 }) // Forest green
+        const mainField = new Mesh(mainFieldGeometry, mainFieldMaterial)
         mainField.rotation.x = -Math.PI / 2
         mainField.receiveShadow = true
         this.scene.add(mainField)
 
         const createFieldLine = (width: number, length: number, position: { x: number; z: number }) => {
-            const fieldLineGeometry = new THREE.PlaneGeometry(width, length)
-            const fieldLineMaterial = new THREE.MeshStandardMaterial({ color: FIELD_LINE_COLOR })
-            const fieldLine = new THREE.Mesh(fieldLineGeometry, fieldLineMaterial)
+            const fieldLineGeometry = new PlaneGeometry(width, length)
+            const fieldLineMaterial = new MeshStandardMaterial({ color: FIELD_LINE_COLOR })
+            const fieldLine = new Mesh(fieldLineGeometry, fieldLineMaterial)
             fieldLine.rotation.x = -Math.PI / 2
             fieldLine.position.set(position.x, 0.01, position.z)
             fieldLine.receiveShadow = true
@@ -122,9 +139,9 @@ export class Scene {
 
         const createQuarterCircle = (position: { x: number; z: number }, rotation: number) => {
             const radius = 1
-            const quarterCircleGeometry = new THREE.RingGeometry(radius - FIELD_LINE_THICKNESS / 2, radius + FIELD_LINE_THICKNESS / 2, 32, 1, 0, Math.PI / 2)
-            const quarterCircleMaterial = new THREE.MeshStandardMaterial({ color: FIELD_LINE_COLOR })
-            const quarterCircle = new THREE.Mesh(quarterCircleGeometry, quarterCircleMaterial)
+            const quarterCircleGeometry = new RingGeometry(radius - FIELD_LINE_THICKNESS / 2, radius + FIELD_LINE_THICKNESS / 2, 32, 1, 0, Math.PI / 2)
+            const quarterCircleMaterial = new MeshStandardMaterial({ color: FIELD_LINE_COLOR })
+            const quarterCircle = new Mesh(quarterCircleGeometry, quarterCircleMaterial)
             quarterCircle.rotation.x = -Math.PI / 2
             quarterCircle.rotation.z = rotation
             quarterCircle.position.set(position.x, 0.01, position.z)
@@ -132,25 +149,25 @@ export class Scene {
         }
 
         const createSpot = (position: { x: number; z: number }) => {
-            const centerSpotGeometry = new THREE.CircleGeometry(FIELD_LINE_THICKNESS, 32)
-            const centerSpotMaterial = new THREE.MeshStandardMaterial({ color: FIELD_LINE_COLOR })
-            const centerSpot = new THREE.Mesh(centerSpotGeometry, centerSpotMaterial)
+            const centerSpotGeometry = new CircleGeometry(FIELD_LINE_THICKNESS, 32)
+            const centerSpotMaterial = new MeshStandardMaterial({ color: FIELD_LINE_COLOR })
+            const centerSpot = new Mesh(centerSpotGeometry, centerSpotMaterial)
             centerSpot.rotation.x = -Math.PI / 2
             centerSpot.position.set(position.x, 0.01, position.z)
             this.scene.add(centerSpot)
         }
 
         const createCornerFlagPole = (position: { x: number; z: number }) => {
-            const cornerFlagPole = new THREE.Group()
-            const cornerPoleGeometry = new THREE.CylinderGeometry(0.05, 0.05, 1.5)
-            const cornerPoleMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff })
-            const cornerPole = new THREE.Mesh(cornerPoleGeometry, cornerPoleMaterial)
+            const cornerFlagPole = new Group()
+            const cornerPoleGeometry = new CylinderGeometry(0.05, 0.05, 1.5)
+            const cornerPoleMaterial = new MeshStandardMaterial({ color: 0xffffff })
+            const cornerPole = new Mesh(cornerPoleGeometry, cornerPoleMaterial)
             cornerPole.position.set(position.x, 0.75, position.z)
             cornerPole.castShadow = true
             cornerFlagPole.add(cornerPole)
-            const cornerFlagGeometry = new THREE.PlaneGeometry(0.4, 0.3)
-            const cornerFlagMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, side: THREE.DoubleSide })
-            const cornerFlag = new THREE.Mesh(cornerFlagGeometry, cornerFlagMaterial)
+            const cornerFlagGeometry = new PlaneGeometry(0.4, 0.3)
+            const cornerFlagMaterial = new MeshStandardMaterial({ color: 0xff0000, side: DoubleSide })
+            const cornerFlag = new Mesh(cornerFlagGeometry, cornerFlagMaterial)
             cornerFlag.position.set(position.x - 0.2, 1.7, position.z)
             cornerFlag.castShadow = true
             cornerFlagPole.add(cornerFlag)
@@ -159,24 +176,24 @@ export class Scene {
 
         const createGoal = (position: [number, number, number]) => {
             // Goal posts
-            const postGeometry = new THREE.CylinderGeometry(FIELD_GOAL_POST_RADIUS, FIELD_GOAL_POST_RADIUS, FIELD_GOAL_HEIGHT, 8)
-            const postMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.5, roughness: 0.2 })
+            const postGeometry = new CylinderGeometry(FIELD_GOAL_POST_RADIUS, FIELD_GOAL_POST_RADIUS, FIELD_GOAL_HEIGHT, 8)
+            const postMaterial = new MeshStandardMaterial({ color: 0xffffff, metalness: 0.5, roughness: 0.2 })
 
             // Left post
-            const leftPost = new THREE.Mesh(postGeometry, postMaterial)
+            const leftPost = new Mesh(postGeometry, postMaterial)
             leftPost.position.set(position[0] - FIELD_GOAL_WIDTH / 2, position[1] + FIELD_GOAL_HEIGHT / 2, position[2])
             leftPost.castShadow = true
             leftPost.receiveShadow = true
 
             // Right post
-            const rightPost = new THREE.Mesh(postGeometry, postMaterial)
+            const rightPost = new Mesh(postGeometry, postMaterial)
             rightPost.position.set(position[0] + FIELD_GOAL_WIDTH / 2, position[1] + FIELD_GOAL_HEIGHT / 2, position[2])
             rightPost.castShadow = true
             rightPost.receiveShadow = true
 
             // Crossbar
-            const crossbarGeometry = new THREE.CylinderGeometry(FIELD_GOAL_POST_RADIUS, FIELD_GOAL_POST_RADIUS, FIELD_GOAL_WIDTH, 8)
-            const crossbar = new THREE.Mesh(crossbarGeometry, postMaterial)
+            const crossbarGeometry = new CylinderGeometry(FIELD_GOAL_POST_RADIUS, FIELD_GOAL_POST_RADIUS, FIELD_GOAL_WIDTH, 8)
+            const crossbar = new Mesh(crossbarGeometry, postMaterial)
             crossbar.position.set(position[0], position[1] + FIELD_GOAL_HEIGHT, position[2])
             crossbar.rotation.z = Math.PI / 2
             crossbar.castShadow = true
@@ -200,9 +217,9 @@ export class Scene {
 
         // Center Circle
         const centerCircleRadius = 9.15 / 2
-        const centerCircleGeometry = new THREE.RingGeometry(centerCircleRadius - FIELD_LINE_THICKNESS / 2, centerCircleRadius + FIELD_LINE_THICKNESS / 2, 32)
-        const centerCircleMaterial = new THREE.MeshStandardMaterial({ color: FIELD_LINE_COLOR })
-        const centerCircle = new THREE.Mesh(centerCircleGeometry, centerCircleMaterial)
+        const centerCircleGeometry = new RingGeometry(centerCircleRadius - FIELD_LINE_THICKNESS / 2, centerCircleRadius + FIELD_LINE_THICKNESS / 2, 32)
+        const centerCircleMaterial = new MeshStandardMaterial({ color: FIELD_LINE_COLOR })
+        const centerCircle = new Mesh(centerCircleGeometry, centerCircleMaterial)
         centerCircle.rotation.x = -Math.PI / 2
         centerCircle.position.y = 0.01
         this.scene.add(centerCircle)
@@ -239,8 +256,8 @@ export class Scene {
 
     private createClouds() {
         const createCloud = (x: number, y: number, z: number, baseSize: number) => {
-            const cloudGroup = new THREE.Group()
-            const cloudMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 })
+            const cloudGroup = new Group()
+            const cloudMaterial = new MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 })
 
             // Create multiple spheres for each cloud
             const numSpheres = 5 + Math.floor(Math.random() * 3) // Random number between 5-7 spheres
@@ -248,8 +265,8 @@ export class Scene {
 
             for (let i = 0; i < numSpheres; i++) {
                 const size = baseSize * (0.7 + Math.random() * 0.6) // Random size between 70% and 130% of base size
-                const sphereGeometry = new THREE.SphereGeometry(size, 8, 8)
-                const sphere = new THREE.Mesh(sphereGeometry, cloudMaterial)
+                const sphereGeometry = new SphereGeometry(size, 8, 8)
+                const sphere = new Mesh(sphereGeometry, cloudMaterial)
 
                 // Random offset from center
                 const offsetX = (Math.random() - 0.5) * baseSize * 2
@@ -280,19 +297,19 @@ export class Scene {
 
     private createTrees() {
         const createTree = (position: { x: number; z: number }, height: number = 4, crownSize: number = 2.5) => {
-            const tree = new THREE.Group()
+            const tree = new Group()
             // Trunk
-            const trunkGeometry = new THREE.CylinderGeometry(0.4, 0.6, height, 5)
-            const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 }) // Saddle Brown
-            const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial)
+            const trunkGeometry = new CylinderGeometry(0.4, 0.6, height, 5)
+            const trunkMaterial = new MeshStandardMaterial({ color: 0x8b4513 }) // Saddle Brown
+            const trunk = new Mesh(trunkGeometry, trunkMaterial)
             trunk.position.set(position.x, height / 2, position.z)
             tree.add(trunk)
 
             // Crown
-            const crownMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22, roughness: 0.8 })
+            const crownMaterial = new MeshStandardMaterial({ color: 0x228b22, roughness: 0.8 })
             for (let i = 0; i < 4 + Math.floor(Math.random() * 3); i++) {
-                const sphereGeometry = new THREE.SphereGeometry(crownSize * (0.7 + Math.random() * 0.6), 8, 8)
-                const sphere = new THREE.Mesh(sphereGeometry, crownMaterial)
+                const sphereGeometry = new SphereGeometry(crownSize * (0.7 + Math.random() * 0.6), 8, 8)
+                const sphere = new Mesh(sphereGeometry, crownMaterial)
                 const offsetX = (Math.random() - 0.5) * crownSize
                 const offsetY = (Math.random() - 0.5) * crownSize * 0.5
                 const offsetZ = (Math.random() - 0.5) * crownSize
