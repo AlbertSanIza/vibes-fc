@@ -1,6 +1,6 @@
 import { AmbientLight, AxesHelper, CircleGeometry, Color, DirectionalLight, Mesh, MeshStandardMaterial, PerspectiveCamera, Scene, WebGLRenderer } from 'three'
 
-import { FIELD_EXTENDED_LENGTH, FIELD_EXTENDED_LENGTH_HALF, FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_WIDTH_HALF, MATH_PI_HALF } from './constants'
+import { FIELD_EXTENDED_LENGTH, FIELD_EXTENDED_LENGTH_HALF, FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_WIDTH_HALF, MATH_PI_HALF } from '../constants'
 
 export class World {
     scene: Scene
@@ -26,8 +26,7 @@ export class World {
         this.scene.add(new AxesHelper(20))
 
         // Global Lighting
-        const ambientLight = new AmbientLight()
-        this.scene.add(ambientLight)
+        this.scene.add(new AmbientLight())
 
         // Top Down Lighting (Players and Ball)
         const topLight = new DirectionalLight()
