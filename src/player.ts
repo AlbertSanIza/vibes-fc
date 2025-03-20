@@ -15,10 +15,10 @@ export class Player {
         this.radius = 0.6
         this.shininess = 30
         this._mesh = new THREE.Group()
-        this._mesh.add(this.createTorso())
         this._mesh.add(this.createHead())
-        this._mesh.add(this.createDirection())
+        this._mesh.add(this.createTorso())
         this._mesh.add(this.createBottom())
+        this._mesh.add(this.createDirection())
     }
 
     get name() {
@@ -38,7 +38,7 @@ export class Player {
     }
 
     private createTorso() {
-        const torsoGeometry = new THREE.CylinderGeometry(this.radius, this.radius, this.height - this.radius * 3, 32)
+        const torsoGeometry = new THREE.CylinderGeometry(this.radius, this.radius, this.height - this.radius * 2, 32)
         const torsoMaterial = new THREE.MeshPhongMaterial({ color: this.color, shininess: this.shininess })
         const torso = new THREE.Mesh(torsoGeometry, torsoMaterial)
         torso.position.y = this.height / 2
@@ -46,10 +46,10 @@ export class Player {
     }
 
     private createBottom() {
-        const bottomGeometry = new THREE.SphereGeometry(this.radius, 32, 32, 0, Math.PI * 2, Math.PI / 2, Math.PI)
+        const bottomGeometry = new THREE.SphereGeometry(this.radius, 32, 32)
         const bottomMaterial = new THREE.MeshPhongMaterial({ color: this.color, shininess: this.shininess })
         const bottom = new THREE.Mesh(bottomGeometry, bottomMaterial)
-        bottom.position.y = 0
+        bottom.position.y = this.radius
         return bottom
     }
 
