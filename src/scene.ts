@@ -2,7 +2,9 @@ import * as THREE from 'three'
 
 import {
     FIELD_EXTENDED_LENGTH,
+    FIELD_EXTENDED_LENGTH_HALF,
     FIELD_EXTENDED_WIDTH,
+    FIELD_EXTENDED_WIDTH_HALF,
     FIELD_GOAL_HEIGHT,
     FIELD_GOAL_POST_RADIUS,
     FIELD_GOAL_WIDTH,
@@ -39,48 +41,44 @@ export class Scene {
         const LAYER_DYNAMIC = 1 // Layer for player and ball
 
         // Global Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 1)
+        const ambientLight = new THREE.AmbientLight()
         this.scene.add(ambientLight)
 
         // Top Down Lighting (Players and Ball)
-        const topLight = new THREE.DirectionalLight(0xffffff, 1)
-        topLight.position.set(0, 10, 0)
+        const topLight = new THREE.DirectionalLight()
+        topLight.position.set(0, 20, 0)
         topLight.castShadow = true
-
-        // Configure shadow properties for top light
-        topLight.shadow.mapSize.width = 4096
-        topLight.shadow.mapSize.height = 4096
+        topLight.shadow.mapSize.width = 1000
+        topLight.shadow.mapSize.height = 1000
         topLight.shadow.camera.near = 0.5
         topLight.shadow.camera.far = 50
-        const shadowWidth = FIELD_EXTENDED_WIDTH / 2
-        const shadowLength = FIELD_EXTENDED_LENGTH / 2
-        topLight.shadow.camera.left = -shadowWidth
-        topLight.shadow.camera.right = shadowWidth
-        topLight.shadow.camera.top = shadowLength
-        topLight.shadow.camera.bottom = -shadowLength
-
-        // Set top light to only affect dynamic objects (player and ball)
+        topLight.shadow.camera.left = -FIELD_EXTENDED_WIDTH_HALF
+        topLight.shadow.camera.right = FIELD_EXTENDED_WIDTH_HALF
+        topLight.shadow.camera.top = FIELD_EXTENDED_LENGTH_HALF
+        topLight.shadow.camera.bottom = -FIELD_EXTENDED_LENGTH_HALF
         topLight.layers.set(LAYER_DYNAMIC)
         this.scene.add(topLight)
 
-        // Angled light for environment objects
-        const angledLight = new THREE.DirectionalLight(0xffffff, 0.8)
-        angledLight.position.set(-10, 8, -10)
-        angledLight.castShadow = true
+        const createAngleLight = (position: { x: number; y: number; z: number }) => {
+            const angledLight = new THREE.DirectionalLight()
+            angledLight.position.set(position.x, position.y, position.z)
+            angledLight.castShadow = true
+            angledLight.shadow.mapSize.width = 1000
+            angledLight.shadow.mapSize.height = 1000
+            angledLight.shadow.camera.near = 0.5
+            angledLight.shadow.camera.far = 100
+            angledLight.shadow.camera.left = -FIELD_EXTENDED_WIDTH_HALF * 1.5
+            angledLight.shadow.camera.right = FIELD_EXTENDED_WIDTH_HALF * 1.5
+            angledLight.shadow.camera.top = FIELD_EXTENDED_LENGTH_HALF * 1.5
+            angledLight.shadow.camera.bottom = -FIELD_EXTENDED_LENGTH_HALF * 1.5
+            angledLight.layers.set(LAYER_GENERAL)
+            this.scene.add(angledLight)
+            // Add helper to visualize shadow camera frustum (for debugging)
+            // const shadowCameraHelper = new THREE.CameraHelper(angledLight.shadow.camera)
+            // this.scene.add(shadowCameraHelper)
+        }
 
-        // Configure shadow properties for angled light
-        angledLight.shadow.mapSize.width = 4096
-        angledLight.shadow.mapSize.height = 4096
-        angledLight.shadow.camera.near = 0.5
-        angledLight.shadow.camera.far = 50
-        angledLight.shadow.camera.left = -shadowWidth * 1.5
-        angledLight.shadow.camera.right = shadowWidth * 1.5
-        angledLight.shadow.camera.top = shadowLength * 1.5
-        angledLight.shadow.camera.bottom = -shadowLength * 1.5
-
-        // Set angled light to only affect general objects
-        angledLight.layers.set(LAYER_GENERAL)
-        this.scene.add(angledLight)
+        createAngleLight({ x: FIELD_EXTENDED_WIDTH_HALF, y: 0, z: FIELD_EXTENDED_LENGTH_HALF }) // Northeast
 
         // Store layers in window for access from game.ts
         ;(window as any).LAYER_GENERAL = LAYER_GENERAL
