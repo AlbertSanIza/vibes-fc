@@ -26,6 +26,10 @@ export class Scene {
         this.scene = new THREE.Scene()
         this.scene.background = new THREE.Color(0x87ceeb) // Sky blue background
 
+        // Axes Helper
+        const axesHelper = new THREE.AxesHelper(20) // Size 5 units
+        this.scene.add(axesHelper)
+
         // Camera
         this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight)
         this.camera.layers.enableAll()

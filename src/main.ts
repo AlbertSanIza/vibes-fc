@@ -2,6 +2,10 @@ import { Game } from './game'
 import { Scene } from './scene'
 import './style.css'
 
+// X Axis = Left/Right
+// Y Axis = Up/Down
+// Z Axis = Back/Forward
+
 class Main {
     scene: Scene
     game: Game

@@ -13,6 +13,7 @@ import {
     FIELD_EXTENDED_LENGTH,
     FIELD_EXTENDED_WIDTH,
     FIELD_LENGTH,
+    FIELD_LENGTH_HALF,
     FIELD_WIDTH,
     PLAYER_BODY_RADIUS,
     PLAYER_GRAVITY,
@@ -62,7 +63,7 @@ export class Game {
 
         // Add the group to the scene
 
-        this.player.mesh.position.set(0, PLAYER_GROUND_LEVEL, 5)
+        this.player.mesh.position.set(0, PLAYER_GROUND_LEVEL, FIELD_LENGTH_HALF)
         this.scene.add(this.player.mesh)
 
         // Try loading GLB first
