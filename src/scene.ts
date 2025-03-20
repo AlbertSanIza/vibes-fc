@@ -236,7 +236,7 @@ export class Scene {
     private createClouds() {
         const createCloud = (x: number, y: number, z: number, baseSize: number) => {
             const cloudGroup = new THREE.Group()
-            const cloudMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 })
+            const cloudMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 })
 
             // Create multiple spheres for each cloud
             const numSpheres = 5 + Math.floor(Math.random() * 3) // Random number between 5-7 spheres
