@@ -1,44 +1,61 @@
 import * as THREE from 'three'
 
-const PLAYER_RADIUS = 0.6
-const PLAYER_HEIGHT = 1.8
-const PLAYER_SHININESS = 30
-
 export class Player {
-    name: string
-    color: number
-    mesh: THREE.Group
+    private _name: string
+    private color: number
+    private height: number
+    private radius: number
+    private shininess: number
+    private _mesh: THREE.Group
 
-    constructor(name: string = 'Player', color: number = 0x0000ff) {
-        this.name = name
+    constructor({ name = 'Player', color = 0x0000ff }: { name?: string; color?: number } = {}) {
+        this._name = name
         this.color = color
+        this.height = 2
+        this.radius = 0.6
+        this.shininess = 30
+        this._mesh = new THREE.Group()
+        this._mesh.add(this.createTorso())
+        this._mesh.add(this.createHead())
+        this._mesh.add(this.createDirection())
+        this._mesh.add(this.createBottom())
+    }
 
-        this.mesh = new THREE.Group()
-        const torso = this.createTorso()
-        const head = this.createHead()
-        this.mesh.add(torso)
-        this.mesh.add(head)
+    get name() {
+        return this._name
+    }
+
+    get mesh() {
+        return this._mesh
     }
 
     private createHead() {
-        const headGeometry = new THREE.SphereGeometry(PLAYER_RADIUS, 32, 32)
-        const headMaterial = new THREE.MeshPhongMaterial({ color: this.color, shininess: PLAYER_SHININESS })
+        const headGeometry = new THREE.SphereGeometry(this.radius, 32, 32)
+        const headMaterial = new THREE.MeshPhongMaterial({ color: this.color, shininess: this.shininess })
         const head = new THREE.Mesh(headGeometry, headMaterial)
-        head.position.y = PLAYER_HEIGHT / 2 + PLAYER_RADIUS
+        head.position.y = this.height - this.radius
         return head
     }
 
     private createTorso() {
-        const torsoGeometry = new THREE.CylinderGeometry(PLAYER_RADIUS, PLAYER_RADIUS, PLAYER_HEIGHT - PLAYER_RADIUS * 2, 32)
-        const torsoMaterial = new THREE.MeshPhongMaterial({ color: this.color, shininess: PLAYER_SHININESS })
+        const torsoGeometry = new THREE.CylinderGeometry(this.radius, this.radius, this.height - this.radius * 3, 32)
+        const torsoMaterial = new THREE.MeshPhongMaterial({ color: this.color, shininess: this.shininess })
         const torso = new THREE.Mesh(torsoGeometry, torsoMaterial)
-        torso.position.y = PLAYER_HEIGHT / 2 - PLAYER_RADIUS
+        torso.position.y = this.height / 2
         return torso
     }
 
-    private arrow() {
+    private createBottom() {
+        const bottomGeometry = new THREE.SphereGeometry(this.radius, 32, 32, 0, Math.PI * 2, Math.PI / 2, Math.PI)
+        const bottomMaterial = new THREE.MeshPhongMaterial({ color: this.color, shininess: this.shininess })
+        const bottom = new THREE.Mesh(bottomGeometry, bottomMaterial)
+        bottom.position.y = 0
+        return bottom
+    }
+
+    private createDirection() {
         const arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, -1), new THREE.Vector3(0, 0, 0), 1, 0xff0000)
-        arrow.position.y = PLAYER_HEIGHT / 2
+        arrow.position.y = this.height / 2
         return arrow
     }
 }

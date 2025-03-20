@@ -101,6 +101,7 @@ export class Game {
         // Add the group to the scene
         this.player_old = playerGroup
         this.player_old.position.set(0, PLAYER_GROUND_LEVEL, 5)
+        this.player.mesh.position.set(0, PLAYER_GROUND_LEVEL, 5)
         this.scene.add(this.player.mesh)
         this.scene.add(this.player_old)
 
