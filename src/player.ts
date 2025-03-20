@@ -3,14 +3,14 @@ import { CylinderGeometry, Group, Mesh, MeshBasicMaterial, MeshPhongMaterial, Sh
 import { MATH_PI_HALF } from './constants'
 
 export class Player {
-    name: string
+    private _name: string
     private _body: { height: number; radius: number; color: number; shininess: number }
     private _speed: { move: number; rotate: number }
     private _mesh: Group
     isRunning: boolean
 
     constructor({ name = 'Player', color = 0x0000ff }: { name?: string; color?: number } = {}) {
-        this.name = name
+        this._name = name
         this._body = { height: 2, radius: 0.6, color, shininess: 30 }
         this._speed = { move: 16, rotate: 5 }
         this._mesh = new Group()
@@ -19,6 +19,10 @@ export class Player {
         this._mesh.add(this.createBottom())
         this._mesh.add(this.createDirection())
         this.isRunning = false
+    }
+
+    get name() {
+        return this._name
     }
 
     get body() {
