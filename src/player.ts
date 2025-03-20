@@ -4,18 +4,16 @@ import { MATH_PI_HALF } from './constants'
 
 export class Player {
     private _name: string
-    private color: number
-    private height: number
-    private radius: number
+    private _body: { height: number; radius: number; color: number }
     private shininess: number
+    private _speed: { move: number; rotate: number }
     private _mesh: Group
 
     constructor({ name = 'Player', color = 0x0000ff }: { name?: string; color?: number } = {}) {
         this._name = name
-        this.color = color
-        this.height = 2
-        this.radius = 0.6
+        this._body = { height: 2, radius: 0.6, color }
         this.shininess = 30
+        this._speed = { move: 0.1, rotate: 0.05 }
         this._mesh = new Group()
         this._mesh.add(this.createHead())
         this._mesh.add(this.createTorso())
@@ -27,31 +25,39 @@ export class Player {
         return this._name
     }
 
+    get body() {
+        return this._body
+    }
+
+    get speed() {
+        return this._speed
+    }
+
     get mesh() {
         return this._mesh
     }
 
     private createHead() {
-        const headGeometry = new SphereGeometry(this.radius, 32, 32)
-        const headMaterial = new MeshPhongMaterial({ color: this.color, shininess: this.shininess })
+        const headGeometry = new SphereGeometry(this.body.radius, 32, 32)
+        const headMaterial = new MeshPhongMaterial({ color: this.body.color, shininess: this.shininess })
         const head = new Mesh(headGeometry, headMaterial)
-        head.position.y = this.height - this.radius
+        head.position.y = this.body.height - this.body.radius
         return head
     }
 
     private createTorso() {
-        const torsoGeometry = new CylinderGeometry(this.radius, this.radius, this.height - this.radius * 2, 32)
-        const torsoMaterial = new MeshPhongMaterial({ color: this.color, shininess: this.shininess })
+        const torsoGeometry = new CylinderGeometry(this.body.radius, this.body.radius, this.body.height - this.body.radius * 2, 32)
+        const torsoMaterial = new MeshPhongMaterial({ color: this.body.color, shininess: this.shininess })
         const torso = new Mesh(torsoGeometry, torsoMaterial)
-        torso.position.y = this.height / 2
+        torso.position.y = this.body.height / 2
         return torso
     }
 
     private createBottom() {
-        const bottomGeometry = new SphereGeometry(this.radius, 32, 32)
-        const bottomMaterial = new MeshPhongMaterial({ color: this.color, shininess: this.shininess })
+        const bottomGeometry = new SphereGeometry(this.body.radius, 32, 32)
+        const bottomMaterial = new MeshPhongMaterial({ color: this.body.color, shininess: this.shininess })
         const bottom = new Mesh(bottomGeometry, bottomMaterial)
-        bottom.position.y = this.radius
+        bottom.position.y = this.body.radius
         return bottom
     }
 
@@ -65,7 +71,7 @@ export class Player {
         const directionMaterial = new MeshBasicMaterial({ color: 0xffff00 })
         const direction = new Mesh(directionGeometry, directionMaterial)
         direction.rotation.x = -MATH_PI_HALF
-        direction.position.set(0, 0.1, -this.radius * 1.5)
+        direction.position.set(0, 0.1, -this.body.radius * 1.5)
         return direction
     }
 }
