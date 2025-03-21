@@ -26,7 +26,7 @@ export class World {
         document.body.appendChild(this.renderer.domElement)
 
         // Ground Radius
-        this.groundRadius = Math.max(FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_LENGTH) * 1.4
+        this.groundRadius = Math.max(FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_LENGTH) * 1.2
 
         // Global Lighting
         this.scene.add(new AmbientLight())
@@ -66,7 +66,7 @@ export class World {
 
     private createTrees() {
         let generated = 0
-        while (generated < 200) {
+        while (generated < 220) {
             const angle = Math.random() * Math.PI * 2
             const radius = Math.random() * this.groundRadius
             const x = radius * Math.cos(angle)
