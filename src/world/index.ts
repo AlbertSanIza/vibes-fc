@@ -79,7 +79,6 @@ export class World {
         const ground = new Mesh(groundGeometry, groundMaterial)
         ground.rotation.x = -MATH_PI_HALF
         ground.receiveShadow = true
-
         this.scene.add(ground)
     }
 
