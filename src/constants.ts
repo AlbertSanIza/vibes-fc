@@ -1,4 +1,9 @@
+// Utils
 export const MATH_PI_HALF = Math.PI / 2
+
+// Lighting Groups
+export const LIGHT_GROUP_STATIC = 0
+export const LIGHT_GROUP_DYNAMIC = 1
 
 // Stadium
 export const FIELD_WIDTH = 75

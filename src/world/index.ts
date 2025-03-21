@@ -59,7 +59,6 @@ export class World {
         this.scene.add(topLight)
 
         // Elements
-
         this.createGround()
         this.createTrees()
         this.createClouds()
