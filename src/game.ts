@@ -21,6 +21,7 @@ import {
     PLAYER_JUMP_FORCE
 } from './constants'
 import { Player } from './player'
+import { Minimap } from './world/minimap'
 import { Scoreboard } from './world/scoreboard'
 
 export class Game {
@@ -47,6 +48,7 @@ export class Game {
     private maxCameraHeight: number = 15
     private isCameraOnBall: boolean = false
     private scoreboard: Scoreboard
+    private minimap: Minimap
 
     constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer) {
         this.scene = scene
@@ -64,6 +66,10 @@ export class Game {
         this.scoreboard = new Scoreboard()
         this.scoreboard.mesh.position.set(FIELD_WIDTH / 2 + 5, 0, 0) // Position on the side of the field
         this.scene.add(this.scoreboard.mesh)
+
+        // Initialize minimap
+        this.minimap = new Minimap()
+        this.scene.add(this.minimap.mesh)
 
         // Try loading GLB first
         const gltfLoader = new GLTFLoader()
@@ -314,20 +320,21 @@ export class Game {
 
     private animate() {
         const currentTime = performance.now()
-        const deltaTime = (currentTime - this.lastTime) / 1000
+        const deltaTime = Math.min((currentTime - this.lastTime) / 1000, 0.1) // Cap at 100ms
         this.lastTime = currentTime
 
         this.stats.begin()
 
         this.updatePlayer(deltaTime)
-
-        // Only update ball if it exists
         if (this.ball) {
             this.updateBall(deltaTime)
+            // Update minimap with current positions
+            this.minimap.update(this.player.mesh.position, this.player.mesh.rotation.y, this.ball.position)
         }
-        this.renderer.render(this.scene, this.camera)
+        this.updateCamera()
 
-        this.stats.end()
+        this.renderer.render(this.scene, this.camera)
+        this.stats.update()
 
         requestAnimationFrame(this.animate.bind(this))
     }
