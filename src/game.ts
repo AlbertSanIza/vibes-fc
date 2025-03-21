@@ -58,6 +58,8 @@ export class Game {
 
         // Initialize Stats
         document.body.appendChild(this.stats.dom)
+        this.stats.dom.style.top = 'auto'
+        this.stats.dom.style.bottom = '0'
 
         this.player.mesh.position.set(0, 0, FIELD_LENGTH_HALF / 2)
         this.scene.add(this.player.mesh)
