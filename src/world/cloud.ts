@@ -10,7 +10,6 @@ export class Cloud {
             const cloudGeometry = new SphereGeometry(size * (0.7 + Math.random() * 0.6), 8, 8)
             const cloud = new Mesh(cloudGeometry, cloudMaterial)
             cloud.position.set((Math.random() - 0.5) * size * 2, (Math.random() - 0.5) * size, (Math.random() - 0.5) * size * 2)
-            cloud.castShadow = true
             this._mesh.add(cloud)
         }
     }
