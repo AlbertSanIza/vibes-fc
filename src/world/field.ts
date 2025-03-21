@@ -72,8 +72,6 @@ export class Field {
         this.createCornerFlagPole({ x: -FIELD_WIDTH_HALF, z: FIELD_LENGTH_HALF }) // Northwest corner
         this.createCornerFlagPole({ x: FIELD_WIDTH_HALF, z: -FIELD_LENGTH_HALF }) // Southeast corner
         this.createCornerFlagPole({ x: -FIELD_WIDTH_HALF, z: -FIELD_LENGTH_HALF }) // Southwest corner
-
-        this.createCornerFlagPole({ x: 0, z: 0 }) // Southwest corner
     }
 
     get mesh() {
