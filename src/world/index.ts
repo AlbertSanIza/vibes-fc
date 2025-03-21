@@ -14,10 +14,10 @@ import { Goal } from './goal'
 import { Tree } from './tree'
 import { Wall } from './wall'
 
-// North: Positive Z
-// South: Negative Z
-// East: Negative X
-// West: Positive X
+// North: -z
+// South: z
+// East: x
+// West: -x
 
 export class World {
     scene: Scene
@@ -32,6 +32,7 @@ export class World {
 
         // Camera
         this.camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight)
+        this.camera.position.set(0, 10, 60)
         this.camera.layers.enableAll()
 
         // Renderer
@@ -52,7 +53,7 @@ export class World {
         topLight.castShadow = true
         topLight.shadow.mapSize.width = 1000
         topLight.shadow.mapSize.height = 1000
-        topLight.shadow.camera.far = 11
+        topLight.shadow.camera.far = topLight.position.y + 1
         topLight.shadow.camera.left = -FIELD_EXTENDED_WIDTH_HALF
         topLight.shadow.camera.right = FIELD_EXTENDED_WIDTH_HALF
         topLight.shadow.camera.top = FIELD_EXTENDED_LENGTH_HALF
@@ -68,10 +69,11 @@ export class World {
 
         // Goals
         const northGoal = new Goal()
-        northGoal.mesh.position.set(0, 0, FIELD_LENGTH_HALF)
+        northGoal.mesh.position.set(0, 0, -FIELD_LENGTH_HALF)
         this.scene.add(northGoal.mesh)
         const southGoal = new Goal()
-        southGoal.mesh.position.set(0, 0, -FIELD_LENGTH_HALF)
+        southGoal.mesh.rotation.y = Math.PI
+        southGoal.mesh.position.set(0, 0, FIELD_LENGTH_HALF)
         this.scene.add(southGoal.mesh)
     }
 
@@ -91,7 +93,7 @@ export class World {
             const radius = Math.random() * this.groundRadius
             const x = radius * Math.cos(angle)
             const z = radius * Math.sin(angle)
-            if (Math.abs(x) <= FIELD_EXTENDED_WIDTH_HALF + 10 && Math.abs(z) <= FIELD_EXTENDED_LENGTH_HALF + 10) {
+            if (Math.abs(x) <= FIELD_EXTENDED_WIDTH_HALF + 2 && Math.abs(z) <= FIELD_EXTENDED_LENGTH_HALF + 2) {
                 continue
             }
             const tree = new Tree(3 + Math.random() * 3, 2 + Math.random() * 1)
@@ -105,8 +107,10 @@ export class World {
         for (let i = 0; i < 140; i++) {
             const angle = Math.random() * Math.PI * 2
             const radius = Math.random() * this.groundRadius - this.groundRadius / 4
+            const x = radius * Math.cos(angle)
+            const z = radius * Math.sin(angle)
             const cloud = new Cloud(1 + Math.random() * 3)
-            cloud.mesh.position.set(radius * Math.cos(angle), 20 + Math.random() * 10, radius * Math.sin(angle))
+            cloud.mesh.position.set(x, 20 + Math.random() * 10, z)
             this.scene.add(cloud.mesh)
         }
     }
