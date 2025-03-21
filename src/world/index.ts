@@ -2,6 +2,7 @@ import { AmbientLight, AxesHelper, CircleGeometry, Color, DirectionalLight, Mesh
 
 import { FIELD_EXTENDED_LENGTH, FIELD_EXTENDED_LENGTH_HALF, FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_WIDTH_HALF, MATH_PI_HALF } from '../constants'
 import { Cloud } from './cloud'
+import { Field } from './field'
 import { Tree } from './tree'
 
 export class World {
@@ -45,9 +46,12 @@ export class World {
         this.scene.add(topLight)
 
         // Elements
+
         this.createGround()
         this.createTrees()
         this.createClouds()
+        const field = new Field()
+        this.scene.add(field.mesh)
 
         // Axes Helper
         this.scene.add(new AxesHelper(20))
@@ -58,7 +62,6 @@ export class World {
         const groundMaterial = new MeshStandardMaterial({ color: 0x90ee90 }) // Light Green
         const ground = new Mesh(groundGeometry, groundMaterial)
         ground.rotation.x = -MATH_PI_HALF
-        ground.position.y = -0.1
         ground.receiveShadow = true
 
         this.scene.add(ground)
