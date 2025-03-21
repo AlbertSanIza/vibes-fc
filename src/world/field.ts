@@ -110,7 +110,7 @@ export class Field {
 
     private createCornerFlagPole = (position: { x: number; z: number }) => {
         const cornerFlagPole = new Group()
-        const cornerPoleGeometry = new CylinderGeometry(0.05, 0.05, 1.5)
+        const cornerPoleGeometry = new CylinderGeometry(0.05, 0.05, 2)
         const cornerPoleMaterial = new MeshStandardMaterial({ color: 0xffffff })
         const cornerPole = new Mesh(cornerPoleGeometry, cornerPoleMaterial)
         cornerPole.position.set(position.x, 0.75, position.z)
@@ -119,7 +119,7 @@ export class Field {
         const cornerFlagGeometry = new PlaneGeometry(0.4, 0.3)
         const cornerFlagMaterial = new MeshStandardMaterial({ color: 0xff0000, side: DoubleSide })
         const cornerFlag = new Mesh(cornerFlagGeometry, cornerFlagMaterial)
-        cornerFlag.position.set(position.x - 0.2, 1.3, position.z)
+        cornerFlag.position.set(position.x - 0.2, 1.5, position.z)
         cornerFlag.castShadow = true
         cornerFlagPole.add(cornerFlag)
         this._mesh.add(cornerFlagPole)
