@@ -3,6 +3,7 @@ import { AmbientLight, AxesHelper, CircleGeometry, Color, DirectionalLight, Mesh
 import { FIELD_EXTENDED_LENGTH, FIELD_EXTENDED_LENGTH_HALF, FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_WIDTH_HALF, MATH_PI_HALF } from '../constants'
 import { Cloud } from './cloud'
 import { Field } from './field'
+import { Goal } from './goal'
 import { Tree } from './tree'
 
 export class World {
@@ -50,8 +51,8 @@ export class World {
         this.createGround()
         this.createTrees()
         this.createClouds()
-        const field = new Field()
-        this.scene.add(field.mesh)
+        this.scene.add(new Field().mesh)
+        this.scene.add(new Goal().mesh)
 
         // Axes Helper
         this.scene.add(new AxesHelper(20))
