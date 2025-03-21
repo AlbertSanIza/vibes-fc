@@ -102,9 +102,9 @@ export class World {
     }
 
     private createClouds() {
-        for (let i = 0; i < 200; i++) {
+        for (let i = 0; i < 140; i++) {
             const angle = Math.random() * Math.PI * 2
-            const radius = Math.random() * this.groundRadius
+            const radius = Math.random() * this.groundRadius - this.groundRadius / 4
             const cloud = new Cloud(1 + Math.random() * 3)
             cloud.mesh.position.set(radius * Math.cos(angle), 20 + Math.random() * 10, radius * Math.sin(angle))
             this.scene.add(cloud.mesh)
