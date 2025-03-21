@@ -12,6 +12,7 @@ import { Cloud } from './cloud'
 import { Field } from './field'
 import { Goal } from './goal'
 import { Tree } from './tree'
+import { Wall } from './wall'
 
 // North: Positive Z
 // South: Negative Z
@@ -62,6 +63,7 @@ export class World {
         this.createGround()
         this.createTrees()
         this.createClouds()
+        this.scene.add(new Wall().mesh)
         this.scene.add(new Field().mesh)
 
         // Goals
