@@ -21,6 +21,7 @@ import {
     PLAYER_JUMP_FORCE
 } from './constants'
 import { Player } from './player'
+import { Scoreboard } from './world/scoreboard'
 
 export class Game {
     private scene: THREE.Scene
@@ -45,6 +46,7 @@ export class Game {
     private minCameraHeight: number = 5
     private maxCameraHeight: number = 15
     private isCameraOnBall: boolean = false
+    private scoreboard: Scoreboard
 
     constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer) {
         this.scene = scene
@@ -57,6 +59,11 @@ export class Game {
 
         this.player.mesh.position.set(0, 0, FIELD_LENGTH_HALF / 2)
         this.scene.add(this.player.mesh)
+
+        // Initialize scoreboard
+        this.scoreboard = new Scoreboard()
+        this.scoreboard.mesh.position.set(FIELD_WIDTH / 2 + 5, 0, 0) // Position on the side of the field
+        this.scene.add(this.scoreboard.mesh)
 
         // Try loading GLB first
         const gltfLoader = new GLTFLoader()
@@ -154,7 +161,12 @@ export class Game {
         if (Math.abs(this.ball.position.z) > fieldBoundaryZ) {
             // Check if ball is within goal width
             if (Math.abs(this.ball.position.x) < FIELD_GOAL_WIDTH / 2 && this.ball.position.y < FIELD_GOAL_HEIGHT) {
-                // Goal scored! Reset ball position
+                // Goal scored! Update score and reset ball position
+                if (this.ball.position.z > 0) {
+                    this.scoreboard.incrementScore('blue') // Blue team scored in north goal
+                } else {
+                    this.scoreboard.incrementScore('red') // Red team scored in south goal
+                }
                 this.resetBall()
             } else {
                 // Ball hit the boundary outside goal area, bounce back
