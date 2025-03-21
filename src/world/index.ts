@@ -1,10 +1,22 @@
 import { AmbientLight, AxesHelper, CircleGeometry, Color, DirectionalLight, Mesh, MeshStandardMaterial, PerspectiveCamera, Scene, WebGLRenderer } from 'three'
 
-import { FIELD_EXTENDED_LENGTH, FIELD_EXTENDED_LENGTH_HALF, FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_WIDTH_HALF, MATH_PI_HALF } from '../constants'
+import {
+    FIELD_EXTENDED_LENGTH,
+    FIELD_EXTENDED_LENGTH_HALF,
+    FIELD_EXTENDED_WIDTH,
+    FIELD_EXTENDED_WIDTH_HALF,
+    FIELD_LENGTH_HALF,
+    MATH_PI_HALF
+} from '../constants'
 import { Cloud } from './cloud'
 import { Field } from './field'
 import { Goal } from './goal'
 import { Tree } from './tree'
+
+// North: Positive Z
+// South: Negative Z
+// East: Negative X
+// West: Positive X
 
 export class World {
     scene: Scene
@@ -52,7 +64,14 @@ export class World {
         this.createTrees()
         this.createClouds()
         this.scene.add(new Field().mesh)
-        this.scene.add(new Goal().mesh)
+
+        // Goals
+        const northGoal = new Goal()
+        northGoal.mesh.position.set(0, 0, FIELD_LENGTH_HALF)
+        this.scene.add(northGoal.mesh)
+        const southGoal = new Goal()
+        southGoal.mesh.position.set(0, 0, -FIELD_LENGTH_HALF)
+        this.scene.add(southGoal.mesh)
 
         // Axes Helper
         this.scene.add(new AxesHelper(20))
