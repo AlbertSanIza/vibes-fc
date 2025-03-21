@@ -33,16 +33,15 @@ export class World {
 
         // Top Down Lighting (Players and Ball)
         const topLight = new DirectionalLight()
-        topLight.position.set(0, 20, 0)
+        topLight.position.set(0, 40, 0)
         topLight.castShadow = true
         topLight.shadow.mapSize.width = 1000
         topLight.shadow.mapSize.height = 1000
-        topLight.shadow.camera.near = 0.5
-        topLight.shadow.camera.far = 50
-        topLight.shadow.camera.left = -FIELD_EXTENDED_WIDTH_HALF
-        topLight.shadow.camera.right = FIELD_EXTENDED_WIDTH_HALF
-        topLight.shadow.camera.top = FIELD_EXTENDED_LENGTH_HALF
-        topLight.shadow.camera.bottom = -FIELD_EXTENDED_LENGTH_HALF
+        topLight.shadow.camera.far = 41
+        topLight.shadow.camera.left = -this.groundRadius / 2
+        topLight.shadow.camera.right = this.groundRadius / 2
+        topLight.shadow.camera.top = this.groundRadius / 2
+        topLight.shadow.camera.bottom = -this.groundRadius / 2
         this.scene.add(topLight)
 
         // Elements
@@ -72,10 +71,10 @@ export class World {
             const radius = Math.random() * this.groundRadius
             const x = radius * Math.cos(angle)
             const z = radius * Math.sin(angle)
-            if (Math.abs(x) <= FIELD_EXTENDED_WIDTH_HALF && Math.abs(z) <= FIELD_EXTENDED_LENGTH_HALF) {
+            if (Math.abs(x) <= FIELD_EXTENDED_WIDTH_HALF + 10 && Math.abs(z) <= FIELD_EXTENDED_LENGTH_HALF + 10) {
                 continue
             }
-            const tree = new Tree(3 + Math.random() * 3)
+            const tree = new Tree(3 + Math.random() * 3, 2 + Math.random() * 1)
             tree.mesh.position.set(x, 0, z)
             this.scene.add(tree.mesh)
             generated++
