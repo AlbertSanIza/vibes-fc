@@ -42,6 +42,14 @@ export class Scoreboard {
     incrementScore(team: 'red' | 'blue') {
         this._scores[team]++
         this.updateDisplay()
+        this.updateOverlayScore(team)
+    }
+
+    private updateOverlayScore(team: 'red' | 'blue') {
+        const scoreElement = document.getElementById(`${team}-score`)
+        if (scoreElement) {
+            scoreElement.textContent = this._scores[team].toString()
+        }
     }
 
     private updateDisplay() {

@@ -21,7 +21,7 @@ import {
     PLAYER_JUMP_FORCE
 } from './constants'
 import { Player } from './player'
-import { Minimap } from './world/minimap'
+import { Minimap } from './world/mini-map'
 import { Scoreboard } from './world/scoreboard'
 
 export class Game {
