@@ -1,4 +1,4 @@
-import { AmbientLight, CircleGeometry, Color, DirectionalLight, Mesh, MeshStandardMaterial, PerspectiveCamera, Scene, SpotLight, WebGLRenderer } from 'three'
+import { AmbientLight, CircleGeometry, Color, DirectionalLight, Mesh, MeshStandardMaterial, PerspectiveCamera, Scene, WebGLRenderer } from 'three'
 
 import {
     FIELD_EXTENDED_LENGTH,
@@ -43,10 +43,10 @@ export class World {
         this.groundRadius = Math.max(FIELD_EXTENDED_WIDTH, FIELD_EXTENDED_LENGTH) * 1.2
 
         // Global Lighting
-        this.scene.add(new AmbientLight()) // Even darker ambient
+        this.scene.add(new AmbientLight())
 
-        // Top Down Lighting (Players and Ball)
-        const topLight = new DirectionalLight(0xffffff, 0.2)
+        // Top Down Lighting
+        const topLight = new DirectionalLight()
         topLight.position.set(0, 10, 0)
         topLight.castShadow = true
         topLight.shadow.mapSize.width = 1000
@@ -57,39 +57,6 @@ export class World {
         topLight.shadow.camera.top = FIELD_EXTENDED_LENGTH_HALF
         topLight.shadow.camera.bottom = -FIELD_EXTENDED_LENGTH_HALF
         this.scene.add(topLight)
-
-        // Corner Spotlights
-        const createCornerLight = (x: number, z: number) => {
-            const light = new SpotLight()
-            light.position.set(x, 30, z)
-            light.castShadow = true
-            light.target.position.set(0, 0, 0)
-            light.penumbra = 0
-            light.decay = 0
-            light.distance = 100
-            light.shadow.mapSize.width = 1000
-            light.shadow.mapSize.height = 1000
-            light.shadow.camera.near = 1
-            light.shadow.camera.far = 100
-            this.scene.add(light)
-            this.scene.add(light.target)
-
-            // DO NOT DELETE
-            // Add helpers to visualize the light
-            // const helper = new SpotLightHelper(light)
-            // this.scene.add(helper)
-            // const shadowHelper = new CameraHelper(light.shadow.camera)
-            // this.scene.add(shadowHelper)
-
-            return light
-        }
-
-        // Add lights at each corner with more spread out positions
-        const cornerOffset = 10 // Add some extra offset from the field edges
-        createCornerLight(FIELD_EXTENDED_WIDTH_HALF + cornerOffset, FIELD_EXTENDED_LENGTH_HALF + cornerOffset) // Northeast
-        createCornerLight(-FIELD_EXTENDED_WIDTH_HALF - cornerOffset, FIELD_EXTENDED_LENGTH_HALF + cornerOffset) // Northwest
-        createCornerLight(FIELD_EXTENDED_WIDTH_HALF + cornerOffset, -FIELD_EXTENDED_LENGTH_HALF - cornerOffset) // Southeast
-        createCornerLight(-FIELD_EXTENDED_WIDTH_HALF - cornerOffset, -FIELD_EXTENDED_LENGTH_HALF - cornerOffset) // Southwest
 
         // Elements
         this.createGround()
