@@ -1,4 +1,4 @@
-import { CircleGeometry, CylinderGeometry, DoubleSide, Group, Mesh, MeshStandardMaterial, PlaneGeometry, RingGeometry } from 'three'
+import { CircleGeometry, CylinderGeometry, DoubleSide, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial, PlaneGeometry, RingGeometry } from 'three'
 
 import {
     FIELD_EXTENDED_LENGTH,
@@ -41,7 +41,7 @@ export class Field {
         // Center Circle
         const centerCircleRadius = 9.15 / 2
         const centerCircleGeometry = new RingGeometry(centerCircleRadius - FIELD_LINE_THICKNESS / 2, centerCircleRadius + FIELD_LINE_THICKNESS / 2, 32)
-        const centerCircleMaterial = new MeshStandardMaterial({ color: FIELD_LINE_COLOR })
+        const centerCircleMaterial = new MeshBasicMaterial({ color: FIELD_LINE_COLOR })
         const centerCircle = new Mesh(centerCircleGeometry, centerCircleMaterial)
         centerCircle.rotation.x = -MATH_PI_HALF
         centerCircle.position.y = 0.02
@@ -80,18 +80,17 @@ export class Field {
 
     private createFieldLine(width: number, length: number, position: { x: number; z: number }) {
         const fieldLineGeometry = new PlaneGeometry(width, length)
-        const fieldLineMaterial = new MeshStandardMaterial({ color: FIELD_LINE_COLOR })
+        const fieldLineMaterial = new MeshBasicMaterial({ color: FIELD_LINE_COLOR })
         const fieldLine = new Mesh(fieldLineGeometry, fieldLineMaterial)
         fieldLine.rotation.x = -MATH_PI_HALF
         fieldLine.position.set(position.x, 0.02, position.z)
-        fieldLine.receiveShadow = true
         this._mesh.add(fieldLine)
     }
 
     private createQuarterCircle = (position: { x: number; z: number }, rotation: number) => {
         const radius = 1
         const quarterCircleGeometry = new RingGeometry(radius - FIELD_LINE_THICKNESS / 2, radius + FIELD_LINE_THICKNESS / 2, 32, 1, 0, MATH_PI_HALF)
-        const quarterCircleMaterial = new MeshStandardMaterial({ color: FIELD_LINE_COLOR })
+        const quarterCircleMaterial = new MeshBasicMaterial({ color: FIELD_LINE_COLOR })
         const quarterCircle = new Mesh(quarterCircleGeometry, quarterCircleMaterial)
         quarterCircle.rotation.x = -MATH_PI_HALF
         quarterCircle.rotation.z = rotation
@@ -101,7 +100,7 @@ export class Field {
 
     private createSpot = (position: { x: number; z: number }) => {
         const centerSpotGeometry = new CircleGeometry(FIELD_LINE_THICKNESS, 32)
-        const centerSpotMaterial = new MeshStandardMaterial({ color: FIELD_LINE_COLOR })
+        const centerSpotMaterial = new MeshBasicMaterial({ color: FIELD_LINE_COLOR })
         const centerSpot = new Mesh(centerSpotGeometry, centerSpotMaterial)
         centerSpot.rotation.x = -MATH_PI_HALF
         centerSpot.position.set(position.x, 0.02, position.z)
