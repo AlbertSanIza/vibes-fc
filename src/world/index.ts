@@ -1,4 +1,16 @@
-import { AmbientLight, AxesHelper, CircleGeometry, Color, DirectionalLight, Mesh, MeshStandardMaterial, PerspectiveCamera, Scene, WebGLRenderer } from 'three'
+import {
+    AmbientLight,
+    AxesHelper,
+    CameraHelper,
+    CircleGeometry,
+    Color,
+    DirectionalLight,
+    Mesh,
+    MeshStandardMaterial,
+    PerspectiveCamera,
+    Scene,
+    WebGLRenderer
+} from 'three'
 
 import {
     FIELD_EXTENDED_LENGTH,
@@ -47,16 +59,20 @@ export class World {
 
         // Top Down Lighting (Players and Ball)
         const topLight = new DirectionalLight()
-        topLight.position.set(0, 40, 0)
+        topLight.position.set(0, 10, 0)
         topLight.castShadow = true
         topLight.shadow.mapSize.width = 1000
         topLight.shadow.mapSize.height = 1000
-        topLight.shadow.camera.far = 41
-        topLight.shadow.camera.left = -this.groundRadius / 2
-        topLight.shadow.camera.right = this.groundRadius / 2
-        topLight.shadow.camera.top = this.groundRadius / 2
-        topLight.shadow.camera.bottom = -this.groundRadius / 2
+        topLight.shadow.camera.far = 11
+        topLight.shadow.camera.left = -FIELD_EXTENDED_WIDTH_HALF
+        topLight.shadow.camera.right = FIELD_EXTENDED_WIDTH_HALF
+        topLight.shadow.camera.top = FIELD_EXTENDED_LENGTH_HALF
+        topLight.shadow.camera.bottom = -FIELD_EXTENDED_LENGTH_HALF
         this.scene.add(topLight)
+
+        // Add Shadow Camera Helper
+        const shadowCameraHelper = new CameraHelper(topLight.shadow.camera)
+        this.scene.add(shadowCameraHelper)
 
         // Elements
         this.createGround()
