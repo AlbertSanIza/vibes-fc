@@ -14,8 +14,8 @@ export const FIELD_EXTENDED_WIDTH_HALF = FIELD_EXTENDED_WIDTH / 2
 export const FIELD_EXTENDED_LENGTH_HALF = FIELD_EXTENDED_LENGTH / 2
 export const FIELD_LINE_THICKNESS = 0.3
 export const FIELD_LINE_COLOR = 0xffffff
-export const FIELD_GOAL_WIDTH = 12
-export const FIELD_GOAL_HEIGHT = 4
+export const FIELD_GOAL_WIDTH = 14
+export const FIELD_GOAL_HEIGHT = 5
 export const FIELD_GOAL_POST_RADIUS = 0.1
 
 // Player

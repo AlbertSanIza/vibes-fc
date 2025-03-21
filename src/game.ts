@@ -12,6 +12,8 @@ import {
     CAMERA_DISTANCE,
     FIELD_EXTENDED_LENGTH,
     FIELD_EXTENDED_WIDTH,
+    FIELD_GOAL_HEIGHT,
+    FIELD_GOAL_WIDTH,
     FIELD_LENGTH,
     FIELD_LENGTH_HALF,
     FIELD_WIDTH,
@@ -142,14 +144,23 @@ export class Game {
         const fieldBoundaryX = FIELD_WIDTH / 2 - BALL_RADIUS
         const fieldBoundaryZ = FIELD_LENGTH / 2 - BALL_RADIUS
 
+        // Only bounce off side boundaries (x-axis)
         if (Math.abs(this.ball.position.x) > fieldBoundaryX) {
             this.ball.position.x = Math.sign(this.ball.position.x) * fieldBoundaryX
             this.ballVelocity.x *= -BALL_BOUNCE
         }
 
+        // Check for goals (z-axis)
         if (Math.abs(this.ball.position.z) > fieldBoundaryZ) {
-            this.ball.position.z = Math.sign(this.ball.position.z) * fieldBoundaryZ
-            this.ballVelocity.z *= -BALL_BOUNCE
+            // Check if ball is within goal width
+            if (Math.abs(this.ball.position.x) < FIELD_GOAL_WIDTH / 2 && this.ball.position.y < FIELD_GOAL_HEIGHT) {
+                // Goal scored! Reset ball position
+                this.resetBall()
+            } else {
+                // Ball hit the boundary outside goal area, bounce back
+                this.ball.position.z = Math.sign(this.ball.position.z) * fieldBoundaryZ
+                this.ballVelocity.z *= -BALL_BOUNCE
+            }
         }
 
         // Check for collision with player
@@ -180,6 +191,13 @@ export class Game {
             this.ballVelocity.copy(playerToBall.multiplyScalar(kickStrength))
             this.ballVelocity.y = BALL_VERTICAL_FORCE // Use constant vertical force
         }
+    }
+
+    private resetBall() {
+        if (!this.ball) return
+        this.ball.position.set(0, 10, 0)
+        this.ballVelocity.set(0, 0, 0)
+        this.ball.rotation.set(0, 0, 0)
     }
 
     private updatePlayer(deltaTime: number) {
