@@ -1,10 +1,6 @@
 // Utils
 export const MATH_PI_HALF = Math.PI / 2
 
-// Lighting Groups
-export const LIGHT_GROUP_STATIC = 0
-export const LIGHT_GROUP_DYNAMIC = 1
-
 // Stadium
 export const FIELD_WIDTH = 75
 export const FIELD_LENGTH = 110
@@ -16,10 +12,10 @@ export const FIELD_EXTENDED_WIDTH = FIELD_WIDTH + FIELD_EXTRA_WIDTH
 export const FIELD_EXTENDED_LENGTH = FIELD_LENGTH + FIELD_EXTRA_LENGTH
 export const FIELD_EXTENDED_WIDTH_HALF = FIELD_EXTENDED_WIDTH / 2
 export const FIELD_EXTENDED_LENGTH_HALF = FIELD_EXTENDED_LENGTH / 2
-export const FIELD_LINE_THICKNESS = 0.12
+export const FIELD_LINE_THICKNESS = 0.3
 export const FIELD_LINE_COLOR = 0xffffff
-export const FIELD_GOAL_WIDTH = 7.32
-export const FIELD_GOAL_HEIGHT = 2.44
+export const FIELD_GOAL_WIDTH = 12
+export const FIELD_GOAL_HEIGHT = 4
 export const FIELD_GOAL_POST_RADIUS = 0.1
 
 // Player
