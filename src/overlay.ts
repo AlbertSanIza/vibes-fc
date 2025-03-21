@@ -3,7 +3,6 @@ export class Overlay {
 
     constructor() {
         this.overlayElement = document.getElementById('overlay') as HTMLElement
-
         if (!this.overlayElement) {
             console.error('Overlay element not found!')
             return
