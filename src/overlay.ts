@@ -9,16 +9,18 @@ export class Overlay {
             return
         }
 
-        this.createScore()
+        this.append('overlay/score.html')
+        this.append('overlay/mini-map.html')
     }
 
-    createScore() {
-        fetch('vibes-fc/overlay/score.html')
+    append(src: string) {
+        fetch(`vibes-fc/${src}`)
             .then((response) => response.text())
             .then((html) => {
-                const scoreElement = document.createElement('div')
-                scoreElement.innerHTML = html
-                this.overlayElement.appendChild(scoreElement)
+                this.overlayElement.innerHTML += html
+            })
+            .catch((error) => {
+                console.error('Error:', error)
             })
     }
 }
