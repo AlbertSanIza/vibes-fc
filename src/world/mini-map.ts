@@ -1,107 +1,61 @@
-import { CanvasTexture, Group, Mesh, MeshBasicMaterial, OrthographicCamera, PlaneGeometry, Scene, Vector3, WebGLRenderer } from 'three'
+import { Vector3 } from 'three'
 import { FIELD_LENGTH, FIELD_WIDTH } from '../constants'
 
 export class Minimap {
-    private _mesh: Group
-    private _camera: OrthographicCamera
-    private _scene: Scene
-    private _renderer: WebGLRenderer
     private _canvas: HTMLCanvasElement
-    private _playerMarker: Mesh
-    private _ballMarker: Mesh
-    private _minimapMesh: Mesh
-    private readonly MINIMAP_SIZE = { width: 200, height: 150 }
+    private _ctx: CanvasRenderingContext2D
+    private readonly MINIMAP_SIZE = { width: 176, height: 120 } // Matches the HTML dimensions
 
     constructor() {
-        this._mesh = new Group()
-
-        // Create a separate scene for the minimap
-        this._scene = new Scene()
-
-        // Create an orthographic camera for top-down view
-        const aspect = FIELD_WIDTH / FIELD_LENGTH
-        const cameraHeight = FIELD_LENGTH
-        this._camera = new OrthographicCamera((-cameraHeight * aspect) / 2, (cameraHeight * aspect) / 2, cameraHeight / 2, -cameraHeight / 2, 1, 1000)
-        this._camera.position.set(0, 100, 0)
-        this._camera.lookAt(0, 0, 0)
-
-        // Create canvas and renderer for the minimap
         this._canvas = document.createElement('canvas')
         this._canvas.width = this.MINIMAP_SIZE.width
         this._canvas.height = this.MINIMAP_SIZE.height
-        this._renderer = new WebGLRenderer({ canvas: this._canvas, alpha: true })
-        this._renderer.setSize(this.MINIMAP_SIZE.width, this.MINIMAP_SIZE.height)
+        this._ctx = this._canvas.getContext('2d')!
 
-        // Create the field outline
-        const fieldGeometry = new PlaneGeometry(FIELD_WIDTH, FIELD_LENGTH)
-        const fieldMaterial = new MeshBasicMaterial({ color: 0x3c8f40 }) // Green field
-        const field = new Mesh(fieldGeometry, fieldMaterial)
-        field.rotation.x = -Math.PI / 2
-        this._scene.add(field)
-
-        // Create field lines
-        const linesGeometry = new PlaneGeometry(FIELD_WIDTH - 1, FIELD_LENGTH - 1)
-        const linesMaterial = new MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 })
-        const lines = new Mesh(linesGeometry, linesMaterial)
-        lines.rotation.x = -Math.PI / 2
-        lines.position.y = 0.1
-        this._scene.add(lines)
-
-        // Create player marker (blue triangle)
-        const playerGeometry = new PlaneGeometry(4, 4)
-        const playerMaterial = new MeshBasicMaterial({ color: 0x0000ff })
-        this._playerMarker = new Mesh(playerGeometry, playerMaterial)
-        this._playerMarker.rotation.x = -Math.PI / 2
-        this._playerMarker.position.y = 0.2
-        this._scene.add(this._playerMarker)
-
-        // Create ball marker (red dot)
-        const ballGeometry = new PlaneGeometry(2, 2)
-        const ballMaterial = new MeshBasicMaterial({ color: 0xff0000 })
-        this._ballMarker = new Mesh(ballGeometry, ballMaterial)
-        this._ballMarker.rotation.x = -Math.PI / 2
-        this._ballMarker.position.y = 0.2
-        this._scene.add(this._ballMarker)
-
-        // Create the minimap display mesh
-        const minimapGeometry = new PlaneGeometry(this.MINIMAP_SIZE.width / 40, this.MINIMAP_SIZE.height / 40)
-        const minimapTexture = new CanvasTexture(this._canvas)
-        const minimapMaterial = new MeshBasicMaterial({
-            map: minimapTexture,
-            transparent: true,
-            opacity: 0.9
-        })
-        this._minimapMesh = new Mesh(minimapGeometry, minimapMaterial)
-        this._minimapMesh.position.set(0, 0, 0)
-        this._mesh.add(this._minimapMesh)
-
-        // Position the minimap in the bottom center of the screen
-        this.updatePosition()
-        window.addEventListener('resize', () => this.updatePosition())
+        // Add the canvas to the mini-map container in the HTML
+        const container = document.querySelector('.relative.h-30.w-\\[176px\\]')
+        if (container) {
+            this._canvas.style.position = 'absolute'
+            this._canvas.style.top = '0'
+            this._canvas.style.left = '0'
+            this._canvas.style.width = '100%'
+            this._canvas.style.height = '100%'
+            container.appendChild(this._canvas)
+        }
     }
 
-    get mesh() {
-        return this._mesh
-    }
-
-    updatePosition() {
-        // Position the minimap in the bottom center of the screen
-        const y = -window.innerHeight / window.innerWidth + 0.2 // Bottom with small margin
-        this._mesh.position.set(0, y, -1)
+    private _worldToCanvas(x: number, z: number): [number, number] {
+        // Convert world coordinates to canvas coordinates
+        const canvasX = (x / FIELD_WIDTH) * this.MINIMAP_SIZE.width + this.MINIMAP_SIZE.width / 2
+        const canvasY = (z / FIELD_LENGTH) * this.MINIMAP_SIZE.height + this.MINIMAP_SIZE.height / 2
+        return [canvasX, canvasY]
     }
 
     update(playerPosition: Vector3, playerRotation: number, ballPosition: Vector3) {
-        // Update player marker position and rotation
-        this._playerMarker.position.x = playerPosition.x
-        this._playerMarker.position.z = playerPosition.z
-        this._playerMarker.rotation.y = playerRotation
+        // Clear the canvas
+        this._ctx.clearRect(0, 0, this.MINIMAP_SIZE.width, this.MINIMAP_SIZE.height)
 
-        // Update ball marker position
-        this._ballMarker.position.x = ballPosition.x
-        this._ballMarker.position.z = ballPosition.z
+        // Draw player marker (triangle)
+        const [playerX, playerY] = this._worldToCanvas(playerPosition.x, playerPosition.z)
+        this._ctx.save()
+        this._ctx.translate(playerX, playerY)
+        this._ctx.rotate(playerRotation)
 
-        // Render the minimap
-        this._renderer.render(this._scene, this._camera)
-        ;(this._minimapMesh.material as MeshBasicMaterial).map!.needsUpdate = true
+        this._ctx.beginPath()
+        this._ctx.moveTo(0, -4) // Top point
+        this._ctx.lineTo(3, 4) // Bottom right
+        this._ctx.lineTo(-3, 4) // Bottom left
+        this._ctx.closePath()
+
+        this._ctx.fillStyle = '#0000ff'
+        this._ctx.fill()
+        this._ctx.restore()
+
+        // Draw ball marker (circle)
+        const [ballX, ballY] = this._worldToCanvas(ballPosition.x, ballPosition.z)
+        this._ctx.beginPath()
+        this._ctx.arc(ballX, ballY, 2, 0, Math.PI * 2)
+        this._ctx.fillStyle = '#ff0000'
+        this._ctx.fill()
     }
 }

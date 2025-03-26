@@ -15,13 +15,7 @@ export class Overlay {
     append(src: string) {
         fetch(`vibes-fc/${src}`)
             .then((response) => response.text())
-            .then((html) => {
-                this.overlayElement.innerHTML += html
-            })
-            .catch((error) => {
-                console.error('Error:', error)
-            })
+            .then((html) => (this.overlayElement.innerHTML += html))
+            .catch((error) => console.error('Error:', error))
     }
 }
-
-new Overlay()
