@@ -72,7 +72,6 @@ export class Game {
 
         // Initialize minimap
         this.minimap = new Minimap()
-        this.scene.add(this.minimap.mesh)
 
         // Try loading GLB first
         const gltfLoader = new GLTFLoader()
