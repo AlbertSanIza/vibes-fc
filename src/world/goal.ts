@@ -22,7 +22,7 @@ export class Goal {
         this._mesh.add(rightPost)
 
         // Crossbar
-        const crossbarGeometry = new CylinderGeometry(FIELD_GOAL_POST_RADIUS, FIELD_GOAL_POST_RADIUS, FIELD_GOAL_WIDTH + FIELD_GOAL_POST_RADIUS, 8)
+        const crossbarGeometry = new CylinderGeometry(FIELD_GOAL_POST_RADIUS, FIELD_GOAL_POST_RADIUS, FIELD_GOAL_WIDTH + FIELD_GOAL_POST_RADIUS * 2, 8)
         const crossbar = new Mesh(crossbarGeometry, postMaterial)
         crossbar.rotation.z = MATH_PI_HALF
         crossbar.position.set(0, FIELD_GOAL_HEIGHT, 0)
@@ -75,7 +75,7 @@ export class Goal {
 
     private addNet() {
         const netDepth = FIELD_GOAL_HEIGHT * 0.8 // Net depth
-        const netMaterial = new LineBasicMaterial({ color: 0xffffff, linewidth: 1 })
+        const netMaterial = new LineBasicMaterial({ color: 0xd3d3d3, linewidth: 1 })
 
         // Back wall
         const backWallGeometry = this.createGridGeometry(FIELD_GOAL_WIDTH, FIELD_GOAL_HEIGHT, 15, 10)
