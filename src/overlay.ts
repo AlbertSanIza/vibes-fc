@@ -8,8 +8,8 @@ export class Overlay {
             return
         }
 
-        this.append('overlay/score.html')
-        this.append('overlay/mini-map.html')
+        this.append('score.html')
+        this.append('mini-map.html')
     }
 
     append(src: string) {
