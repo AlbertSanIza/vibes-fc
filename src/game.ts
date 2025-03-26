@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+import { Group, Mesh, PerspectiveCamera, Scene, Vector3, WebGLRenderer } from 'three'
 import Stats from 'three/examples/jsm/libs/stats.module.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
@@ -25,11 +25,11 @@ import { Minimap } from './world/mini-map'
 import { Scoreboard } from './world/scoreboard'
 
 export class Game {
-    private scene: THREE.Scene
-    private camera: THREE.PerspectiveCamera
-    private renderer: THREE.WebGLRenderer
+    private scene: Scene
+    private camera: PerspectiveCamera
+    private renderer: WebGLRenderer
     private player: Player
-    private ball?: THREE.Group
+    private ball?: Group
     private stats: Stats = new Stats()
     private cameraDistance: number = CAMERA_DISTANCE
     private cameraHeight: number = 5
@@ -41,7 +41,7 @@ export class Game {
     private lastTime: number = 0
     private isDragging: boolean = false
     private previousMousePosition: { x: number; y: number } = { x: 0, y: 0 }
-    private ballVelocity = new THREE.Vector3(0, 0, 0)
+    private ballVelocity = new Vector3(0, 0, 0)
     private minCameraDistance: number = 5
     private maxCameraDistance: number = 15
     private minCameraHeight: number = 5
@@ -50,7 +50,7 @@ export class Game {
     private scoreboard: Scoreboard
     private minimap: Minimap
 
-    constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer) {
+    constructor(scene: Scene, camera: PerspectiveCamera, renderer: WebGLRenderer) {
         this.scene = scene
         this.camera = camera
         this.renderer = renderer
@@ -78,7 +78,7 @@ export class Game {
         gltfLoader.load('/vibes-fc/ball.glb', (gltf) => {
             const model = gltf.scene
             model.traverse((child) => {
-                if (child instanceof THREE.Mesh) {
+                if (child instanceof Mesh) {
                     child.castShadow = true
                 }
             })
@@ -139,7 +139,7 @@ export class Game {
         const speed = this.ballVelocity.length()
         if (speed > 0.1) {
             // Only rotate if moving faster than threshold
-            const rotationAxis = new THREE.Vector3(this.ballVelocity.z, 0, -this.ballVelocity.x).normalize()
+            const rotationAxis = new Vector3(this.ballVelocity.z, 0, -this.ballVelocity.x).normalize()
             const rotationAngle = speed * (deltaTime / BALL_RADIUS) // Adjust rotation based on ball size
             if (rotationAxis.length() > 0.001) {
                 this.ball.rotateOnWorldAxis(rotationAxis, rotationAngle)
@@ -196,7 +196,7 @@ export class Game {
             this.ball.position.copy(this.player.mesh.position.clone().add(playerToBall.multiplyScalar(collisionDistance)))
 
             // Calculate kick force based on player movement
-            const playerVelocity = new THREE.Vector3()
+            const playerVelocity = new Vector3()
             if (this.keys['ArrowUp']) {
                 playerVelocity.x -= Math.sin(this.player.mesh.rotation.y) * this.player.speed.move
                 playerVelocity.z -= Math.cos(this.player.mesh.rotation.y) * this.player.speed.move
@@ -300,7 +300,7 @@ export class Game {
     private updateCamera() {
         if (this.isCameraOnBall && this.ball) {
             // Calculate direction from player to ball
-            const playerToBall = new THREE.Vector3()
+            const playerToBall = new Vector3()
             playerToBall.subVectors(this.ball.position, this.player.mesh.position).normalize()
 
             // Position camera behind player relative to ball
