@@ -66,7 +66,8 @@ export class Game {
 
         // Initialize scoreboard
         this.scoreboard = new Scoreboard()
-        this.scoreboard.mesh.position.set(FIELD_WIDTH / 2 + 5, 0, 0) // Position on the side of the field
+        this.scoreboard.mesh.rotation.y = -Math.PI / 2
+        this.scoreboard.mesh.position.set(FIELD_EXTENDED_WIDTH / 2, 0, 0)
         this.scene.add(this.scoreboard.mesh)
 
         // Initialize minimap
