@@ -13,7 +13,8 @@ export class Overlay {
     }
 
     append(src: string) {
-        fetch(`vibes-fc/${src}`)
+        const basePath = window.location.hostname === 'localhost' ? 'vibes-fc/' : ''
+        fetch(`${basePath}${src}`)
             .then((response) => response.text())
             .then((html) => (this.overlayElement.innerHTML += html))
             .catch((error) => console.error('Error:', error))
