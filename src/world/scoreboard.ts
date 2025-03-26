@@ -10,6 +10,23 @@ export class Scoreboard {
     constructor() {
         this._mesh = new Group()
 
+        // Structure
+        const frameGeometry = new BoxGeometry(12, 6, 1)
+        const frameMaterial = new MeshBasicMaterial({ color: 0x333333 })
+        const frame = new Mesh(frameGeometry, frameMaterial)
+        frame.position.set(0, 6, 0)
+        this._mesh.add(frame)
+
+        // Structure Legs
+        const legGeometry = new BoxGeometry(1, 3, 1)
+        const legMaterial = new MeshBasicMaterial({ color: 0x333333 })
+        const leftLeg = new Mesh(legGeometry, legMaterial)
+        leftLeg.position.set(-3, 1.5, 0)
+        this._mesh.add(leftLeg)
+        const rightLeg = new Mesh(legGeometry, legMaterial)
+        rightLeg.position.set(3, 1.5, 0)
+        this._mesh.add(rightLeg)
+
         // Create canvas for the scoreboard
         this._canvas = document.createElement('canvas')
         this._canvas.width = 512
@@ -18,18 +35,11 @@ export class Scoreboard {
         this._texture = new CanvasTexture(this._canvas)
 
         // Create the billboard
-        const boardGeometry = new PlaneGeometry(10, 5)
+        const boardGeometry = new PlaneGeometry(11, 5)
         const boardMaterial = new MeshBasicMaterial({ map: this._texture })
         const board = new Mesh(boardGeometry, boardMaterial)
-        board.position.set(0, 6, 0) // Position above ground
+        board.position.set(0, 6, 0.51)
         this._mesh.add(board)
-
-        // Add a simple frame
-        const frameGeometry = new BoxGeometry(10.5, 5.5, 0.5)
-        const frameMaterial = new MeshBasicMaterial({ color: 0x333333 })
-        const frame = new Mesh(frameGeometry, frameMaterial)
-        frame.position.set(0, 6, -0.25)
-        this._mesh.add(frame)
 
         // Initial render
         this.updateDisplay()
