@@ -1,4 +1,5 @@
 import { Game } from './game'
+import { Overlay } from './overlay'
 import './style.css'
 import { World } from './world'
 
@@ -7,10 +8,12 @@ import { World } from './world'
 // Z Axis = Back/Forward
 
 class Main {
+    overlay: Overlay
     world: World
     game: Game
 
     constructor() {
+        this.overlay = new Overlay()
         this.world = new World()
         this.game = new Game(this.world.scene, this.world.camera, this.world.renderer)
         this.setupEventListeners()
