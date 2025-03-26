@@ -330,8 +330,8 @@ export class Game {
         this.updatePlayer(deltaTime)
         if (this.ball) {
             this.updateBall(deltaTime)
-            // Update minimap with current positions
-            this.minimap.update(this.player.mesh.position, this.player.mesh.rotation.y, this.ball.position)
+            // Update minimap with current positions and player color
+            this.minimap.update(this.player.mesh.position, this.player.mesh.rotation.y, this.ball.position, this.player.body.color)
         }
         this.updateCamera()
 

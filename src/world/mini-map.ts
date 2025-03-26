@@ -23,40 +23,50 @@ export class Minimap {
     }
 
     private _worldToCanvas(x: number, z: number): [number, number] {
-        // Convert world coordinates to canvas coordinates
-        const canvasX = (x / FIELD_WIDTH) * MINIMAP_SIZE.width + MINIMAP_SIZE.width / 2
-        const canvasY = (z / FIELD_LENGTH) * MINIMAP_SIZE.height + MINIMAP_SIZE.height / 2
+        const canvasX = (z / FIELD_LENGTH) * MINIMAP_SIZE.width + MINIMAP_SIZE.width / 2
+        const canvasY = -(x / FIELD_WIDTH) * MINIMAP_SIZE.height + MINIMAP_SIZE.height / 2
         return [canvasX, canvasY]
     }
 
-    update(playerPosition: Vector3, playerRotation: number, ballPosition: Vector3) {
+    update(playerPosition: Vector3, playerRotation: number, ballPosition: Vector3, playerColor: number) {
         if (!this.ctx) {
             return
         }
-        // Clear the canvas
         this.ctx.clearRect(0, 0, MINIMAP_SIZE.width, MINIMAP_SIZE.height)
 
         // Draw player marker (triangle)
         const [playerX, playerY] = this._worldToCanvas(playerPosition.x, playerPosition.z)
         this.ctx.save()
         this.ctx.translate(playerX, playerY)
-        this.ctx.rotate(playerRotation)
+        this.ctx.rotate(-playerRotation)
 
         this.ctx.beginPath()
-        this.ctx.moveTo(0, -4) // Top point
-        this.ctx.lineTo(3, 4) // Bottom right
-        this.ctx.lineTo(-3, 4) // Bottom left
+        this.ctx.moveTo(-3.5, 0) // Left point
+        this.ctx.lineTo(3.5, -3) // Top right
+        this.ctx.lineTo(3.5, 3) // Bottom right
         this.ctx.closePath()
 
-        this.ctx.fillStyle = '#0000ff'
+        // Convert hex color to CSS color string
+        const r = (playerColor >> 16) & 255
+        const g = (playerColor >> 8) & 255
+        const b = playerColor & 255
+
+        // First draw the white stroke
+        this.ctx.strokeStyle = 'white'
+        this.ctx.lineWidth = 2
+        this.ctx.stroke()
+
+        // Then fill with player color
+        this.ctx.fillStyle = `rgb(${r}, ${g}, ${b})`
         this.ctx.fill()
+
         this.ctx.restore()
 
         // Draw ball marker (circle)
         const [ballX, ballY] = this._worldToCanvas(ballPosition.x, ballPosition.z)
         this.ctx.beginPath()
         this.ctx.arc(ballX, ballY, 2, 0, Math.PI * 2)
-        this.ctx.fillStyle = '#ff0000'
+        this.ctx.fillStyle = 'yellow'
         this.ctx.fill()
     }
 }
