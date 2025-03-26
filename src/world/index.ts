@@ -32,7 +32,8 @@ export class World {
 
         // Camera
         this.camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight)
-        this.camera.position.set(0, 6, 20)
+        this.camera.position.set(0, 7, 20)
+        this.camera.lookAt(0, 0, 0)
         this.camera.layers.enableAll()
 
         // Renderer
