@@ -27,16 +27,16 @@ export class Field {
         mainField.receiveShadow = true
         this._mesh.add(mainField)
 
-        this.createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: FIELD_LENGTH_HALF }) // Outer Line North
-        this.createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: -FIELD_LENGTH_HALF }) // Outer Line South
-        this.createFieldLine(FIELD_LINE_THICKNESS, FIELD_LENGTH + FIELD_LINE_THICKNESS, { x: -FIELD_WIDTH_HALF, z: 0 }) // Outer Line East
-        this.createFieldLine(FIELD_LINE_THICKNESS, FIELD_LENGTH + FIELD_LINE_THICKNESS, { x: FIELD_WIDTH_HALF, z: 0 }) // Outer Line West
+        this.createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: -FIELD_LENGTH_HALF }) // Outer Line North
+        this.createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: FIELD_LENGTH_HALF }) // Outer Line South
+        this.createFieldLine(FIELD_LINE_THICKNESS, FIELD_LENGTH + FIELD_LINE_THICKNESS, { x: FIELD_WIDTH_HALF, z: 0 }) // Outer Line East
+        this.createFieldLine(FIELD_LINE_THICKNESS, FIELD_LENGTH + FIELD_LINE_THICKNESS, { x: -FIELD_WIDTH_HALF, z: 0 }) // Outer Line West
         this.createFieldLine(FIELD_WIDTH, FIELD_LINE_THICKNESS, { x: 0, z: 0 }) // Center Line
 
-        this.createQuarterCircle({ x: -FIELD_WIDTH_HALF, z: FIELD_LENGTH_HALF }, 0) // Quarter Circle Northeast
-        this.createQuarterCircle({ x: FIELD_WIDTH_HALF, z: FIELD_LENGTH_HALF }, MATH_PI_HALF) // Quarter Circle Northwest
-        this.createQuarterCircle({ x: -FIELD_WIDTH_HALF, z: -FIELD_LENGTH_HALF }, -MATH_PI_HALF) // Quarter Circle Southeast
-        this.createQuarterCircle({ x: FIELD_WIDTH_HALF, z: -FIELD_LENGTH_HALF }, Math.PI) // Quarter Circle Southwest
+        this.createQuarterCircle({ x: FIELD_WIDTH_HALF, z: -FIELD_LENGTH_HALF }, Math.PI) // Quarter Circle Northeast
+        this.createQuarterCircle({ x: -FIELD_WIDTH_HALF, z: -FIELD_LENGTH_HALF }, -MATH_PI_HALF) // Quarter Circle Northwest
+        this.createQuarterCircle({ x: FIELD_WIDTH_HALF, z: FIELD_LENGTH_HALF }, MATH_PI_HALF) // Quarter Circle Southeast
+        this.createQuarterCircle({ x: -FIELD_WIDTH_HALF, z: FIELD_LENGTH_HALF }, 0) // Quarter Circle Southwest
 
         // Center Circle
         const centerCircleRadius = 9.15 / 2
@@ -48,8 +48,8 @@ export class Field {
         this._mesh.add(centerCircle)
 
         this.createSpot({ x: 0, z: 0 }) // Center Spot
-        this.createSpot({ x: 0, z: FIELD_LENGTH_HALF - 11 }) // Penalty Spot North
-        this.createSpot({ x: 0, z: -FIELD_LENGTH_HALF + 11 }) // Penalty Spot South
+        this.createSpot({ x: 0, z: -FIELD_LENGTH_HALF + 11 }) // Penalty Spot North
+        this.createSpot({ x: 0, z: FIELD_LENGTH_HALF - 11 }) // Penalty Spot South
 
         // Penalty Area North
         this.createFieldLine(40.3, FIELD_LINE_THICKNESS, { x: 0, z: FIELD_LENGTH_HALF - 16.5 })
