@@ -44,9 +44,10 @@ export class Game {
     private ballVelocity = new Vector3(0, 0, 0)
     private minCameraDistance: number = 5
     private maxCameraDistance: number = 15
-    private minCameraHeight: number = 5
-    private maxCameraHeight: number = 15
+    private minCameraHeight: number = 1
+    private maxCameraHeight: number = 10
     private isCameraOnBall: boolean = false
+    private isCameraSideFollow: boolean = false
     private scoreboard: Scoreboard
     private minimap: Minimap
 
@@ -114,6 +115,15 @@ export class Game {
         }
         if (event.key === 'z' || event.key === 'Z') {
             this.isCameraOnBall = !this.isCameraOnBall
+            if (this.isCameraOnBall) {
+                this.isCameraSideFollow = false
+            }
+        }
+        if (event.key === 'c' || event.key === 'C') {
+            this.isCameraSideFollow = !this.isCameraSideFollow
+            if (this.isCameraSideFollow) {
+                this.isCameraOnBall = false
+            }
         }
     }
 
@@ -311,6 +321,13 @@ export class Game {
             // Update camera position
             this.camera.position.set(x, this.cameraHeight, z)
             this.camera.lookAt(this.ball.position)
+        } else if (this.isCameraSideFollow) {
+            // Side-follow camera behavior: position camera to the side of the player
+            const sideOffset = new Vector3(Math.cos(this.playerRotation), 0, -Math.sin(this.playerRotation)).multiplyScalar(this.cameraDistance)
+            const x = this.player.mesh.position.x + sideOffset.x + 20
+            const z = this.player.mesh.position.z + sideOffset.z
+            this.camera.position.set(x, 20, z)
+            this.camera.lookAt(this.player.mesh.position)
         } else {
             // Original third-person camera behavior
             const x = this.player.mesh.position.x + Math.sin(this.playerRotation) * this.cameraDistance
