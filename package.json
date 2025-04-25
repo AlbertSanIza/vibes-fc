@@ -10,8 +10,10 @@
         "prettier": "prettier --write ."
     },
     "devDependencies": {
+        "@tailwindcss/postcss": "^4.1.4",
         "@tailwindcss/vite": "^4.1.4",
         "@types/three": "^0.174.0",
+        "postcss": "^8.5.3",
         "prettier": "^3.5.3",
         "prettier-plugin-tailwindcss": "^0.6.11",
         "tailwindcss": "^4.1.4",
